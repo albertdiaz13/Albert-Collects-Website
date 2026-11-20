@@ -1,0 +1,324 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "intro": {
+      "type": "ac-page-intro",
+      "blocks": {
+        "j0": {
+          "type": "jump",
+          "settings": {
+            "code": "NM",
+            "label": "Near Mint",
+            "anchor": "condition-nm"
+          }
+        },
+        "j1": {
+          "type": "jump",
+          "settings": {
+            "code": "LP",
+            "label": "Lightly Played",
+            "anchor": "condition-lp"
+          }
+        },
+        "j2": {
+          "type": "jump",
+          "settings": {
+            "code": "MP",
+            "label": "Moderately Played",
+            "anchor": "condition-mp"
+          }
+        },
+        "j3": {
+          "type": "jump",
+          "settings": {
+            "code": "HP",
+            "label": "Heavily Played",
+            "anchor": "condition-hp"
+          }
+        },
+        "j4": {
+          "type": "jump",
+          "settings": {
+            "code": "DMG",
+            "label": "Damaged",
+            "anchor": "condition-dmg"
+          }
+        },
+        "j5": {
+          "type": "jump",
+          "settings": {
+            "code": "",
+            "label": "Raw vs graded",
+            "anchor": "raw-vs-graded"
+          }
+        },
+        "j6": {
+          "type": "jump",
+          "settings": {
+            "code": "",
+            "label": "Check a card yourself",
+            "anchor": "check-a-card"
+          }
+        }
+      },
+      "block_order": [
+        "j0",
+        "j1",
+        "j2",
+        "j3",
+        "j4",
+        "j5",
+        "j6"
+      ],
+      "settings": {
+        "eyebrow": "A collector's guide",
+        "title": "",
+        "lede": "<p>Condition tells you how much life a card has lived. Every raw card in the shop is listed as one of five conditions, from Near Mint to Damaged. This guide explains each one in everyday words, so you know what to expect before a card arrives.</p><p>The descriptions follow TCGplayer's published conditioning standards, a common reference for buying and selling single cards.</p>",
+        "jump_label": "Jump to a condition"
+      }
+    },
+    "levels": {
+      "type": "ac-condition-levels",
+      "blocks": {
+        "tier_nm": {
+          "type": "tier",
+          "settings": {
+            "tier": "nm",
+            "code": "NM",
+            "name": "Near Mint",
+            "summary": "<p>The card looks like it went from the pack into a sleeve. Look very closely and you might find a speck of white on an edge or a faint scuff, and that's about it.</p>",
+            "look_for_label": "What you might see",
+            "look_for": "<ul><li><strong>Edges and corners:</strong> at most a tiny white speck or two, usually only visible on the dark blue back.</li><li><strong>Surface:</strong> a faint scuff or one light scratch that you have to tilt the card to find.</li><li><strong>Shape:</strong> perfectly flat. No bends, no dents you can feel.</li></ul>",
+            "not_here_label": "Not at this level:",
+            "not_here": "Creases, bends, dirt or grime, peeling, or any wear that shows without tilting the card.",
+            "diagram_label": "Card back with one tiny white speck on the right edge"
+          }
+        },
+        "tier_lp": {
+          "type": "tier",
+          "settings": {
+            "tier": "lp",
+            "code": "LP",
+            "name": "Lightly Played",
+            "summary": "<p>The card has been handled or played with care. Small signs of wear show up when you look for them, but nothing jumps out from arm's length.</p>",
+            "look_for_label": "What you might see",
+            "look_for": "<ul><li><strong>Edges and corners:</strong> a few small white nicks along the edges, or a corner that has lost a little color. The back shows this first.</li><li><strong>Surface:</strong> light scratches or scuffing, like a fine line across the holo that only appears when it catches the light.</li><li><strong>Shape:</strong> a slight bend can still be Lightly Played if it is small. A crease cannot.</li></ul>",
+            "not_here_label": "Not at this level:",
+            "not_here": "Creases, tears, splits in the surface, or anything that changes the card's shape.",
+            "diagram_label": "Card back with a few white nicks on the edges and one corner, and a faint scratch"
+          }
+        },
+        "tier_mp": {
+          "type": "tier",
+          "settings": {
+            "tier": "mp",
+            "code": "MP",
+            "name": "Moderately Played",
+            "summary": "<p>The card has clearly been used. Wear is easy to spot, but the card is whole and still looks good in a binder.</p>",
+            "look_for_label": "What you might see",
+            "look_for": "<ul><li><strong>Edges and corners:</strong> whitening along long stretches of the edges and on several corners.</li><li><strong>Surface:</strong> scratches and scuffing you can see without tilting, including on the holo.</li><li><strong>Shape:</strong> a visible bend, a small dent, or a tiny split in the surface.</li></ul>",
+            "not_here_label": "Not at this level:",
+            "not_here": "Tears, holes, water damage, writing, or a deep crease across the card.",
+            "diagram_label": "Card back with whitening along long stretches of the edges, two worn corners and several scratches"
+          }
+        },
+        "tier_hp": {
+          "type": "tier",
+          "settings": {
+            "tier": "hp",
+            "code": "HP",
+            "name": "Heavily Played",
+            "summary": "<p>A lot of wear: heavy whitening, scuffing across big areas, maybe a crease. It is still clearly the real card, and still in one piece.</p>",
+            "look_for_label": "What you might see",
+            "look_for": "<ul><li><strong>Edges and corners:</strong> whitening around most of the border and on every corner.</li><li><strong>Surface:</strong> scuffing or scratches over large parts of the front or back.</li><li><strong>Shape:</strong> a long bend (more than about 2&nbsp;cm, or three quarters of an inch), dents, or a crease line.</li></ul>",
+            "not_here_label": "Not at this level:",
+            "not_here": "Anything that tears, punctures or splits the card, or hides its text.",
+            "diagram_label": "Card back with whitening on all edges and corners, a large scuffed area and a crease line"
+          }
+        },
+        "tier_dmg": {
+          "type": "tier",
+          "settings": {
+            "tier": "dmg",
+            "code": "DMG",
+            "name": "Damaged",
+            "summary": "<p>Wear goes past Heavily Played, or something has broken the card itself. Damaged cards can still be lovely binder copies for the right price, so look closely at the photos and the listing notes.</p>",
+            "look_for_label": "What you might see",
+            "look_for": "<ul><li>Tears, holes, punctures, or a fold that breaks the card.</li><li>Water damage, stains, writing, stickers or tape residue.</li><li>A crease that cuts across the card, or text that is missing or unreadable.</li><li>A big miscut or printing problem that affects the card itself.</li></ul>",
+            "not_here_label": "Not at this level:",
+            "not_here": "",
+            "diagram_label": "Card back with a tear on the right edge, a crease from corner to corner and a water stain"
+          }
+        }
+      },
+      "block_order": [
+        "tier_nm",
+        "tier_lp",
+        "tier_mp",
+        "tier_hp",
+        "tier_dmg"
+      ],
+      "settings": {
+        "label": "The five conditions",
+        "diagram_note": "The drawings show where wear tends to appear on a card back. They aren't photos of a listing."
+      }
+    },
+    "plusminus": {
+      "type": "ac-text-panels",
+      "settings": {
+        "heading": "Plus, minus and listing notes",
+        "anchor": "plus-minus",
+        "layout": "stack",
+        "style": "page",
+        "text": "<p>Some listings add a plus or minus after the condition, like <strong>LP+</strong> or <strong>NM−</strong>. It shows where a card sits within that condition: LP+ at the cleaner end of Lightly Played, NM− toward the worn end of Near Mint.</p>",
+        "eyebrow": ""
+      },
+      "blocks": {
+        "notes": {
+          "type": "panel",
+          "settings": {
+            "heading": "Listing notes",
+            "text": "<p>A card page can also show details called out about that exact copy under <strong>Noted in listing</strong>:</p><ul><li><strong>Holo swirl</strong> and <strong>holo bleed</strong> describe how the holofoil was printed on that copy. They come from the factory, not from wear, and some collectors look for them.</li><li><strong>Creased</strong> means the listing points out a crease.</li><li><strong>Clean front</strong> means the listing points out that the front looks clean even though the card has a flaw somewhere else.</li></ul>"
+          }
+        }
+      },
+      "block_order": [
+        "notes"
+      ]
+    },
+    "graded": {
+      "type": "ac-text-panels",
+      "settings": {
+        "heading": "Raw cards vs graded cards",
+        "anchor": "raw-vs-graded",
+        "layout": "columns",
+        "style": "card",
+        "text": "<p>Conditions and grades answer the same question in different ways. A condition is a range. A grade is a single number from a grading company.</p>",
+        "eyebrow": ""
+      },
+      "blocks": {
+        "raw": {
+          "type": "panel",
+          "settings": {
+            "heading": "Raw card",
+            "text": "<p>A raw card is out of any grading case, usually in a sleeve. It is listed with a condition (NM, LP, MP, HP or DMG) that describes how much wear to expect.</p><p>You can hold it, play with it, put it in your binder, or send it to be graded yourself later.</p>"
+          }
+        },
+        "slab": {
+          "type": "panel",
+          "settings": {
+            "heading": "Graded card",
+            "text": "<p>A graded card has been sent to a professional grading company such as PSA, examined, given a number grade (for example PSA 10 Gem Mint, PSA 9 Mint, PSA 8 NM-MT) and sealed in a labeled plastic case called a slab.</p><p>On graded listings here, the grade shown is the one printed on the grading company's label.</p>"
+          }
+        },
+        "why": {
+          "type": "panel",
+          "settings": {
+            "heading": "Why they don't line up exactly",
+            "text": "<p>Grading companies look at centering, corners, edges and surface on a finer scale. Two Near Mint raw cards can come back with different grades, so a condition tells you the range of wear, not a future grade.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "raw",
+        "slab",
+        "why"
+      ]
+    },
+    "check": {
+      "type": "ac-text-panels",
+      "settings": {
+        "heading": "Check a card yourself",
+        "anchor": "check-a-card",
+        "layout": "steps",
+        "style": "page",
+        "text": "<p>Whether you're looking at listing photos or a card in your hand, these checks catch most of what decides a condition.</p>",
+        "eyebrow": ""
+      },
+      "blocks": {
+        "s1": {
+          "type": "step",
+          "settings": {
+            "heading": "Start with the back",
+            "text": "<p>The dark blue back of a Pokémon card is the easiest place to spot <strong>whitening</strong>: tiny white chips along the edges and corners where the blue has worn away. On the front, a yellow or silver border hides the same wear.</p>"
+          }
+        },
+        "s2": {
+          "type": "step",
+          "settings": {
+            "heading": "Tilt the holo toward a light",
+            "text": "<p>Scratches in holofoil often vanish when you look straight on, then show up as thin bright lines when the light catches them. A cluster of fine scratches looks like a cloudy patch, which collectors call <strong>scuffing</strong>.</p>"
+          }
+        },
+        "s3": {
+          "type": "step",
+          "settings": {
+            "heading": "Look along the card from the side",
+            "text": "<p>Hold the card at eye level. A <strong>bend</strong> shows as a gentle curve. A <strong>crease</strong> is a sharp line that catches the light, sometimes with a white ridge on the back.</p>"
+          }
+        },
+        "s4": {
+          "type": "step",
+          "settings": {
+            "heading": "Check each corner",
+            "text": "<p>A soft, slightly rounded or frayed corner is wear. A corner that's lifted, split or missing a piece is damage.</p>"
+          }
+        },
+        "s5": {
+          "type": "step",
+          "settings": {
+            "heading": "Separate printing from wear",
+            "text": "<p>Off-center borders, print lines, holo swirl and holo bleed come from the factory. Under TCGplayer's standard, printing quirks are judged against what's normal for that print run, and centering up to 70/30 doesn't lower a card's condition.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5"
+      ]
+    },
+    "process": {
+      "type": "ac-text-panels",
+      "settings": {
+        "heading": "How I check every card (draft for Albert's review)",
+        "anchor": "how-i-check",
+        "layout": "stack",
+        "style": "card",
+        "text": "<ul><li>I look at every card out of its sleeve, front and back, under a bright light.</li><li>I tilt every holo to look for scratches.</li><li>The photos on each listing show the exact card you'll receive.</li><li>I condition raw cards using TCGplayer's standard.</li></ul>",
+        "eyebrow": ""
+      },
+      "disabled": true
+    },
+    "source": {
+      "type": "ac-text-panels",
+      "settings": {
+        "heading": "Sources",
+        "anchor": "sources",
+        "layout": "stack",
+        "style": "page",
+        "text": "<p>This guide is written in our own words using TCGplayer's <a href=\"https://mktg-assets.tcgplayer.com/web/seller/guides/Card-Conditioning-Standards.pdf\">Card Conditioning Standards</a> (updated October 2026) and their <a href=\"https://help.tcgplayer.com/hc/en-us/articles/221430307-Card-Conditioning-Overview\">Card Conditioning Overview</a> as references. Have a question about a specific card? <a href=\"/pages/contact\">Ask me</a>.</p>",
+        "eyebrow": ""
+      }
+    }
+  },
+  "order": [
+    "intro",
+    "levels",
+    "plusminus",
+    "graded",
+    "check",
+    "process",
+    "source"
+  ]
+}

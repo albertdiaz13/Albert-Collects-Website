@@ -13,7 +13,9 @@
   "sections": {
     "footer": {
       "type": "ac-footer",
-      "settings": {}
+      "settings": {
+        "menu": "refinement-footer"
+      }
     }
   },
   "order": [

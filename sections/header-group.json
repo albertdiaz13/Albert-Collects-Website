@@ -14,8 +14,8 @@
     "brand": {
       "type": "ac-header",
       "settings": {
-        "announcement": "WELCOME TO THE NEW WEBSITE",
-        "menu": "main-menu"
+        "announcement": "Explore the cards in Albert’s collection.",
+        "menu": "refinement-main-menu"
       }
     }
   },

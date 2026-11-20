@@ -22,7 +22,7 @@
     <div class="collection-hero__text-wrapper">
       <h1 class="collection-hero__title">
         <span class="visually-hidden">{{ 'sections.collection_template.title' | t }}: </span>
-        {{- collection.title | escape -}}
+        {%- if collection.handle == 'all' and section.settings.all_title != blank -%}{{- section.settings.all_title | escape -}}{%- else -%}{{- collection.title | escape -}}{%- endif -%}
       </h1>
 
       {%- if section.settings.show_collection_description -%}
@@ -60,6 +60,7 @@
   "name": "t:sections.main-collection-banner.name",
   "class": "section",
   "settings": [
+    { "type": "text", "id": "all_title", "label": "Heading for all products", "default": "Catalog" },
     {
       "type": "paragraph",
       "content": "t:sections.main-collection-banner.settings.paragraph.content"

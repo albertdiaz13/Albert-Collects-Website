@@ -1,0 +1,148 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "intro": {
+      "type": "ac-page-intro",
+      "settings": {
+        "eyebrow": "About Us",
+        "title": "Hi, I'm Albert.",
+        "lede": "<p>I collect Pokémon cards, and Albert Collects is where I share the ones I find.</p>",
+        "jump_label": "On this page"
+      }
+    },
+    "story": {
+      "type": "ac-text-panels",
+      "settings": {
+        "heading": "About the binder",
+        "anchor": "about",
+        "layout": "stack",
+        "style": "page",
+        "text": "",
+        "eyebrow": ""
+      },
+      "blocks": {
+        "p1": {
+          "type": "panel",
+          "settings": {
+            "heading": "",
+            "text": "<p>Most of what's here is Japanese, with plenty of older cards mixed in and a few graded slabs. Some are big names. A lot of them are the kind of card you only notice up close: the way a holo was printed, a set you'd forgotten about, a promo with a story behind it.</p>"
+          }
+        },
+        "q1": {
+          "type": "quote",
+          "settings": {
+            "text": "The fun is in the details of one particular card."
+          }
+        },
+        "p2": {
+          "type": "panel",
+          "settings": {
+            "heading": "",
+            "text": "<p>I love going to card shows, flipping through binders and talking with other collectors about what they've found. That's also why every listing here spells out the set, the card number, the language and the condition, and why I put together a guide to how I describe condition.</p>"
+          }
+        },
+        "p3": {
+          "type": "panel",
+          "settings": {
+            "heading": "",
+            "text": "<p>If you want to know more about a card, ask me. I'm always happy to talk cards.</p>"
+          }
+        },
+        "cta": {
+          "type": "button",
+          "settings": {
+            "label": "Get in touch",
+            "link": "shopify://pages/contact"
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "q1",
+        "p2",
+        "p3",
+        "cta"
+      ]
+    },
+    "photos": {
+      "type": "ac-photo-row",
+      "disabled": true,
+      "blocks": {
+        "ph1": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "ph2": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        },
+        "ph3": {
+          "type": "photo",
+          "settings": {
+            "caption": ""
+          }
+        }
+      },
+      "block_order": [
+        "ph1",
+        "ph2",
+        "ph3"
+      ],
+      "settings": {
+        "heading": "From the shows"
+      }
+    },
+    "guide": {
+      "type": "ac-text-panels",
+      "settings": {
+        "eyebrow": "",
+        "heading": "Buying your first single?",
+        "text": "<p>Start with How We Condition. It explains Near Mint through Damaged in everyday words, with what to look for on the front and back.</p>",
+        "anchor": "",
+        "layout": "stack",
+        "style": "card"
+      },
+      "blocks": {
+        "b": {
+          "type": "button",
+          "settings": {
+            "label": "Read How We Condition",
+            "link": "shopify://pages/how-we-condition"
+          }
+        }
+      },
+      "block_order": [
+        "b"
+      ]
+    },
+    "home": {
+      "type": "ac-story",
+      "settings": {
+        "eyebrow": "FROM ONE COLLECTOR TO ANOTHER",
+        "title": "The best finds have a story.",
+        "body": "Every card here has a set, a number and a little history. Come take a look.",
+        "link": "shopify://collections/all",
+        "link_label": "Browse the catalog"
+      }
+    }
+  },
+  "order": [
+    "intro",
+    "story",
+    "photos",
+    "guide",
+    "home"
+  ]
+}

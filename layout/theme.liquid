@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="js" lang="{{ request.locale.iso_code }}" data-ac-build="generic-showcase-2.15.0">
+<html class="js" lang="{{ request.locale.iso_code }}" data-ac-build="refinement-preview">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -328,6 +328,8 @@
 
 <script src="{{ 'albert-card-tilt.js' | asset_url }}" defer="defer"></script>
 <script src="{{ 'albert-store.js' | asset_url }}" defer="defer"></script>
+  {{ 'albert-refine.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'albert-refine.js' | asset_url }}" defer="defer"></script>
 </head>
 
   {%- liquid
@@ -344,7 +346,7 @@
       glance which uploaded build you are looking at. It never renders on the published theme.
     {%- endcomment -%}
     {%- if request.design_mode or theme.role == 'unpublished' or theme.role == 'development' -%}
-      <div class="ac-build-badge" role="note" style="position:fixed;right:10px;bottom:10px;z-index:30;max-width:70vw;padding:6px 12px;border-radius:999px;background:#24132c;color:#f7efe4;font:700 11px/1.3 system-ui,sans-serif;letter-spacing:.02em;pointer-events:none;opacity:.92">Preview build: Albert Collects Generic · The Showcase 2.15.0 · hidden on your live theme</div>
+      <div class="ac-build-badge" role="note">Refinement preview · not live</div>
     {%- endif -%}
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}

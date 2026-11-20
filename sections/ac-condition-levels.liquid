@@ -1,0 +1,53 @@
+<section class="acx-levels" aria-label="{{ section.settings.label | escape }}">
+  <div class="ac-wrap">
+    <ol class="acx-levels__list" role="list">
+      {%- for block in section.blocks -%}
+        {%- assign tier = block.settings.tier -%}
+        <li class="acx-level" id="condition-{{ tier }}" data-tier="{{ tier }}" {{ block.shopify_attributes }}>
+          <div class="acx-level__art">
+            {%- render 'ac-wear-diagram', tier: tier, id: section.id, label: block.settings.diagram_label -%}
+          </div>
+          <div class="acx-level__text">
+            <h2 class="acx-level__name"><span class="acx-chip__code" data-tier="{{ tier }}">{{ block.settings.code | escape }}</span> {{ block.settings.name | escape }}</h2>
+            <div class="acx-level__summary">{{ block.settings.summary }}</div>
+            {%- if block.settings.look_for != blank -%}
+              <h3 class="acx-label">{{ block.settings.look_for_label | escape }}</h3>
+              <div class="acx-prose">{{ block.settings.look_for }}</div>
+            {%- endif -%}
+            {%- if block.settings.not_here != blank -%}
+              <p class="acx-level__not"><strong>{{ block.settings.not_here_label | escape }}</strong> {{ block.settings.not_here | escape }}</p>
+            {%- endif -%}
+            <a class="acx-top" href="#MainContent">Back to the top <span aria-hidden="true">↑</span></a>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ol>
+    {%- if section.settings.diagram_note != blank -%}<p class="acx-fine">{{ section.settings.diagram_note | escape }}</p>{%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Condition levels",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Accessible name", "default": "The five conditions" },
+    { "type": "text", "id": "diagram_note", "label": "Note under the drawings", "default": "The drawings show where wear tends to appear on a card back. They aren't photos of a listing." }
+  ],
+  "blocks": [
+    { "type": "tier", "name": "Condition", "settings": [
+      { "type": "select", "id": "tier", "label": "Level", "options": [
+        { "value": "nm", "label": "Near Mint" }, { "value": "lp", "label": "Lightly Played" }, { "value": "mp", "label": "Moderately Played" },
+        { "value": "hp", "label": "Heavily Played" }, { "value": "dmg", "label": "Damaged" } ], "default": "nm" },
+      { "type": "text", "id": "code", "label": "Code", "default": "NM" },
+      { "type": "text", "id": "name", "label": "Name", "default": "Near Mint" },
+      { "type": "richtext", "id": "summary", "label": "In one breath" },
+      { "type": "text", "id": "look_for_label", "label": "List heading", "default": "What you might see" },
+      { "type": "richtext", "id": "look_for", "label": "What you might see" },
+      { "type": "text", "id": "not_here_label", "label": "Not allowed heading", "default": "Not at this level:" },
+      { "type": "text", "id": "not_here", "label": "Not allowed" },
+      { "type": "text", "id": "diagram_label", "label": "Drawing description" }
+    ] }
+  ],
+  "presets": [{ "name": "Condition levels" }]
+}
+{% endschema %}

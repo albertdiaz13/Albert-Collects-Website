@@ -9,7 +9,64 @@
  */
 {
   "current": {
-    "ac_event_collection": "racket-sports"
+    "ac_event_collection": "racket-sports",
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#FBF8F3",
+          "background_gradient": "",
+          "text": "#4B210F",
+          "button": "#4B210F",
+          "button_label": "#FBF8F3",
+          "secondary_button_label": "#4B210F",
+          "shadow": "#4B210F"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#FFFFFF",
+          "background_gradient": "",
+          "text": "#4B210F",
+          "button": "#4B210F",
+          "button_label": "#FFFFFF",
+          "secondary_button_label": "#4B210F",
+          "shadow": "#4B210F"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#2A1634",
+          "background_gradient": "",
+          "text": "#F7EFE4",
+          "button": "#FBD16F",
+          "button_label": "#4B210F",
+          "secondary_button_label": "#F7EFE4",
+          "shadow": "#170C1D"
+        }
+      },
+      "scheme-4": {
+        "settings": {
+          "background": "#F7EFE4",
+          "background_gradient": "",
+          "text": "#4B210F",
+          "button": "#4B210F",
+          "button_label": "#F7EFE4",
+          "secondary_button_label": "#4B210F",
+          "shadow": "#4B210F"
+        }
+      },
+      "scheme-5": {
+        "settings": {
+          "background": "#FBD16F",
+          "background_gradient": "",
+          "text": "#4B210F",
+          "button": "#4B210F",
+          "button_label": "#FBD16F",
+          "secondary_button_label": "#4B210F",
+          "shadow": "#4B210F"
+        }
+      }
+    }
   },
   "presets": {}
 }

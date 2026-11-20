@@ -1,0 +1,47 @@
+<section class="acx-panels-section acx-panels-section--{{ section.settings.style }}"{% if section.settings.anchor != blank %} id="{{ section.settings.anchor | handle }}"{% endif %} aria-labelledby="PanelsTitle-{{ section.id }}">
+  <div class="ac-wrap acx-panels-wrap acx-panels-wrap--{{ section.settings.layout }}">
+    {%- if section.settings.eyebrow != blank -%}<p class="acx-eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+    <h2 class="acx-h2" id="PanelsTitle-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+    {%- if section.settings.text != blank -%}<div class="acx-prose acx-lede">{{ section.settings.text }}</div>{%- endif -%}
+    {%- if section.blocks.size > 0 -%}
+      <div class="acx-panels acx-panels--{{ section.settings.layout }}">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'panel', 'step' -%}
+              <div class="acx-panel{% if block.type == 'step' %} acx-panel--step{% endif %}" {{ block.shopify_attributes }}>
+                {%- if block.settings.heading != blank -%}<h3 class="acx-h3">{{ block.settings.heading | escape }}</h3>{%- endif -%}
+                <div class="acx-prose">{{ block.settings.text }}</div>
+              </div>
+            {%- when 'quote' -%}
+              <p class="acx-pull" {{ block.shopify_attributes }}><span aria-hidden="true">✦</span> {{ block.settings.text | escape }}</p>
+            {%- when 'button' -%}
+              {%- if block.settings.link != blank -%}<p class="acx-actions" {{ block.shopify_attributes }}><a class="acx-button" href="{{ block.settings.link }}">{{ block.settings.label | escape }} <span aria-hidden="true">→</span></a></p>{%- endif -%}
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Text panels",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "richtext", "id": "text", "label": "Introduction" },
+    { "type": "text", "id": "anchor", "label": "Anchor", "info": "Lets links jump here, e.g. raw-vs-graded" },
+    { "type": "select", "id": "layout", "label": "Layout", "options": [
+      { "value": "stack", "label": "One column" }, { "value": "columns", "label": "Two columns" }, { "value": "steps", "label": "Numbered steps" } ], "default": "stack" },
+    { "type": "select", "id": "style", "label": "Background", "options": [
+      { "value": "page", "label": "Page" }, { "value": "card", "label": "Card" }, { "value": "plum", "label": "Plum" } ], "default": "page" }
+  ],
+  "blocks": [
+    { "type": "panel", "name": "Panel", "settings": [ { "type": "text", "id": "heading", "label": "Heading" }, { "type": "richtext", "id": "text", "label": "Text" } ] },
+    { "type": "step", "name": "Step", "settings": [ { "type": "text", "id": "heading", "label": "Heading" }, { "type": "richtext", "id": "text", "label": "Text" } ] },
+    { "type": "quote", "name": "Large line", "settings": [ { "type": "textarea", "id": "text", "label": "Text" } ] },
+    { "type": "button", "name": "Button", "settings": [ { "type": "text", "id": "label", "label": "Label" }, { "type": "url", "id": "link", "label": "Link" } ] }
+  ],
+  "presets": [{ "name": "Text panels" }]
+}
+{% endschema %}

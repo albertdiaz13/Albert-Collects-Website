@@ -1,0 +1,36 @@
+<section class="acx-intro" aria-labelledby="IntroTitle-{{ section.id }}">
+  <div class="ac-wrap acx-intro__inner">
+    {%- if section.settings.eyebrow != blank -%}<p class="acx-eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+    <h1 class="acx-intro__title" id="IntroTitle-{{ section.id }}">{{ section.settings.title | default: page.title | escape }}</h1>
+    {%- if section.settings.lede != blank -%}<div class="acx-intro__lede">{{ section.settings.lede }}</div>{%- endif -%}
+    {%- if section.blocks.size > 0 -%}
+      <nav class="acx-jump" aria-label="{{ section.settings.jump_label | escape }}">
+        <ul role="list">
+          {%- for block in section.blocks -%}
+            <li {{ block.shopify_attributes }}><a class="acx-chip" href="#{{ block.settings.anchor | handle }}">{% if block.settings.code != blank %}<span class="acx-chip__code" data-tier="{{ block.settings.anchor | remove: 'condition-' }}">{{ block.settings.code | escape }}</span>{% endif %}{{ block.settings.label | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Page intro",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label" },
+    { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the page title." },
+    { "type": "richtext", "id": "lede", "label": "Introduction" },
+    { "type": "text", "id": "jump_label", "label": "Jump links label", "default": "On this page" }
+  ],
+  "blocks": [
+    { "type": "jump", "name": "Jump link", "settings": [
+      { "type": "text", "id": "code", "label": "Short code", "info": "Optional, e.g. NM" },
+      { "type": "text", "id": "label", "label": "Label" },
+      { "type": "text", "id": "anchor", "label": "Section anchor", "info": "e.g. condition-nm or raw-vs-graded" }
+    ] }
+  ],
+  "presets": [{ "name": "Page intro" }]
+}
+{% endschema %}
