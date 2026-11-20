@@ -634,7 +634,7 @@ img { max-width: 100%; height: auto; }
 .b-tier__name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); margin: 0 0 var(--s-3); font-family: var(--b-font-display); font-weight: 560; font-variation-settings: 'opsz' 72; font-size: clamp(2.6rem, 3.4vw, 3.6rem); line-height: 1.05; }
 .b-tier__summary { font-size: 1.8rem; }
 .b-tier__label { margin: var(--s-4) 0 var(--s-2); font-family: var(--b-font-body); font-size: 1.3rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--b-muted); }
-.b-tier__not { margin: var(--s-4) 0 0; padding: var(--s-3) var(--s-4); border-radius: var(--r-button); background: var(--b-surface-raised); border-left: 3px solid var(--b-tier); font-size: 1.5rem; }
+.b-tier__not { margin: var(--s-4) 0 0; padding: var(--s-3) var(--s-4); border-radius: var(--r-button); background: var(--b-surface-raised); border: 1px solid var(--b-rule); font-size: 1.5rem; }
 @media (min-width: 750px) { .b-tier { grid-template-columns: 16rem minmax(0, 1fr); gap: var(--s-7); } }
 
 .b-prose-section { scroll-margin-top: 8rem; }
