@@ -1,0 +1,53 @@
+<section class="b-section" aria-labelledby="ShelvesHeading-{{ section.id }}">
+  <div class="b-wrap">
+    <h2 class="b-h2 b-section__title" id="ShelvesHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+    <ul class="b-shelves" role="list">
+      {%- for block in section.blocks -%}
+        {%- assign col = block.settings.collection -%}
+        {%- if col == blank -%}{%- continue -%}{%- endif -%}
+        <li class="b-shelf" {{ block.shopify_attributes }}>
+          <a class="b-shelf__link" href="{{ col.url }}">
+            <span class="b-shelf__spine" aria-hidden="true"></span>
+            <span class="b-shelf__text">
+              <span class="b-shelf__title">{{ block.settings.title | default: col.title | escape }}</span>
+              <span class="b-shelf__count b-mono">{{ 'binder.catalog.cards' | t: count: col.products_count }}</span>
+              {%- if block.settings.text != blank -%}<span class="b-shelf__desc">{{ block.settings.text | escape }}</span>{%- endif -%}
+            </span>
+            <span class="b-shelf__fan" aria-hidden="true">
+              {%- assign fanned = 0 -%}
+              {%- for product in col.products limit: 12 -%}
+                {%- if product.available == false or product.featured_media == blank -%}{%- continue -%}{%- endif -%}
+                {%- assign fanned = fanned | plus: 1 -%}
+                <span class="b-shelf__card">
+                  {{ product.featured_media | image_url: width: 300 | image_tag: widths: '150, 220, 300', sizes: '(min-width: 990px) 110px, 70px', loading: 'lazy', alt: '' }}
+                </span>
+                {%- if fanned == 3 -%}{%- break -%}{%- endif -%}
+              {%- endfor -%}
+            </span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Binder shelves",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Pick a binder" }
+  ],
+  "blocks": [
+    {
+      "type": "shelf",
+      "name": "Binder",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the collection name." },
+        { "type": "text", "id": "text", "label": "Short description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Binder shelves" }]
+}
+{% endschema %}

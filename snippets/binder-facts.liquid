@@ -1,0 +1,341 @@
+{%- comment -%}
+  Reads the collector details of a card listing from its own title and tags. Nothing is invented:
+  a detail that cannot be read from the listing comes back empty, and the page leaves that field out.
+
+  Listings use three title styles, all handled here:
+    A. "Pikachu 073/071 · Dark Phantasma · Japanese · Character Rare Holo · NM"
+    B. "Golem 122/128 Rare Expedition Pokemon Japanese 1st Edition Holo Near Mint-"   (set comes from tags)
+    C. "Mewtwo No. 150 Base Set Holo HOLO BLEED Pokemon Japanese Near Mint"          (tags carry "Condition: NM")
+  Graded cards ("... PSA 10 Gem Mint") return the grade in place of a raw condition.
+
+  Accepts:
+  - product: {Object}
+
+  Output: one string, fields separated by "§", in this order:
+    0 name · 1 number · 2 set · 3 language · 4 condition (full words or grade) · 5 condition code (LP+, NM-)
+    6 tier (nm, lp, mp, hp, dmg, graded) · 7 printing · 8 year · 9 listing notes (comma separated) · 10 graded (true/false)
+
+  Usage:
+  {%- capture facts -%}{%- render 'binder-facts', product: product -%}{%- endcapture -%}
+  {%- assign f = facts | split: '§' -%}
+{%- endcomment -%}
+{%- liquid
+  assign t = product.title | replace: '🌀', '' | strip
+  assign tl = t | downcase
+  assign tags = product.tags
+
+  assign name = ''
+  assign number = ''
+  assign set = ''
+  assign lang = ''
+  assign cond_raw = ''
+  assign cond_full = ''
+  assign cond_code = ''
+  assign tier = ''
+  assign print = ''
+  assign year = ''
+  assign notes = ''
+  assign graded = false
+  assign num_idx = -1
+
+  if product.type == 'Graded Card' or tags contains 'graded' or tags contains 'slabs'
+    assign graded = true
+  endif
+
+  comment
+    Year: a four-digit tag such as "2001".
+  endcomment
+  for tag in tags
+    if tag.size == 4
+      assign tnum = tag | plus: 0
+      if tnum > 1990 and tnum < 2100
+        assign year = tag
+      endif
+    endif
+  endfor
+
+  comment
+    Title style A: segments separated by " · ".
+  endcomment
+  assign style_a = false
+  if t contains ' · '
+    assign style_a = true
+    assign segs = t | split: ' · '
+    assign head = segs.first | strip
+    assign seg_count = segs.size
+    if seg_count >= 3
+      assign set = segs[1] | strip
+      assign maybe_lang = segs[2] | strip
+      if maybe_lang == 'Japanese' or maybe_lang == 'English' or maybe_lang == 'Korean' or maybe_lang == 'Chinese'
+        assign lang = maybe_lang
+      endif
+      assign cond_raw = segs.last | strip
+      if seg_count >= 5
+        assign print = segs[3] | strip
+      endif
+    endif
+  else
+    assign head = t
+  endif
+
+  comment
+    Collector number: the first word with a slash (058/087, 143/S-P), "No. 196", "DPBP #413", or HGSS07 / SWSH180 style promos.
+  endcomment
+  assign words = head | split: ' '
+  for w in words
+    if w contains '/'
+      assign number = w
+      assign num_idx = forloop.index0
+      break
+    endif
+  endfor
+  if number == ''
+    for w in words
+      assign wl = w | downcase
+      if wl == 'no.' or wl == 'no'
+        assign next_i = forloop.index
+        if words[next_i] != blank
+          assign number = 'No. ' | append: words[next_i]
+          assign num_idx = forloop.index0
+          break
+        endif
+      endif
+      if w == 'DPBP'
+        assign next_i = forloop.index
+        if words[next_i] != blank
+          assign number = 'DPBP ' | append: words[next_i]
+          assign num_idx = forloop.index0
+          break
+        endif
+      endif
+      assign w5 = w | slice: 0, 5
+      if w5 == 'DPBP#'
+        assign number = w | replace: 'DPBP#', 'DPBP #'
+        assign num_idx = forloop.index0
+        break
+      endif
+      assign w4 = w | slice: 0, 4
+      if w.size > 4 and w4 == 'HGSS' or w.size > 4 and w4 == 'SWSH'
+        assign number = w
+        assign num_idx = forloop.index0
+        break
+      endif
+    endfor
+  endif
+  comment
+    Graded slabs: the label number, such as "Vaporeon Vmax 182 ...". Only after the first word, and only for slabs.
+  endcomment
+  if number == '' and graded
+    for w in words
+      if forloop.first
+        continue
+      endif
+      assign non_digits = w | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+      if non_digits == '' and w.size < 5
+        assign number = '#' | append: w
+        assign num_idx = forloop.index0
+        break
+      endif
+    endfor
+  endif
+
+  comment
+    Card name: the words before the collector number. Without a number, a tag the title starts with (newer listings carry one).
+  endcomment
+  if num_idx > 0
+    assign name = ''
+    for w in words limit: num_idx
+      assign name = name | append: w | append: ' '
+    endfor
+    assign name = name | strip
+  elsif style_a
+    assign name = head
+  else
+    for tag in tags
+      assign tagl = tag | downcase
+      assign tag_len = tag.size
+      assign t_start = tl | slice: 0, tag_len
+      if tag_len > 2 and t_start == tagl and tagl != 'pokemon'
+        if tag.size > name.size
+          assign name = t | slice: 0, tag_len
+        endif
+      endif
+    endfor
+  endif
+
+  comment
+    Language, when the listing does not state it in a title segment.
+  endcomment
+  if lang == ''
+    if t contains 'Japanese' or tags contains 'Japanese'
+      assign lang = 'Japanese'
+    else
+      assign col_handles = product.collections | map: 'handle'
+      if col_handles contains 'english'
+        assign lang = 'English'
+      elsif col_handles contains 'japanese'
+        assign lang = 'Japanese'
+      endif
+    endif
+  endif
+
+  comment
+    Condition. Graded: the grade after "PSA", "BGS" or "CGC". Raw: the "Condition:" tag, else the end of the title.
+  endcomment
+  if graded
+    assign graders = 'PSA,BGS,CGC,SGC,TAG' | split: ','
+    for grader in graders
+      assign marker = ' ' | append: grader | append: ' '
+      if t contains marker
+        assign grade_tail = t | split: marker | last
+        assign cond_full = grader | append: ' ' | append: grade_tail
+        assign cond_code = grader | append: ' ' | append: grade_tail | split: ' ' | slice: 0, 2 | join: ' '
+        assign tier = 'graded'
+        break
+      endif
+    endfor
+  else
+    if cond_raw == ''
+      for tag in tags
+        assign tag6 = tag | slice: 0, 10
+        if tag6 == 'Condition:'
+          assign cond_raw = tag | remove_first: 'Condition:' | strip
+        endif
+      endfor
+    endif
+    if cond_raw == ''
+      assign endings = 'Near Mint-|Near Mint+|Near Mint|Lightly Played|Moderately Played|Heavily Played|Damaged|NM-|NM+|NM|LP-|LP+|LP|MP-|MP+|MP|HP-|HP+|HP|DMG' | split: '|'
+      for e in endings
+        assign probe = ' ' | append: e
+        assign probe_len = probe.size
+        assign title_len = t.size
+        if title_len > probe_len
+          assign start = title_len | minus: probe_len
+          assign tail = t | slice: start, probe_len
+          if tail == probe
+            assign cond_raw = e
+            break
+          endif
+        endif
+      endfor
+    endif
+
+    if cond_raw != ''
+      assign c2 = cond_raw | slice: 0, 2
+      assign c_last = cond_raw | slice: -1, 1
+      assign modifier = ''
+      if c_last == '+' or c_last == '-'
+        assign modifier = c_last
+      endif
+      if c2 == 'NM' or c2 == 'Ne'
+        assign tier = 'nm'
+        assign cond_full = 'Near Mint'
+        assign cond_code = 'NM' | append: modifier
+      elsif c2 == 'LP' or c2 == 'Li'
+        assign tier = 'lp'
+        assign cond_full = 'Lightly Played'
+        assign cond_code = 'LP' | append: modifier
+      elsif c2 == 'MP' or c2 == 'Mo'
+        assign tier = 'mp'
+        assign cond_full = 'Moderately Played'
+        assign cond_code = 'MP' | append: modifier
+      elsif c2 == 'HP' or c2 == 'He'
+        assign tier = 'hp'
+        assign cond_full = 'Heavily Played'
+        assign cond_code = 'HP' | append: modifier
+      elsif c2 == 'DM' or c2 == 'Da'
+        assign tier = 'dmg'
+        assign cond_full = 'Damaged'
+        assign cond_code = 'DMG'
+      endif
+    endif
+  endif
+
+  comment
+    Set, for titles without " · " segments: the listing's set tag. Generic tags (year, rarity, condition, language, notes) are skipped.
+    With several candidates, the one that also appears in the title wins; with none in the title, the field stays empty.
+  endcomment
+  if set == ''
+    assign skip = '|pokémon tcg|pokemon|japanese|japanese pokemon|english|single card|ungraded|graded|slabs|psa|bgs|cgc|holofoil|modern|modern jp|vintage|vintage jp|promo|rare|rare ex|rare holo|holo rare|uncommon|common|glossy uncommon|glossy common|prime|art rare|special art rare|super rare|double rare|triple rare|ultra rare|character rare|character super rare|secret rare|shining rare|holo swirl|holo bleed|creased|clean front|near mint|near mint minus|near mint plus|lightly played|lightly played plus|lightly played minus|moderately played|moderately played plus|moderately played minus|heavily played|heavily played plus|heavily played minus|damaged|lv.x|'
+    assign candidates = ''
+    assign candidate_count = 0
+    for tag in tags
+      assign tagl = tag | downcase
+      assign key = '|' | append: tagl | append: '|'
+      assign tag10 = tag | slice: 0, 10
+      assign tag4 = tag | slice: 0, 4
+      assign non_digits = tag | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+      if skip contains key or tag10 == 'Condition:' or tag4 == 'PSA ' or non_digits == ''
+        continue
+      endif
+      comment
+        Skip the card-name tag: the title starts with it.
+      endcomment
+      assign t_start = tl | slice: 0, tag.size
+      if t_start == tagl
+        continue
+      endif
+      assign candidates = candidates | append: tag | append: '¦'
+      assign candidate_count = candidate_count | plus: 1
+    endfor
+    assign candidate_list = candidates | split: '¦'
+    if candidate_count == 1
+      assign set = candidate_list.first
+    elsif candidate_count > 1
+      for c in candidate_list
+        assign cl = c | downcase
+        if tl contains cl and c.size > set.size
+          assign set = c
+        endif
+      endfor
+    endif
+    comment
+      Slab tags are in capitals; show the set the way the title spells it.
+    endcomment
+    if set != ''
+      assign set_up = set | upcase
+      assign setl = set | downcase
+      if set == set_up and tl contains setl
+        assign before = tl | split: setl | first
+        assign set = t | slice: before.size, set.size
+      endif
+    endif
+  endif
+
+  comment
+    Printing, for titles without " · " segments: edition, rarity tag and holo, as the listing states them.
+  endcomment
+  if print == '' and graded == false
+    assign parts = ''
+    if t contains '1st Edition'
+      assign parts = '1st Edition '
+    elsif t contains 'Unlimited'
+      assign parts = 'Unlimited '
+    endif
+    assign rarities = 'Special Art Rare|Character Super Rare|Character Rare|Art Rare|Super Rare|Double Rare|Triple Rare|Ultra Rare|Secret Rare|Shining Rare|Rare ex|Rare|Uncommon|Glossy Uncommon|Glossy Common|Common|Prime|Promo' | split: '|'
+    for r in rarities
+      if tags contains r
+        assign parts = parts | append: r | append: ' '
+        break
+      endif
+    endfor
+    assign words_check = t | split: ' '
+    if words_check contains 'Holo'
+      assign parts = parts | append: 'Holo'
+    endif
+    assign print = parts | strip
+  endif
+
+  comment
+    Listing notes: details the listing calls out about this exact copy.
+  endcomment
+  assign note_list = 'Holo Swirl|Holo Bleed|Creased|Clean Front' | split: '|'
+  for n in note_list
+    assign nu = n | upcase
+    if tags contains n or t contains nu
+      assign notes = notes | append: n | append: ','
+    endif
+  endfor
+  assign notes = notes | remove_last: ','
+-%}
+{{- name -}}§{{- number -}}§{{- set -}}§{{- lang -}}§{{- cond_full -}}§{{- cond_code -}}§{{- tier -}}§{{- print -}}§{{- year -}}§{{- notes -}}§{{- graded -}}

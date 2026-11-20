@@ -1,0 +1,60 @@
+<section class="b-section b-tiers" aria-label="{{ section.settings.label | escape }}">
+  <div class="b-wrap">
+    <ol class="b-tiers__list" role="list">
+      {%- for block in section.blocks -%}
+        {%- assign tier = block.settings.tier -%}
+        <li class="b-tier" id="condition-{{ tier }}" data-tier="{{ tier }}" {{ block.shopify_attributes }}>
+          <div class="b-tier__art">
+            {%- capture art_label -%}{{ block.settings.diagram_label | default: block.settings.name }}{%- endcapture -%}
+            {%- render 'binder-wear-diagram', tier: tier, id: section.id, label: art_label -%}
+          </div>
+          <div class="b-tier__text">
+            <h2 class="b-tier__name">
+              <span class="b-chip" data-tier="{{ tier }}"><span class="b-chip__dot" aria-hidden="true"></span><span class="b-mono">{{ block.settings.code | escape }}</span></span>
+              {{ block.settings.name | escape }}
+            </h2>
+            <div class="b-tier__summary b-prose">{{ block.settings.summary }}</div>
+            {%- if block.settings.look_for != blank -%}
+              <h3 class="b-tier__label">{{ block.settings.look_for_label | escape }}</h3>
+              <div class="b-prose b-tier__list">{{ block.settings.look_for }}</div>
+            {%- endif -%}
+            {%- if block.settings.not_here != blank -%}
+              <p class="b-tier__not"><strong>{{ block.settings.not_here_label | escape }}</strong> {{ block.settings.not_here | escape }}</p>
+            {%- endif -%}
+          </div>
+        </li>
+      {%- endfor -%}
+    </ol>
+    {%- if section.settings.diagram_note != blank -%}<p class="b-fine">{{ section.settings.diagram_note | escape }}</p>{%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Condition levels",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Accessible name", "default": "The five conditions" },
+    { "type": "text", "id": "diagram_note", "label": "Note under the illustrations", "default": "Illustrations show where wear tends to appear on a card back. They aren't photos of a listing." }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Condition",
+      "settings": [
+        { "type": "select", "id": "tier", "label": "Level", "options": [
+          { "value": "nm", "label": "Near Mint" }, { "value": "lp", "label": "Lightly Played" }, { "value": "mp", "label": "Moderately Played" },
+          { "value": "hp", "label": "Heavily Played" }, { "value": "dmg", "label": "Damaged" } ], "default": "nm" },
+        { "type": "text", "id": "code", "label": "Code", "default": "NM" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Near Mint" },
+        { "type": "richtext", "id": "summary", "label": "In one breath" },
+        { "type": "text", "id": "look_for_label", "label": "List heading", "default": "What you might see" },
+        { "type": "richtext", "id": "look_for", "label": "What you might see" },
+        { "type": "text", "id": "not_here_label", "label": "Not allowed heading", "default": "Not at this level:" },
+        { "type": "text", "id": "not_here", "label": "Not allowed" },
+        { "type": "text", "id": "diagram_label", "label": "Illustration description" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Condition levels" }]
+}
+{% endschema %}

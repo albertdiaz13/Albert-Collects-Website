@@ -1,0 +1,190 @@
+{%- liquid
+  assign per_page = section.settings.per_page
+  assign is_all = false
+  if collection.handle == 'all' or collection.handle == blank
+    assign is_all = true
+  endif
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+  assign active_count = 0
+  for filter in collection.filters
+    assign active_count = active_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign active_count = active_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+{%- paginate collection.products by per_page -%}
+<section class="b-catalog" data-b-catalog>
+  <div class="b-wrap">
+    <header class="b-catalog__head">
+      <h1 class="b-h1">
+        {%- if is_all and section.settings.all_title != blank -%}{{ section.settings.all_title | escape }}{%- else -%}{{ collection.title | escape }}{%- endif -%}
+      </h1>
+      <p class="b-catalog__count b-mono">{{ 'binder.catalog.cards' | t: count: collection.products_count }}</p>
+      {%- if collection.description != blank and is_all == false -%}<div class="b-catalog__desc b-prose">{{ collection.description }}</div>{%- endif -%}
+    </header>
+
+    {%- if section.blocks.size > 0 -%}
+      <nav class="b-tabs" aria-label="{{ 'binder.catalog.binders' | t }}">
+        <ul role="list" class="b-tabs__list">
+          <li><a class="b-tab" href="{{ routes.all_products_collection_url }}"{% if is_all %} aria-current="page"{% endif %}>{{ 'binder.catalog.all' | t }}</a></li>
+          {%- for block in section.blocks -%}
+            {%- assign tab = block.settings.collection -%}
+            {%- if tab == blank -%}{%- continue -%}{%- endif -%}
+            <li {{ block.shopify_attributes }}><a class="b-tab" href="{{ tab.url }}"{% if tab.handle == collection.handle %} aria-current="page"{% endif %}>{{ block.settings.label | default: tab.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    <div class="b-toolbar">
+      <form class="b-search b-toolbar__search" action="{{ routes.search_url }}" method="get" role="search">
+        <label class="visually-hidden" for="CatalogSearch-{{ section.id }}">{{ 'binder.catalog.search_label' | t }}</label>
+        <svg class="b-icon b-search__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15 15 5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <input class="b-input" id="CatalogSearch-{{ section.id }}" type="search" name="q" placeholder="{{ 'binder.catalog.search_placeholder' | t }}" autocomplete="off">
+        <input type="hidden" name="type" value="product">
+      </form>
+      <div class="b-toolbar__actions">
+        {%- if section.settings.enable_filtering and collection.filters.size > 0 -%}
+          <button class="b-btn b-btn--outline b-btn--small" type="button" data-b-open-filters aria-haspopup="dialog">
+            <svg class="b-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16" cy="7" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="10" cy="17" r="2" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+            {{ 'binder.catalog.filter' | t }}{% if active_count > 0 %} <span class="b-count-badge b-mono">{{ active_count }}</span>{% endif %}
+          </button>
+        {%- endif -%}
+        <form class="b-sort" action="{{ collection.url }}" method="get" data-b-sort>
+          {%- for filter in collection.filters -%}
+            {%- for value in filter.active_values -%}<input type="hidden" name="{{ value.param_name }}" value="{{ value.value | escape }}">{%- endfor -%}
+            {%- if filter.type == 'price_range' -%}
+              {%- if filter.min_value.value != nil -%}<input type="hidden" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency | remove: ',' }}">{%- endif -%}
+              {%- if filter.max_value.value != nil -%}<input type="hidden" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency | remove: ',' }}">{%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+          <label class="b-sort__label" for="SortBy-{{ section.id }}">{{ 'binder.catalog.sort' | t }}</label>
+          <select class="b-select" id="SortBy-{{ section.id }}" name="sort_by">
+            {%- for option in collection.sort_options -%}
+              <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+            {%- endfor -%}
+          </select>
+          <noscript><button class="b-btn b-btn--small" type="submit">{{ 'binder.catalog.apply' | t }}</button></noscript>
+        </form>
+      </div>
+    </div>
+
+    {%- if active_count > 0 -%}
+      <ul class="b-activefilters" role="list">
+        {%- for filter in collection.filters -%}
+          {%- for value in filter.active_values -%}
+            <li><a class="b-chip b-chip--remove" href="{{ value.url_to_remove }}">{{ value.label | escape }}<span class="visually-hidden">: {{ 'binder.catalog.remove' | t: label: value.label }}</span><span aria-hidden="true">×</span></a></li>
+          {%- endfor -%}
+          {%- if filter.type == 'price_range' -%}
+            {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+              <li><a class="b-chip b-chip--remove" href="{{ filter.url_to_remove }}">{{ filter.min_value.value | default: 0 | money_without_trailing_zeros }}–{{ filter.max_value.value | default: filter.range_max | money_without_trailing_zeros }}<span aria-hidden="true">×</span></a></li>
+            {%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+        <li><a class="b-textlink" href="{{ collection.url }}?sort_by={{ sort_by }}">{{ 'binder.catalog.clear' | t }}</a></li>
+      </ul>
+    {%- endif -%}
+
+    {%- if collection.products.size > 0 -%}
+      <ul class="b-grid" role="list">
+        {%- for product in collection.products -%}
+          {%- assign eager = false -%}
+          {%- if forloop.index <= 4 -%}{%- assign eager = true -%}{%- endif -%}
+          {%- render 'binder-card', product: product, collection: collection, heading_tag: 'h2', eager: eager -%}
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <p class="b-empty">{{ 'binder.catalog.empty' | t }} <a class="b-textlink" href="{{ collection.url }}">{{ 'binder.catalog.clear' | t }}</a></p>
+    {%- endif -%}
+
+    {%- if paginate.pages > 1 -%}
+      <nav class="b-pager" aria-label="{{ 'binder.catalog.page' | t: current: paginate.current_page, total: paginate.pages }}">
+        {%- if paginate.previous -%}
+          <a class="b-btn b-btn--outline b-btn--small" href="{{ paginate.previous.url }}" rel="prev">{{ 'binder.catalog.prev' | t }}</a>
+        {%- else -%}<span></span>{%- endif -%}
+        <p class="b-mono b-pager__status">{{ 'binder.catalog.page' | t: current: paginate.current_page, total: paginate.pages }}</p>
+        {%- if paginate.next -%}
+          <a class="b-btn b-btn--primary b-btn--small" href="{{ paginate.next.url }}" rel="next">{{ 'binder.catalog.next' | t }}</a>
+        {%- else -%}<span></span>{%- endif -%}
+      </nav>
+    {%- endif -%}
+  </div>
+
+  {%- if section.settings.enable_filtering and collection.filters.size > 0 -%}
+    <dialog class="b-sheet" data-b-filters aria-labelledby="FiltersTitle-{{ section.id }}">
+      <form class="b-sheet__form" action="{{ collection.url }}" method="get">
+        <header class="b-sheet__head">
+          <h2 class="b-h3" id="FiltersTitle-{{ section.id }}">{{ 'binder.catalog.filter' | t }}</h2>
+          <button class="b-iconbtn" type="button" data-b-close-filters>
+            <span class="visually-hidden">{{ 'binder.catalog.close' | t }}</span>
+            <svg class="b-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </header>
+        <input type="hidden" name="sort_by" value="{{ sort_by | escape }}">
+        <div class="b-sheet__body">
+          {%- for filter in collection.filters -%}
+            {%- case filter.type -%}
+              {%- when 'boolean', 'list' -%}
+                <fieldset class="b-filter">
+                  <legend class="b-filter__label">{{ filter.label | escape }}</legend>
+                  <ul role="list" class="b-filter__options">
+                    {%- for value in filter.values -%}
+                      {%- if value.count == 0 and value.active == false -%}{%- continue -%}{%- endif -%}
+                      <li>
+                        <label class="b-check">
+                          <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value | escape }}"{% if value.active %} checked{% endif %}>
+                          <span>{{ value.label | escape }}</span>
+                          <span class="b-check__count b-mono">{{ value.count }}</span>
+                        </label>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </fieldset>
+              {%- when 'price_range' -%}
+                <fieldset class="b-filter">
+                  <legend class="b-filter__label">{{ filter.label | escape }}</legend>
+                  <div class="b-filter__range">
+                    <label><span>{{ 'binder.catalog.from' | t }} ({{ cart.currency.symbol }})</span>
+                      <input class="b-input" type="number" inputmode="decimal" name="{{ filter.min_value.param_name }}" min="0" max="{{ filter.range_max | money_without_currency | remove: ',' }}" placeholder="0"{% if filter.min_value.value %} value="{{ filter.min_value.value | money_without_currency | remove: ',' }}"{% endif %}>
+                    </label>
+                    <label><span>{{ 'binder.catalog.to' | t }} ({{ cart.currency.symbol }})</span>
+                      <input class="b-input" type="number" inputmode="decimal" name="{{ filter.max_value.param_name }}" min="0" max="{{ filter.range_max | money_without_currency | remove: ',' }}" placeholder="{{ filter.range_max | money_without_currency | remove: ',' }}"{% if filter.max_value.value %} value="{{ filter.max_value.value | money_without_currency | remove: ',' }}"{% endif %}>
+                    </label>
+                  </div>
+                </fieldset>
+            {%- endcase -%}
+          {%- endfor -%}
+        </div>
+        <footer class="b-sheet__foot">
+          <a class="b-btn b-btn--outline" href="{{ collection.url }}?sort_by={{ sort_by }}">{{ 'binder.catalog.clear' | t }}</a>
+          <button class="b-btn b-btn--primary" type="submit">{{ 'binder.catalog.apply' | t }}</button>
+        </footer>
+      </form>
+    </dialog>
+  {%- endif -%}
+</section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Binder catalog",
+  "settings": [
+    { "type": "text", "id": "all_title", "label": "Title for all cards", "default": "The catalog" },
+    { "type": "range", "id": "per_page", "label": "Cards per page", "min": 12, "max": 48, "step": 4, "default": 24 },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Show filters", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "tab",
+      "name": "Binder tab",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "label", "label": "Label" }
+      ]
+    }
+  ]
+}
+{% endschema %}

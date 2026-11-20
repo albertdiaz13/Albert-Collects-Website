@@ -1,0 +1,10 @@
+{%- comment -%}
+  Condition chip. Accepts: tier (nm, lp, mp, hp, dmg, graded), code (LP+, PSA 10), label (full words, optional, for screen readers).
+{%- endcomment -%}
+{%- if code != blank -%}
+  <span class="b-chip" data-tier="{{ tier }}"{% if label != blank %} title="{{ label | escape }}"{% endif %}>
+    <span class="b-chip__dot" aria-hidden="true"></span>
+    <span class="b-mono">{{ code }}</span>
+    {%- if label != blank and label != code -%}<span class="visually-hidden"> ({{ label }})</span>{%- endif -%}
+  </span>
+{%- endif -%}

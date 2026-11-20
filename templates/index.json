@@ -9,146 +9,202 @@
  */
 {
   "sections": {
-    "welcome": {
-      "type": "ac-intro",
+    "hero": {
+      "type": "binder-hero",
       "blocks": {
-        "vintage_japanese": {
-          "type": "category",
+        "card_1": {
+          "type": "card",
           "settings": {
-            "collection": "vintage",
-            "title": "Vintage Japanese",
-            "symbol": "✧"
+            "product": "milotic-ex-131106-super-electric-breaker-pokemon-japanese-holo-nm-243279"
           }
         },
-        "modern_japanese": {
-          "type": "category",
+        "card_2": {
+          "type": "card",
           "settings": {
-            "collection": "japanese",
-            "title": "Modern Japanese",
-            "symbol": "✦"
+            "product": "typhlosion-no-157-holo-rare-neo-genesis-pokemon-japanese-lightly-played-swirl-232062"
           }
         },
-        "mixed_english": {
-          "type": "category",
+        "card_3": {
+          "type": "card",
           "settings": {
-            "collection": "english",
-            "title": "Mixed English",
-            "symbol": "◇"
+            "product": "lillies-clefairy-ex-126100-battle-partners-pokemon-japanese-holo-nm-045718"
           }
         },
-        "slabs": {
-          "type": "category",
+        "card_4": {
+          "type": "card",
           "settings": {
-            "collection": "graded-slabs",
-            "title": "Slabs",
-            "symbol": "▣"
+            "product": "mewtwo-no-150-holo-rare-base-set-pokemon-japanese-near-mint-039580"
+          }
+        },
+        "card_5": {
+          "type": "card",
+          "settings": {
+            "product": "umbreon-vmax-101184-triple-rare-vmax-climax-pokemon-japanese-holo-near-mint-138711"
+          }
+        },
+        "card_6": {
+          "type": "card",
+          "settings": {
+            "product": "shining-mew-151-holofoil-promo-corocoro-comics-pokemon-japanese-psa-6-ex-mt-92981991"
           }
         }
       },
       "block_order": [
-        "vintage_japanese",
-        "modern_japanese",
-        "mixed_english",
-        "slabs"
+        "card_1",
+        "card_2",
+        "card_3",
+        "card_4",
+        "card_5",
+        "card_6"
       ],
       "settings": {
-        "eyebrow": "JAPANESE CARDS & NOSTALGIC FINDS",
-        "heading": "Collected with curiosity.",
-        "description": "Old favorites. Unexpected discoveries. Cards, games, and vintage finds, picked by a collector like you.",
-        "showcase_collection": "frontpage"
+        "heading": "One card at a time.",
+        "text": "Japanese and vintage Pokémon singles, each listed with its set, number and condition so you can look closely before you buy.",
+        "button_label": "",
+        "link": "shopify://collections/all"
       }
     },
-    "fresh": {
-      "type": "ac-shelf",
+    "page": {
+      "type": "binder-page",
       "settings": {
-        "eyebrow": "THE LATEST ADDITIONS",
-        "title": "Fresh finds",
-        "collection": "frontpage",
-        "limit": 8,
-        "slab_layout": false,
-        "band": "standard"
-      }
-    },
-    "vintage_japanese": {
-      "type": "ac-shelf",
-      "settings": {
-        "eyebrow": "CLASSIC ARTWORK AND EXCLUSIVES",
-        "title": "Vintage Japanese",
-        "collection": "vintage",
-        "limit": 8,
-        "slab_layout": false
-      }
-    },
-    "modern_japanese": {
-      "type": "ac-shelf",
-      "settings": {
-        "eyebrow": "HIGH QUALITY TEXTURED SINGLES",
-        "title": "Modern Japanese",
+        "heading": "Turn the page",
+        "text": "Nine pockets from the Japanese binder. Tap any card to see it up close.",
         "collection": "japanese",
-        "limit": 8,
-        "slab_layout": false
+        "available_only": true,
+        "link_label": "See the whole binder"
       }
     },
-    "slabs": {
-      "type": "ac-shelf",
+    "shelves": {
+      "type": "binder-shelves",
+      "blocks": {
+        "japanese": {
+          "type": "shelf",
+          "settings": {
+            "collection": "japanese",
+            "title": "Japanese",
+            "text": ""
+          }
+        },
+        "vintage": {
+          "type": "shelf",
+          "settings": {
+            "collection": "vintage",
+            "title": "Vintage",
+            "text": ""
+          }
+        },
+        "slabs": {
+          "type": "shelf",
+          "settings": {
+            "collection": "graded-slabs",
+            "title": "Graded slabs",
+            "text": ""
+          }
+        },
+        "english": {
+          "type": "shelf",
+          "settings": {
+            "collection": "english",
+            "title": "English",
+            "text": ""
+          }
+        }
+      },
+      "block_order": [
+        "japanese",
+        "vintage",
+        "slabs",
+        "english"
+      ],
       "settings": {
-        "eyebrow": "GRADED & AUTHENTIC",
-        "title": "Slabs",
-        "collection": "graded-slabs",
-        "limit": 8,
-        "slab_layout": true,
-        "band": "vault"
+        "heading": "Pick a binder"
       }
     },
-    "mixed_english": {
-      "type": "ac-shelf",
+    "ladder": {
+      "type": "binder-condition-teaser",
+      "blocks": {
+        "tier_nm": {
+          "type": "tier",
+          "settings": {
+            "tier": "nm",
+            "code": "NM",
+            "name": "Near Mint",
+            "line": "Looks like it went from the pack straight into a sleeve."
+          }
+        },
+        "tier_lp": {
+          "type": "tier",
+          "settings": {
+            "tier": "lp",
+            "code": "LP",
+            "name": "Lightly Played",
+            "line": "Small signs of handling you notice only up close."
+          }
+        },
+        "tier_mp": {
+          "type": "tier",
+          "settings": {
+            "tier": "mp",
+            "code": "MP",
+            "name": "Moderately Played",
+            "line": "Wear you can see from arm's length, card still whole."
+          }
+        },
+        "tier_hp": {
+          "type": "tier",
+          "settings": {
+            "tier": "hp",
+            "code": "HP",
+            "name": "Heavily Played",
+            "line": "Lots of wear, maybe a crease, still clearly the real card."
+          }
+        },
+        "tier_dmg": {
+          "type": "tier",
+          "settings": {
+            "tier": "dmg",
+            "code": "DMG",
+            "name": "Damaged",
+            "line": "Tears, water damage, writing, or a fold that breaks the card."
+          }
+        }
+      },
+      "block_order": [
+        "tier_nm",
+        "tier_lp",
+        "tier_mp",
+        "tier_hp",
+        "tier_dmg"
+      ],
       "settings": {
-        "eyebrow": "A LITTLE BIT OF EVERYTHING",
-        "title": "Mixed English",
-        "collection": "english",
-        "limit": 8,
-        "slab_layout": false
+        "heading": "Condition, in plain words",
+        "text": "Every raw card is listed with one of five conditions. Here's the short version, and the full guide shows what each one looks like.",
+        "link_label": "Read How We Condition"
       }
     },
-    "story": {
-      "type": "ac-story",
+    "shipping": {
+      "type": "binder-ship-strip",
       "settings": {
-        "eyebrow": "FROM ONE COLLECTOR TO ANOTHER",
-        "title": "The best finds have a story.",
-        "body": "A favorite Pokémon. A game you grew up with. That unexpected piece you cannot leave behind. Albert Collects is a home for the things worth keeping.",
-        "link": "",
-        "link_label": "Meet Albert"
+        "heading": "Shipping"
       }
     },
-    "games": {
-      "type": "ac-shelf",
+    "note": {
+      "type": "binder-note",
       "settings": {
-        "eyebrow": "PRESS START AGAIN",
-        "title": "Nostalgia, unlocked",
-        "collection": "games",
-        "limit": 4,
-        "slab_layout": false
-      }
-    },
-    "racket": {
-      "type": "ac-racket",
-      "settings": {
-        "eyebrow": "LIVE AT TODAY'S SHOW",
-        "title": "Discover What's on Display",
-        "text": "Explore the cards available at today's show.",
-        "button_label": "Browse Available Cards"
+        "heading": "From one collector to another",
+        "text": "<p>I'm Albert. I collect Pokémon cards, go to card shows, and love the small details that make one copy of a card different from the next. This shop is where I share the ones I find.</p>",
+        "link": "shopify://pages/about",
+        "link_label": "More about me",
+        "color_scheme": "scheme-1"
       }
     }
   },
   "order": [
-    "welcome",
-    "fresh",
-    "racket",
-    "vintage_japanese",
-    "modern_japanese",
-    "slabs",
-    "mixed_english",
-    "story",
-    "games"
+    "hero",
+    "page",
+    "shelves",
+    "ladder",
+    "shipping",
+    "note"
   ]
 }

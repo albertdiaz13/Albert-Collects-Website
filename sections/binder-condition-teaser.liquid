@@ -1,0 +1,45 @@
+{%- assign guide = settings.binder_condition_page -%}
+<section class="b-section b-ladder-section" aria-labelledby="LadderHeading-{{ section.id }}">
+  <div class="b-wrap b-ladder">
+    <div class="b-ladder__head">
+      <h2 class="b-h2" id="LadderHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}<p>{{ section.settings.text | escape }}</p>{%- endif -%}
+      {%- if guide != blank -%}<a class="b-btn b-btn--primary" href="{{ guide.url }}">{{ section.settings.link_label | escape }}</a>{%- endif -%}
+    </div>
+    <ol class="b-ladder__steps" role="list">
+      {%- for block in section.blocks -%}
+        <li class="b-ladder__step" data-tier="{{ block.settings.tier }}" {{ block.shopify_attributes }}>
+          <span class="b-chip" data-tier="{{ block.settings.tier }}"><span class="b-chip__dot" aria-hidden="true"></span><span class="b-mono">{{ block.settings.code | escape }}</span></span>
+          <span class="b-ladder__name">{{ block.settings.name | escape }}</span>
+          <span class="b-ladder__line">{{ block.settings.line | escape }}</span>
+        </li>
+      {%- endfor -%}
+    </ol>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Condition ladder",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Condition, in plain words" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Every raw card is listed with one of five conditions. Here's the short version." },
+    { "type": "text", "id": "link_label", "label": "Link label", "default": "Read How We Condition" }
+  ],
+  "blocks": [
+    {
+      "type": "tier",
+      "name": "Condition",
+      "settings": [
+        { "type": "select", "id": "tier", "label": "Level", "options": [
+          { "value": "nm", "label": "Near Mint" }, { "value": "lp", "label": "Lightly Played" }, { "value": "mp", "label": "Moderately Played" },
+          { "value": "hp", "label": "Heavily Played" }, { "value": "dmg", "label": "Damaged" } ], "default": "nm" },
+        { "type": "text", "id": "code", "label": "Code", "default": "NM" },
+        { "type": "text", "id": "name", "label": "Name", "default": "Near Mint" },
+        { "type": "text", "id": "line", "label": "One line" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Condition ladder" }]
+}
+{% endschema %}

@@ -9,7 +9,86 @@
  */
 {
   "current": {
-    "ac_event_collection": "racket-sports"
+    "ac_event_collection": "racket-sports",
+    "color_schemes": {
+      "scheme-1": {
+        "settings": {
+          "background": "#F4EEE3",
+          "background_gradient": "",
+          "text": "#2B1B17",
+          "button": "#2B1B17",
+          "button_label": "#F4EEE3",
+          "secondary_button_label": "#2B1B17",
+          "shadow": "#2B1B17"
+        }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#FFFFFF",
+          "background_gradient": "",
+          "text": "#2B1B17",
+          "button": "#2B1B17",
+          "button_label": "#FFFFFF",
+          "secondary_button_label": "#2B1B17",
+          "shadow": "#2B1B17"
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#2B1B17",
+          "background_gradient": "",
+          "text": "#F4EEE3",
+          "button": "#F2BE45",
+          "button_label": "#2B1B17",
+          "secondary_button_label": "#F4EEE3",
+          "shadow": "#1E1210"
+        }
+      },
+      "scheme-4": {
+        "settings": {
+          "background": "#FBF8F2",
+          "background_gradient": "",
+          "text": "#2B1B17",
+          "button": "#2B1B17",
+          "button_label": "#FBF8F2",
+          "secondary_button_label": "#2B1B17",
+          "shadow": "#2B1B17"
+        }
+      },
+      "scheme-5": {
+        "settings": {
+          "background": "#F2BE45",
+          "background_gradient": "",
+          "text": "#2B1B17",
+          "button": "#2B1B17",
+          "button_label": "#F2BE45",
+          "secondary_button_label": "#2B1B17",
+          "shadow": "#2B1B17"
+        }
+      }
+    },
+    "type_body_font": "figtree_n4",
+    "type_header_font": "figtree_n7",
+    "body_scale": 100,
+    "heading_scale": 100,
+    "cart_type": "drawer",
+    "show_cart_note": false,
+    "predictive_search_enabled": true,
+    "buttons_radius": 12,
+    "inputs_radius": 12,
+    "page_width": 1300,
+    "animations_reveal_on_scroll": false,
+    "popup_corner_radius": 18,
+    "badge_corner_radius": 40,
+    "card_style": "standard",
+    "card_image_padding": 0,
+    "card_corner_radius": 14,
+    "binder_mono_font": "space_mono_n4",
+    "binder_ship_region": "Ships within the United States",
+    "binder_ship_standard": 8,
+    "binder_ship_free_over": 70,
+    "binder_ship_express": 15,
+    "binder_condition_page": "how-we-condition"
   },
   "presets": {}
 }

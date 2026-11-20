@@ -1,0 +1,278 @@
+{%- liquid
+  capture facts
+    render 'binder-facts', product: product
+  endcapture
+  assign f = facts | split: '§'
+  assign c_name = f[0] | default: product.title
+  assign c_number = f[1]
+  assign c_set = f[2]
+  assign c_lang = f[3]
+  assign c_cond = f[4]
+  assign c_code = f[5]
+  assign c_tier = f[6]
+  assign c_print = f[7]
+  assign c_year = f[8]
+  assign c_notes = f[9]
+  assign c_graded = false
+  if f[10] == 'true'
+    assign c_graded = true
+  endif
+
+  assign guide = settings.binder_condition_page
+  assign guide_url = ''
+  if guide != blank
+    assign guide_url = guide.url
+    if c_graded
+      assign guide_url = guide_url | append: '#raw-vs-graded'
+    elsif c_tier != blank
+      assign guide_url = guide_url | append: '#condition-' | append: c_tier
+    endif
+  endif
+
+  assign images = product.media | where: 'media_type', 'image'
+  assign image_count = images.size
+  assign variant = product.selected_or_first_available_variant
+  assign product_form_id = 'product-form-' | append: section.id
+
+  assign desc_text = product.description | strip_html | strip
+  assign show_description = false
+  if desc_text != blank and desc_text != 'Thanks for viewing my listing!'
+    assign show_description = true
+  endif
+
+  comment
+    Short summary, built only from the listing's own details.
+  endcomment
+  assign start = c_print
+  if c_lang != blank and start != blank
+    assign start = c_lang | append: ' ' | append: c_print
+  elsif c_lang != blank
+    assign card_word = 'binder.summary.card' | t
+    assign start = c_lang | append: ' ' | append: card_word
+  endif
+  assign first_letter = start | slice: 0 | upcase
+  assign rest = start | slice: 1, 200
+  assign start = first_letter | append: rest
+  assign s1 = ''
+  if c_set != blank and start != blank
+    assign s1 = 'binder.summary.intro' | t: start: start, set: c_set
+  elsif c_set != blank
+    assign s1 = c_set
+  else
+    assign s1 = start
+  endif
+  if s1 != blank
+    if c_year != blank
+      assign year_part = 'binder.summary.year' | t: year: c_year
+      assign s1 = s1 | append: ', ' | append: year_part
+    endif
+    assign s1 = s1 | append: '.'
+  endif
+  assign s2 = ''
+  if c_graded and c_cond != blank
+    assign s2 = 'binder.summary.graded' | t: grade: c_cond
+  elsif c_cond != blank
+    assign s2 = 'binder.summary.listed' | t: condition: c_cond, code: c_code
+  endif
+  assign s3 = ''
+  if c_notes != blank
+    assign notes_text = c_notes | replace: ',', ', ' | downcase
+    assign s3 = 'binder.summary.notes' | t: notes: notes_text
+  endif
+-%}
+
+<section class="b-product" data-b-product>
+  <div class="b-wrap">
+    <a class="b-back b-textlink" href="{% if collection %}{{ collection.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}">
+      <svg class="b-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M19 12H6m5 6-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      {%- if collection -%}{{ collection.title | escape }}{%- else -%}{{ 'binder.product.back' | t }}{%- endif -%}
+    </a>
+
+    <div class="b-product__grid">
+      <div class="b-gallery" data-b-gallery>
+        <ul class="b-gallery__track" role="list" data-b-track>
+          {%- for media in images -%}
+            <li class="b-gallery__item" data-index="{{ forloop.index0 }}">
+              <button class="b-pocket b-pocket--large b-gallery__open" type="button" data-b-zoom="{{ forloop.index0 }}" aria-haspopup="dialog">
+                {%- if forloop.first -%}
+                  {{ media | image_url: width: 1400 | image_tag:
+                    widths: '400, 600, 800, 1000, 1200, 1400',
+                    sizes: '(min-width: 1100px) 560px, (min-width: 750px) 50vw, 88vw',
+                    loading: 'eager',
+                    fetchpriority: 'high',
+                    alt: '',
+                    class: 'b-gallery__img'
+                  }}
+                {%- else -%}
+                  {{ media | image_url: width: 1400 | image_tag:
+                    widths: '400, 600, 800, 1000, 1200, 1400',
+                    sizes: '(min-width: 1100px) 560px, (min-width: 750px) 50vw, 88vw',
+                    loading: 'lazy',
+                    alt: '',
+                    class: 'b-gallery__img'
+                  }}
+                {%- endif -%}
+                <span class="visually-hidden">{{ 'binder.product.enlarge' | t: index: forloop.index, count: image_count }}{% if media.alt != blank %}: {{ media.alt | escape }}{% endif %}</span>
+                <span class="b-gallery__expand" aria-hidden="true"><svg class="b-icon" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </button>
+            </li>
+          {%- endfor -%}
+        </ul>
+        {%- if image_count > 1 -%}
+          <div class="b-gallery__thumbs" role="group" aria-label="{{ 'binder.product.viewer' | t }}">
+            {%- for media in images -%}
+              <button class="b-gallery__thumb" type="button" data-b-thumb="{{ forloop.index0 }}"{% if forloop.first %} aria-current="true"{% endif %}>
+                {{ media | image_url: width: 160 | image_tag: loading: 'lazy', alt: '', width: 80, height: 107 }}
+                <span class="visually-hidden">{{ 'binder.product.show_photo' | t: index: forloop.index }}</span>
+              </button>
+            {%- endfor -%}
+            <p class="b-gallery__hint">{{ 'binder.product.zoom_hint' | t }}</p>
+          </div>
+        {%- endif -%}
+      </div>
+
+      <div class="b-info">
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'title' -%}
+              <div class="b-info__title" {{ block.shopify_attributes }}>
+                <h1 class="b-h1 b-info__name">{{ c_name | escape }}</h1>
+                {%- if c_print != blank -%}<p class="b-info__print">{{ c_print | escape }}</p>{%- endif -%}
+              </div>
+
+            {%- when 'price' -%}
+              <div class="b-info__price" {{ block.shopify_attributes }}>
+                {%- if product.available -%}
+                  <p class="b-price">{{ variant.price | money }}</p>
+                  {%- if variant.inventory_management == 'shopify' and variant.inventory_quantity > 0 -%}
+                    <p class="b-stock b-mono">{{ 'binder.product.in_stock' | t: count: variant.inventory_quantity }}</p>
+                  {%- endif -%}
+                {%- else -%}
+                  <p class="b-price b-price--sold">{{ 'binder.product.sold_out' | t }}</p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'facts' -%}
+              <dl class="b-facts" {{ block.shopify_attributes }}>
+                {%- if c_cond != blank -%}
+                  <div class="b-facts__row b-facts__row--condition">
+                    <dt>{% if c_graded %}{{ 'binder.facts.grade' | t }}{% else %}{{ 'binder.facts.condition' | t }}{% endif %}</dt>
+                    <dd>
+                      <span class="b-facts__cond">
+                        {%- render 'binder-chip', tier: c_tier, code: c_code, label: c_cond -%}
+                        <span>{{ c_cond | escape }}</span>
+                      </span>
+                      {%- if guide_url != blank -%}
+                        <a class="b-textlink b-facts__guide" href="{{ guide_url }}">{{ 'binder.facts.how' | t }}</a>
+                      {%- endif -%}
+                    </dd>
+                  </div>
+                {%- endif -%}
+                {%- if c_set != blank -%}<div class="b-facts__row"><dt>{{ 'binder.facts.set' | t }}</dt><dd>{{ c_set | escape }}</dd></div>{%- endif -%}
+                {%- if c_number != blank -%}<div class="b-facts__row"><dt>{{ 'binder.facts.number' | t }}</dt><dd class="b-mono">{{ c_number | escape }}</dd></div>{%- endif -%}
+                {%- if c_lang != blank -%}<div class="b-facts__row"><dt>{{ 'binder.facts.language' | t }}</dt><dd>{{ c_lang | escape }}</dd></div>{%- endif -%}
+                {%- if c_print != blank and block.settings.show_printing -%}<div class="b-facts__row"><dt>{{ 'binder.facts.printing' | t }}</dt><dd>{{ c_print | escape }}</dd></div>{%- endif -%}
+                {%- if c_year != blank -%}<div class="b-facts__row"><dt>{{ 'binder.facts.year' | t }}</dt><dd class="b-mono">{{ c_year }}</dd></div>{%- endif -%}
+                {%- if c_notes != blank -%}<div class="b-facts__row"><dt>{{ 'binder.facts.notes' | t }}</dt><dd>{{ c_notes | replace: ',', ' · ' | escape }}</dd></div>{%- endif -%}
+              </dl>
+
+            {%- when 'summary' -%}
+              {%- if s1 != blank or s2 != blank -%}
+                <div class="b-summary" {{ block.shopify_attributes }}>
+                  <h2 class="b-summary__label">{{ 'binder.facts.about' | t }}</h2>
+                  <p>{{ s1 | escape }} {{ s2 | escape }} {{ s3 | escape }}</p>
+                </div>
+              {%- endif -%}
+
+            {%- when 'buy_buttons' -%}
+              <div class="b-info__buy">
+                {%- render 'buy-buttons', block: block, product: product, product_form_id: product_form_id, section_id: section.id, show_pickup_availability: false -%}
+              </div>
+
+            {%- when 'shipping' -%}
+              <div class="b-info__ship" {{ block.shopify_attributes }}>
+                <h2 class="b-summary__label">{{ 'binder.shipping.heading' | t }}</h2>
+                {%- render 'binder-shipping-note', context: 'product' -%}
+              </div>
+
+            {%- when 'description' -%}
+              {%- if show_description -%}
+                <div class="b-prose b-info__desc" {{ block.shopify_attributes }}>{{ product.description }}</div>
+              {%- endif -%}
+
+            {%- when 'text' -%}
+              <div class="b-prose b-info__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- endcase -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+
+  {%- if image_count > 0 -%}
+    <dialog class="b-viewer" data-b-viewer aria-label="{{ 'binder.product.viewer' | t }}">
+      <div class="b-viewer__bar">
+        <p class="b-viewer__title">{{ c_name | escape }}</p>
+        <div class="b-viewer__tools">
+          {%- if image_count > 1 -%}
+            {%- for media in images -%}
+              <button class="b-viewer__tab" type="button" data-b-view="{{ forloop.index0 }}">{{ 'binder.product.photo' | t: index: forloop.index, count: image_count }}</button>
+            {%- endfor -%}
+          {%- endif -%}
+          <button class="b-btn b-btn--small b-btn--outline" type="button" data-b-zoomtoggle data-label-in="{{ 'binder.product.zoom_in' | t }}" data-label-out="{{ 'binder.product.zoom_out' | t }}">{{ 'binder.product.zoom_in' | t }}</button>
+          <button class="b-iconbtn" type="button" data-b-close-viewer>
+            <span class="visually-hidden">{{ 'binder.product.close' | t }}</span>
+            <svg class="b-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="b-viewer__stage" data-b-stage>
+        {%- for media in images -%}
+          {%- capture viewer_alt -%}{%- if media.alt != blank -%}{{ media.alt }}{%- else -%}{{ 'binder.card.photo_alt' | t: name: c_name, index: forloop.index, count: image_count }}{%- endif -%}{%- endcapture -%}
+          <figure class="b-viewer__fig" data-b-fig="{{ forloop.index0 }}"{% unless forloop.first %} hidden{% endunless %}>
+            {{ media | image_url: width: 2400 | image_tag:
+              widths: '800, 1200, 1600, 2000, 2400',
+              sizes: '100vw',
+              loading: 'lazy',
+              alt: viewer_alt,
+              class: 'b-viewer__img'
+            }}
+          </figure>
+        {%- endfor -%}
+      </div>
+    </dialog>
+  {%- endif -%}
+
+  <script type="application/ld+json">
+    {{ product | structured_data }}
+  </script>
+</section>
+
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+
+{% schema %}
+{
+  "name": "Binder product",
+  "class": "b-product-section",
+  "blocks": [
+    { "type": "title", "name": "Card name", "limit": 1 },
+    { "type": "price", "name": "Price", "limit": 1 },
+    {
+      "type": "facts", "name": "Collector details", "limit": 1,
+      "settings": [
+        { "type": "paragraph", "content": "Set, number, language, condition and year are read from each listing's title and tags. A detail the listing doesn't state is left out." },
+        { "type": "checkbox", "id": "show_printing", "label": "Show printing row", "default": false }
+      ]
+    },
+    { "type": "summary", "name": "Card summary", "limit": 1 },
+    {
+      "type": "buy_buttons", "name": "Buy buttons", "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true }
+      ]
+    },
+    { "type": "shipping", "name": "Shipping", "limit": 1 },
+    { "type": "description", "name": "Listing description", "limit": 1 },
+    { "type": "text", "name": "Text", "settings": [{ "type": "richtext", "id": "text", "label": "Text" }] }
+  ]
+}
+{% endschema %}

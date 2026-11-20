@@ -8,12 +8,16 @@
  * ------------------------------------------------------------
  */
 {
-  "name": "Albert footer",
   "type": "footer",
+  "name": "Footer group",
   "sections": {
     "footer": {
-      "type": "ac-footer",
-      "settings": {}
+      "type": "binder-footer",
+      "settings": {
+        "text": "<p>Pokémon singles from a collector in Orlando, FL.</p>",
+        "menu": "redesign-main-menu",
+        "menu_two": "footer"
+      }
     }
   },
   "order": [

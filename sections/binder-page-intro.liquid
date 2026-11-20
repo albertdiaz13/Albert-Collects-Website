@@ -1,0 +1,31 @@
+<section class="b-intro" aria-labelledby="IntroTitle-{{ section.id }}">
+  <div class="b-wrap b-intro__inner">
+    <h1 class="b-display b-intro__title" id="IntroTitle-{{ section.id }}">{{ section.settings.title | default: page.title | escape }}</h1>
+    {%- if section.settings.lede != blank -%}<div class="b-intro__lede">{{ section.settings.lede }}</div>{%- endif -%}
+    {%- if section.blocks.size > 0 -%}
+      <nav class="b-jump" aria-label="{{ section.settings.jump_label | escape }}">
+        <ul role="list">
+          {%- for block in section.blocks -%}<li {{ block.shopify_attributes }}><a class="b-tab" href="#{{ block.settings.anchor | handle }}">{{ block.settings.label | escape }}</a></li>{%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Page intro",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "info": "Leave empty to use the page title." },
+    { "type": "richtext", "id": "lede", "label": "Introduction" },
+    { "type": "text", "id": "jump_label", "label": "Jump links label", "default": "On this page" }
+  ],
+  "blocks": [
+    { "type": "jump", "name": "Jump link", "settings": [
+      { "type": "text", "id": "label", "label": "Label" },
+      { "type": "text", "id": "anchor", "label": "Section anchor", "info": "Matches the anchor set on a section below, e.g. condition-nm" }
+    ] }
+  ],
+  "presets": [{ "name": "Page intro" }]
+}
+{% endschema %}

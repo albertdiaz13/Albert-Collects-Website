@@ -1,0 +1,23 @@
+<section class="b-section b-note-section color-{{ section.settings.color_scheme }}" aria-labelledby="NoteHeading-{{ section.id }}">
+  <div class="b-wrap b-note">
+    <h2 class="b-h2" id="NoteHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+    <div class="b-note__body b-prose">{{ section.settings.text }}</div>
+    {%- if section.settings.link != blank and section.settings.link_label != blank -%}
+      <a class="b-textlink" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }}</a>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Note",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "From one collector to another" },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "text", "id": "link_label", "label": "Link label" },
+    { "type": "color_scheme", "id": "color_scheme", "label": "Color scheme", "default": "scheme-1" }
+  ],
+  "presets": [{ "name": "Note" }]
+}
+{% endschema %}

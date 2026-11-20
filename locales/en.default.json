@@ -283,7 +283,6 @@
       "announcement": "Announcement",
       "announcement_bar": "Announcement bar"
     },
-
     "header": {
       "announcement": "Announcement",
       "menu": "Menu",
@@ -536,6 +535,105 @@
       "max_characters": "{{ max_chars }} characters max",
       "send_on": "YYYY-MM-DD",
       "send_on_label": "Send on (optional)"
+    }
+  },
+  "binder": {
+    "header": {
+      "menu": "Menu",
+      "close_menu": "Close menu",
+      "search": "Search",
+      "cart": "Cart",
+      "home": "Albert Collects home",
+      "cart_count": "{{ count }} items in cart"
+    },
+    "hero": {
+      "prev": "Previous card",
+      "next": "Next card",
+      "counter": "{{ current }} of {{ total }}",
+      "announce": "Card {{ current }} of {{ total }}: {{ name }}",
+      "see": "See every detail",
+      "browse": "Browse all {{ count }} cards"
+    },
+    "card": {
+      "sold": "Sold",
+      "photo_alt": "{{ name }}, photo {{ index }} of {{ count }}"
+    },
+    "facts": {
+      "set": "Set",
+      "number": "Number",
+      "language": "Language",
+      "condition": "Condition",
+      "grade": "Grade",
+      "printing": "Printing",
+      "year": "Year",
+      "notes": "Noted in listing",
+      "how": "How we condition",
+      "about": "About this card",
+      "graded_label": "Professionally graded"
+    },
+    "summary": {
+      "intro": "{{ start }} from {{ set }}",
+      "year": "released {{ year }}",
+      "listed": "Listed as {{ condition }} ({{ code }}).",
+      "graded": "Professionally graded: {{ grade }}.",
+      "notes": "The listing also notes: {{ notes }}.",
+      "card": "card"
+    },
+    "product": {
+      "enlarge": "Enlarge photo {{ index }} of {{ count }}",
+      "close": "Close",
+      "zoom_in": "Zoom in",
+      "zoom_out": "Fit to screen",
+      "photo": "Photo {{ index }} of {{ count }}",
+      "back": "Back to the catalog",
+      "in_stock": "{{ count }} in stock",
+      "sold_out": "Sold out",
+      "viewer": "Photo viewer",
+      "show_photo": "Show photo {{ index }}",
+      "zoom_hint": "Tap a photo to see it full size."
+    },
+    "shipping": {
+      "heading": "Shipping",
+      "standard": "Standard",
+      "express": "Express",
+      "free_over": "Free standard shipping on orders of {{ amount }} or more.",
+      "away": "Add {{ amount }} more for free standard shipping.",
+      "qualified": "This order qualifies for free standard shipping.",
+      "checkout_note": "Choose Standard or Express at checkout."
+    },
+    "catalog": {
+      "cards": {
+        "one": "{{ count }} card",
+        "other": "{{ count }} cards"
+      },
+      "filter": "Filter",
+      "sort": "Sort by",
+      "apply": "Show results",
+      "clear": "Clear all",
+      "remove": "Remove filter: {{ label }}",
+      "search_placeholder": "Name, set or number",
+      "search_label": "Search the catalog",
+      "search_button": "Search",
+      "empty": "No cards match these filters yet.",
+      "page": "Page {{ current }} of {{ total }}",
+      "prev": "Previous page",
+      "next": "Next page",
+      "all": "All cards",
+      "from": "From",
+      "to": "To",
+      "close": "Close filters",
+      "binders": "Binders"
+    },
+    "related": {
+      "heading": "Next in the binder"
+    },
+    "search": {
+      "results": {
+        "one": "{{ count }} result for “{{ terms }}”",
+        "other": "{{ count }} results for “{{ terms }}”"
+      },
+      "none": "Nothing matched “{{ terms }}”. Try a card name, a set, or a number like 073/071.",
+      "other_results": "Pages"
     }
   }
 }

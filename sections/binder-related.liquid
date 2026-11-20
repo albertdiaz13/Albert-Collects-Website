@@ -1,0 +1,55 @@
+{%- liquid
+  assign source = collection
+  if source == blank
+    for c in product.collections
+      if c.handle != 'frontpage' and c.handle != 'racket-sports'
+        assign source = c
+        break
+      endif
+    endfor
+  endif
+  if source == blank
+    assign source = collections.all
+  endif
+  assign shown = 0
+-%}
+<section class="b-section b-related" aria-labelledby="RelatedHeading-{{ section.id }}">
+  <div class="b-wrap">
+    <div class="b-related__head">
+      <h2 class="b-h2" id="RelatedHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+      <a class="b-textlink" href="{{ source.url }}">{{ source.title | escape }}</a>
+    </div>
+    <ul class="b-grid b-grid--related" role="list">
+      {%- comment -%} Start right after this card in the binder, then wrap around. {%- endcomment -%}
+      {%- assign after = false -%}
+      {%- for p in source.products limit: 60 -%}
+        {%- if after and p.available and p.id != product.id -%}
+          {%- render 'binder-card', product: p, collection: source, sizes: '(min-width: 990px) 220px, 44vw' -%}
+          {%- assign shown = shown | plus: 1 -%}
+          {%- if shown >= section.settings.limit -%}{%- break -%}{%- endif -%}
+        {%- endif -%}
+        {%- if p.id == product.id -%}{%- assign after = true -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if shown < section.settings.limit -%}
+        {%- for p in source.products limit: 60 -%}
+          {%- if p.id == product.id -%}{%- break -%}{%- endif -%}
+          {%- if p.available -%}
+            {%- render 'binder-card', product: p, collection: source, sizes: '(min-width: 990px) 220px, 44vw' -%}
+            {%- assign shown = shown | plus: 1 -%}
+            {%- if shown >= section.settings.limit -%}{%- break -%}{%- endif -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Next in the binder",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Next in the binder" },
+    { "type": "range", "id": "limit", "label": "Cards to show", "min": 4, "max": 12, "step": 1, "default": 8 }
+  ]
+}
+{% endschema %}

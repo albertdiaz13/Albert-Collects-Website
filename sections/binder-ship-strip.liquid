@@ -1,0 +1,17 @@
+<section class="b-section b-shipstrip-section" aria-labelledby="ShipHeading-{{ section.id }}">
+  <div class="b-shipstrip">
+    <h2 class="b-h3" id="ShipHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h2>
+    {%- render 'binder-shipping-note', context: 'strip' -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Shipping strip",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shipping" },
+    { "type": "paragraph", "content": "Rates come from Theme settings > Binder redesign. Keep them matched to your Shopify shipping rates." }
+  ],
+  "presets": [{ "name": "Shipping strip" }]
+}
+{% endschema %}

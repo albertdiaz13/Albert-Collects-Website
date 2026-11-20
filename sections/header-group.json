@@ -8,18 +8,18 @@
  * ------------------------------------------------------------
  */
 {
-  "name": "Albert header",
   "type": "header",
+  "name": "Header group",
   "sections": {
-    "brand": {
-      "type": "ac-header",
+    "header": {
+      "type": "binder-header",
       "settings": {
-        "announcement": "WELCOME TO THE NEW WEBSITE",
-        "menu": "main-menu"
+        "menu": "redesign-main-menu",
+        "announcement": ""
       }
     }
   },
   "order": [
-    "brand"
+    "header"
   ]
 }

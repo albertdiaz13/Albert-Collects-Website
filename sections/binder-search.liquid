@@ -1,0 +1,49 @@
+<section class="b-catalog">
+  <div class="b-wrap">
+    <header class="b-catalog__head">
+      <h1 class="b-h1">{{ 'binder.header.search' | t }}</h1>
+      {%- if search.performed -%}
+        <p class="b-catalog__count">
+          {%- if search.results_count > 0 -%}{{ 'binder.search.results' | t: count: search.results_count, terms: search.terms }}{%- else -%}{{ 'binder.search.none' | t: terms: search.terms }}{%- endif -%}
+        </p>
+      {%- endif -%}
+    </header>
+    <form class="b-search b-search--page" action="{{ routes.search_url }}" method="get" role="search">
+      <label class="visually-hidden" for="SearchPage-{{ section.id }}">{{ 'binder.catalog.search_label' | t }}</label>
+      <svg class="b-icon b-search__icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15 15 5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      <input class="b-input" id="SearchPage-{{ section.id }}" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'binder.catalog.search_placeholder' | t }}" autocomplete="off">
+      <input type="hidden" name="type" value="product">
+      <button class="b-btn b-btn--primary" type="submit">{{ 'binder.catalog.search_button' | t }}</button>
+    </form>
+
+    {%- paginate search.results by 24 -%}
+      {%- if search.performed and search.results_count > 0 -%}
+        <ul class="b-grid" role="list">
+          {%- for item in search.results -%}
+            {%- if item.object_type == 'product' -%}
+              {%- render 'binder-card', product: item, heading_tag: 'h2' -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+        {%- assign page_links = search.results | where: 'object_type', 'page' -%}
+        {%- if page_links.size > 0 -%}
+          <h2 class="b-h3 b-search__pages-title">{{ 'binder.search.other_results' | t }}</h2>
+          <ul class="b-search__pages" role="list">
+            {%- for item in page_links -%}<li><a class="b-textlink" href="{{ item.url }}">{{ item.title | escape }}</a></li>{%- endfor -%}
+          </ul>
+        {%- endif -%}
+      {%- endif -%}
+      {%- if paginate.pages > 1 -%}
+        <nav class="b-pager" aria-label="{{ 'binder.catalog.page' | t: current: paginate.current_page, total: paginate.pages }}">
+          {%- if paginate.previous -%}<a class="b-btn b-btn--outline b-btn--small" href="{{ paginate.previous.url }}" rel="prev">{{ 'binder.catalog.prev' | t }}</a>{%- else -%}<span></span>{%- endif -%}
+          <p class="b-mono b-pager__status">{{ 'binder.catalog.page' | t: current: paginate.current_page, total: paginate.pages }}</p>
+          {%- if paginate.next -%}<a class="b-btn b-btn--primary b-btn--small" href="{{ paginate.next.url }}" rel="next">{{ 'binder.catalog.next' | t }}</a>{%- else -%}<span></span>{%- endif -%}
+        </nav>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Binder search" }
+{% endschema %}

@@ -1,0 +1,116 @@
+{%- liquid
+  assign cards = section.blocks | where: 'type', 'card'
+  assign total = 0
+  for block in cards
+    if block.settings.product != blank
+      assign total = total | plus: 1
+    endif
+  endfor
+  assign catalog_count = collections.all.products_count
+-%}
+<section class="b-hero" data-b-hero aria-labelledby="HeroHeading-{{ section.id }}">
+  <div class="b-hero__inner b-wrap">
+    <div class="b-hero__copy">
+      <h1 class="b-display" id="HeroHeading-{{ section.id }}">{{ section.settings.heading | escape }}</h1>
+      {%- if section.settings.text != blank -%}<p class="b-hero__lede">{{ section.settings.text | escape }}</p>{%- endif -%}
+      <a class="b-btn b-btn--star b-hero__cta" href="{{ section.settings.link | default: routes.all_products_collection_url }}">
+        {%- if section.settings.button_label != blank -%}{{ section.settings.button_label | escape }}{%- else -%}{{ 'binder.hero.browse' | t: count: catalog_count }}{%- endif -%}
+        <svg class="b-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M5 12h13m-5-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <div class="b-hero__stage">
+      <div class="b-hero__slides">
+        {%- assign n = 0 -%}
+        {%- for block in cards -%}
+          {%- assign product = block.settings.product -%}
+          {%- if product == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign n = n | plus: 1 -%}
+          {%- capture facts -%}{%- render 'binder-facts', product: product -%}{%- endcapture -%}
+          {%- assign f = facts | split: '§' -%}
+          {%- assign c_name = f[0] | default: product.title -%}
+          <article class="b-hero__slide" data-b-slide data-name="{{ c_name | escape }}" {{ block.shopify_attributes }}{% unless n == 1 %} hidden{% endunless %}>
+            <a class="b-hero__pocket b-holoframe" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+              {%- if product.featured_media -%}
+                {%- if n == 1 -%}
+                  {{ product.featured_media | image_url: width: 1100 | image_tag:
+                    widths: '360, 480, 640, 800, 960, 1100',
+                    sizes: '(min-width: 990px) 34vw, (min-width: 750px) 46vw, 64vw',
+                    loading: 'eager',
+                    fetchpriority: 'high',
+                    alt: '',
+                    class: 'b-hero__img'
+                  }}
+                {%- else -%}
+                  {{ product.featured_media | image_url: width: 1100 | image_tag:
+                    widths: '360, 480, 640, 800, 960, 1100',
+                    sizes: '(min-width: 990px) 34vw, (min-width: 750px) 46vw, 64vw',
+                    loading: 'lazy',
+                    alt: '',
+                    class: 'b-hero__img'
+                  }}
+                {%- endif -%}
+              {%- endif -%}
+            </a>
+            <div class="b-hero__meta">
+              <h2 class="b-hero__name"><a href="{{ product.url }}">{{ c_name | escape }}</a></h2>
+              {%- if f[2] != blank or f[1] != blank -%}
+                <p class="b-hero__set b-mono">{{ f[2] | escape }}{% if f[2] != blank and f[1] != blank %} · {% endif %}{{ f[1] | escape }}{% if f[3] != blank %} · {{ f[3] }}{% endif %}</p>
+              {%- endif -%}
+              <div class="b-hero__buy">
+                {%- render 'binder-chip', tier: f[6], code: f[5], label: f[4] -%}
+                {%- if product.available -%}
+                  <span class="b-hero__price">{{ product.price | money }}</span>
+                {%- else -%}
+                  <span class="b-hero__price">{{ 'binder.card.sold' | t }}</span>
+                {%- endif -%}
+              </div>
+              <a class="b-textlink b-hero__see" href="{{ product.url }}">{{ 'binder.hero.see' | t }}</a>
+            </div>
+          </article>
+        {%- endfor -%}
+      </div>
+
+      {%- if total > 1 -%}
+        <div class="b-hero__controls">
+          <button class="b-iconbtn b-iconbtn--ring" type="button" data-b-prev>
+            <span class="visually-hidden">{{ 'binder.hero.prev' | t }}</span>
+            <svg class="b-icon" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M19 12H6m5 6-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="b-hero__count b-mono" data-b-count>{{ 'binder.hero.counter' | t: current: 1, total: total }}</p>
+          <button class="b-btn b-btn--ghost-light" type="button" data-b-next>
+            {{ 'binder.hero.next' | t }}
+            <svg class="b-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path d="M5 12h13m-5-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <p class="visually-hidden" aria-live="polite" aria-atomic="true" data-b-announce></p>
+        <template data-b-counter-template>{{ 'binder.hero.counter' | t: current: '[current]', total: total }}</template>
+        <template data-b-announce-template>{{ 'binder.hero.announce' | t: current: '[current]', total: total, name: '[name]' }}</template>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Binder hero",
+  "class": "b-hero-section",
+  "max_blocks": 10,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "One card at a time." },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "Japanese and vintage Pokémon singles, each listed with its set, number and condition so you can look closely before you buy." },
+    { "type": "text", "id": "button_label", "label": "Button label", "info": "Leave empty to show the live card count." },
+    { "type": "url", "id": "link", "label": "Button link", "default": "/collections/all" }
+  ],
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Featured card",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Card" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Binder hero" }]
+}
+{% endschema %}

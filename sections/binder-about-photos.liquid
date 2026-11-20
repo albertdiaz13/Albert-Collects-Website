@@ -1,0 +1,36 @@
+<section class="b-section b-photos" aria-labelledby="PhotosTitle-{{ section.id }}">
+  <div class="b-wrap">
+    {%- if section.settings.heading != blank -%}<h2 class="b-h2" id="PhotosTitle-{{ section.id }}">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    <ul class="b-photos__grid" role="list">
+      {%- for block in section.blocks -%}
+        <li class="b-photos__item" {{ block.shopify_attributes }}>
+          <figure>
+            <div class="b-photos__frame">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 1400 | image_tag: widths: '400, 700, 1000, 1400', sizes: '(min-width: 990px) 33vw, 92vw', loading: 'lazy', class: 'b-photos__img' }}
+              {%- else -%}
+                {{ 'lifestyle-1' | placeholder_svg_tag: 'b-photos__img b-placeholder' }}
+              {%- endif -%}
+            </div>
+            {%- if block.settings.caption != blank -%}<figcaption>{{ block.settings.caption | escape }}</figcaption>{%- endif -%}
+          </figure>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Photos",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "From the shows" }
+  ],
+  "blocks": [
+    { "type": "photo", "name": "Photo", "settings": [
+      { "type": "image_picker", "id": "image", "label": "Image" },
+      { "type": "text", "id": "caption", "label": "Caption" } ] }
+  ],
+  "presets": [{ "name": "Photos", "blocks": [{ "type": "photo" }, { "type": "photo" }, { "type": "photo" }] }]
+}
+{% endschema %}

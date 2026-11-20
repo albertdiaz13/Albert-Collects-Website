@@ -1,0 +1,44 @@
+<footer class="b-footer">
+  <div class="b-footer__inner b-wrap">
+    <div class="b-footer__brand">
+      <p class="b-footer__name">{{ shop.name | escape }}</p>
+      {%- if section.settings.text != blank -%}<div class="b-footer__text">{{ section.settings.text }}</div>{%- endif -%}
+    </div>
+    {%- if section.settings.menu.links.size > 0 -%}
+      <nav class="b-footer__col" aria-label="{{ section.settings.menu.title | escape }}">
+        <ul role="list">
+          {%- for link in section.settings.menu.links -%}<li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>{%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+    <div class="b-footer__col">
+      <ul role="list">
+        {%- for link in section.settings.menu_two.links -%}<li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>{%- endfor -%}
+        {%- for policy in shop.policies -%}{%- if policy != blank -%}<li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>{%- endif -%}{%- endfor -%}
+      </ul>
+    </div>
+    <div class="b-footer__col b-footer__ship">
+      <p class="b-footer__label">{{ 'binder.shipping.heading' | t }}</p>
+      {%- render 'binder-shipping-note', context: 'footer' -%}
+    </div>
+  </div>
+  <div class="b-footer__base b-wrap">
+    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}</p>
+    {%- if shop.enabled_payment_types.size > 0 -%}
+      <ul class="b-footer__pay" role="list">
+        {%- for type in shop.enabled_payment_types -%}<li>{{ type | payment_type_svg_tag: class: 'b-footer__payicon' }}</li>{%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Binder footer",
+  "settings": [
+    { "type": "richtext", "id": "text", "label": "Short note", "default": "<p>Pokémon singles from a collector in Orlando, FL.</p>" },
+    { "type": "link_list", "id": "menu", "label": "Main links", "default": "main-menu" },
+    { "type": "link_list", "id": "menu_two", "label": "Help links", "default": "footer" }
+  ]
+}
+{% endschema %}

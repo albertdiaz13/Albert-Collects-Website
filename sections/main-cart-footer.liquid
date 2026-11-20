@@ -104,6 +104,7 @@
                 </small>
               </div>
             {%- else -%}
+              {%- if cart.item_count > 0 -%}{%- render 'binder-shipping-note', context: 'cart', total: cart.total_price -%}{%- endif -%}
               <div class="cart__ctas" {{ block.shopify_attributes }}>
                 <button
                   type="submit"

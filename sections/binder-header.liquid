@@ -1,0 +1,85 @@
+{%- liquid
+  assign menu = section.settings.menu
+  assign on_catalog = false
+  if template.name == 'collection' or template.name == 'product' or template.name == 'search'
+    assign on_catalog = true
+  endif
+-%}
+<header class="b-header" data-b-header>
+  {%- if section.settings.announcement != blank -%}
+    <p class="b-header__note">{{ section.settings.announcement | escape }}</p>
+  {%- endif -%}
+  <div class="b-header__bar b-wrap">
+    <details class="b-menu" data-b-menu>
+      <summary class="b-iconbtn b-menu__toggle">
+        <span class="visually-hidden">{{ 'binder.header.menu' | t }}</span>
+        <svg class="b-icon b-menu__open" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg class="b-icon b-menu__close" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </summary>
+      <div class="b-menu__panel">
+        <nav aria-label="{{ 'binder.header.menu' | t }}">
+          <ul class="b-menu__list" role="list">
+            {%- for link in menu.links -%}
+              {%- liquid
+                assign is_current = link.current
+                if link.type == 'catalog_link' and on_catalog
+                  assign is_current = true
+                endif
+              -%}
+              <li><a class="b-menu__link" href="{{ link.url }}"{% if is_current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+        <form action="{{ routes.search_url }}" method="get" role="search" class="b-search b-search--menu">
+          <label class="visually-hidden" for="MenuSearch-{{ section.id }}">{{ 'binder.catalog.search_label' | t }}</label>
+          <input class="b-input" id="MenuSearch-{{ section.id }}" type="search" name="q" placeholder="{{ 'binder.catalog.search_placeholder' | t }}" autocomplete="off">
+          <input type="hidden" name="type" value="product">
+          <button class="b-btn b-btn--star" type="submit">{{ 'binder.catalog.search_button' | t }}</button>
+        </form>
+      </div>
+    </details>
+
+    <a class="b-brand" href="{{ routes.root_url }}">
+      {%- if section.settings.logo != blank -%}
+        {{ section.settings.logo | image_url: width: 96 | image_tag: class: 'b-brand__mark', width: 40, height: 40, alt: '', loading: 'eager' }}
+      {%- else -%}
+        <img class="b-brand__mark" src="{{ 'albert-circle-logo.png' | asset_img_url: '96x' }}" width="40" height="40" alt="" loading="eager">
+      {%- endif -%}
+      <span class="b-brand__name">{{ shop.name | escape }}</span>
+    </a>
+
+    <nav class="b-nav" aria-label="{{ 'binder.header.menu' | t }}">
+      <ul class="b-nav__list" role="list">
+        {%- for link in menu.links -%}
+          {%- liquid
+            assign is_current = link.current
+            if link.type == 'catalog_link' and on_catalog
+              assign is_current = true
+            endif
+          -%}
+          <li><a class="b-nav__link" href="{{ link.url }}"{% if is_current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="b-header__actions">
+      <a class="b-iconbtn" href="{{ routes.search_url }}">
+        <svg class="b-icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m15 15 5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <span class="visually-hidden">{{ 'binder.header.search' | t }}</span>
+      </a>
+      <a class="b-iconbtn b-cart" href="{{ routes.cart_url }}" id="cart-icon-bubble">{%- render 'binder-cart-icon' -%}</a>
+    </div>
+  </div>
+</header>
+
+{% schema %}
+{
+  "name": "Binder header",
+  "class": "b-header-section",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" },
+    { "type": "image_picker", "id": "logo", "label": "Logo mark", "info": "Square image. Leave empty to use the round Albert Collects mark." },
+    { "type": "text", "id": "announcement", "label": "Announcement" }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,31 @@
+{%- comment -%}
+  Shipping summary from the theme's shipping settings (kept in step with the store's Shopify shipping rates).
+  Accepts: context ('product' or 'cart'), total (cart total in cents, cart context only).
+{%- endcomment -%}
+{%- liquid
+  assign standard = settings.binder_ship_standard | times: 100
+  assign express = settings.binder_ship_express | times: 100
+  assign free_over = settings.binder_ship_free_over | times: 100
+  assign free_money = free_over | money_without_trailing_zeros
+-%}
+<div class="b-ship{% if context == 'cart' %} b-ship--cart{% endif %}">
+  {%- if context == 'cart' and free_over > 0 -%}
+    {%- if total >= free_over -%}
+      <p class="b-ship__status"><strong>{{ 'binder.shipping.qualified' | t }}</strong></p>
+    {%- else -%}
+      {%- assign remaining = free_over | minus: total -%}
+      {%- assign remaining_money = remaining | money_without_trailing_zeros -%}
+      <p class="b-ship__status">{{ 'binder.shipping.away' | t: amount: remaining_money }}</p>
+      {%- assign pct = total | times: 100 | divided_by: free_over -%}
+      <div class="b-ship__meter" aria-hidden="true"><span style="--pct: {{ pct }}%"></span></div>
+    {%- endif -%}
+  {%- endif -%}
+  <ul class="b-ship__rates" role="list">
+    {%- if settings.binder_ship_region != blank -%}<li class="b-ship__region">{{ settings.binder_ship_region | escape }}</li>{%- endif -%}
+    <li><span>{{ 'binder.shipping.standard' | t }}</span><span class="b-mono">{{ standard | money_without_trailing_zeros }}</span></li>
+    {%- if free_over > 0 -%}<li class="b-ship__free">{{ 'binder.shipping.free_over' | t: amount: free_money }}</li>{%- endif -%}
+    {%- if express > 0 -%}<li><span>{{ 'binder.shipping.express' | t }}</span><span class="b-mono">{{ express | money_without_trailing_zeros }}</span></li>{%- endif -%}
+  </ul>
+  {%- if settings.binder_ship_extra != blank -%}<div class="b-ship__extra">{{ settings.binder_ship_extra }}</div>{%- endif -%}
+  {%- if context == 'cart' -%}<p class="b-ship__fine">{{ 'binder.shipping.checkout_note' | t }}</p>{%- endif -%}
+</div>

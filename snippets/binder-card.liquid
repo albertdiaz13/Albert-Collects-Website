@@ -1,0 +1,63 @@
+{%- comment -%}
+  Card tile for grids and rows.
+  Accepts: product, collection (optional, for "within" links), heading_tag (default h3), eager (boolean), sizes (string)
+{%- endcomment -%}
+{%- liquid
+  capture facts
+    render 'binder-facts', product: product
+  endcapture
+  assign f = facts | split: '§'
+  assign c_name = f[0] | default: product.title
+  assign tag = heading_tag | default: 'h3'
+  assign img = product.featured_media
+  assign img_sizes = sizes | default: '(min-width: 1100px) 240px, (min-width: 750px) 30vw, 46vw'
+  if collection
+    assign url = product.url | within: collection
+  else
+    assign url = product.url
+  endif
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+  assign lang_code = ''
+  if f[3] == 'Japanese'
+    assign lang_code = 'JP'
+  elsif f[3] == 'English'
+    assign lang_code = 'EN'
+  endif
+-%}
+<li class="b-tile{% unless product.available %} is-sold{% endunless %}">
+  <a class="b-tile__link" href="{{ url }}">
+    <div class="b-pocket b-pocket--tile">
+      {%- if img -%}
+        {{ img | image_url: width: 720 | image_tag:
+          widths: '240, 360, 480, 600, 720',
+          sizes: img_sizes,
+          loading: loading,
+          alt: '',
+          class: 'b-pocket__img'
+        }}
+      {%- else -%}
+        {{ 'product-1' | placeholder_svg_tag: 'b-pocket__img b-placeholder' }}
+      {%- endif -%}
+    </div>
+    <div class="b-tile__body">
+      <{{ tag }} class="b-tile__name">{{ c_name | escape }}</{{ tag }}>
+      {%- if f[2] != blank or f[1] != blank -%}
+        <p class="b-tile__meta b-mono">{{ f[2] | escape }}{% if f[1] != blank %}<span class="b-nowrap">{% if f[2] != blank %}{{ ' · ' }}{% endif %}{{ f[1] | escape }}</span>{% endif %}</p>
+      {%- endif -%}
+      <div class="b-tile__foot">
+        <span class="b-tile__tags">
+          {%- render 'binder-chip', tier: f[6], code: f[5], label: f[4] -%}
+          {%- if lang_code != '' -%}<span class="b-lang b-mono" title="{{ f[3] }}">{{ lang_code }}<span class="visually-hidden"> {{ f[3] }}</span></span>{%- endif -%}
+        </span>
+        {%- if product.available -%}
+          <span class="b-tile__price">{{ product.price | money }}</span>
+        {%- else -%}
+          <span class="b-tile__price b-tile__price--sold">{{ 'binder.card.sold' | t }}</span>
+        {%- endif -%}
+      </div>
+    </div>
+  </a>
+</li>

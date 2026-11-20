@@ -1541,5 +1541,65 @@
         "info": "Automatic lets Shopify pick the best format per browser. Use Always JPEG only to troubleshoot blank photos on old devices; it removes PNG transparency."
       }
     ]
+  },
+  {
+    "name": "Binder redesign",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Typography"
+      },
+      {
+        "type": "font_picker",
+        "id": "binder_mono_font",
+        "label": "Collector data font",
+        "info": "Used for card numbers, condition codes and set details.",
+        "default": "space_mono_n4"
+      },
+      {
+        "type": "header",
+        "content": "Condition guide"
+      },
+      {
+        "type": "page",
+        "id": "binder_condition_page",
+        "label": "How We Condition page",
+        "info": "Linked beside the condition on every card."
+      },
+      {
+        "type": "header",
+        "content": "Shipping (match your Shopify shipping rates)"
+      },
+      {
+        "type": "text",
+        "id": "binder_ship_region",
+        "label": "Where you ship",
+        "default": "Ships within the United States"
+      },
+      {
+        "type": "number",
+        "id": "binder_ship_standard",
+        "label": "Standard shipping price (USD)",
+        "default": 8
+      },
+      {
+        "type": "number",
+        "id": "binder_ship_free_over",
+        "label": "Free standard shipping from (USD order total)",
+        "default": 70
+      },
+      {
+        "type": "number",
+        "id": "binder_ship_express",
+        "label": "Express shipping price (USD)",
+        "default": 15
+      },
+      {
+        "type": "richtext",
+        "id": "binder_ship_extra",
+        "label": "Extra shipping note",
+        "info": "Optional. Only add details you have confirmed, such as packaging or handling time."
+      }
+    ]
   }
 ]
