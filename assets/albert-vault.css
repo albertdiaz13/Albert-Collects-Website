@@ -1,0 +1,245 @@
+/* ALBERT COLLECTS | THE VAULT (generic theme, kiosk page only). Markup: snippets/ac-vault.liquid and ac-vault-door.liquid.
+   Script: assets/albert-vault.js.
+   Palette: obsidian, deep plum, champagne gold, warm cream, with soft holographic foil. Built for an iPad in landscape.
+   Only transform and opacity are animated. Ambient motion runs under html.ac-motion-ok (modern browser, reduced
+   motion off); everything else is a composed still that still plays. ".is-lite" drops the costly layers. */
+.acv,.acv-overlay{--acv-obsidian:#08050b;--acv-plum:#2a1634;--acv-gold:#e9c877;--acv-gold-hi:#fff3cf;--acv-gold-lo:#a97f2c;--acv-cream:#f7efe4;--acv-mist:#cdbfd3;--acv-accent:#c9a4ff;--acv-out:cubic-bezier(.23,1,.32,1);--acv-inout:cubic-bezier(.77,0,.175,1);--acv-display:"Fraunces Variable","Fraunces",var(--font-heading-family),Georgia,serif}
+
+/* ---------- The door (shared by the teaser and the Vault) ---------- */
+.acv-door{position:relative;width:100%;height:0;padding-top:100%;border-radius:50%}
+.acv-layer,.acv-ringwrap,.acv-ring,.acv-hub,.acv-ring svg,.acv-hub svg{position:absolute;top:0;left:0;width:100%;height:100%}
+.acv-layer,.acv-ring svg,.acv-hub svg{display:block;overflow:visible;pointer-events:none}
+.acv-ringwrap,.acv-ring,.acv-hub{-webkit-transform-origin:50% 50%;transform-origin:50% 50%}
+.acv-ring{will-change:transform}
+.acv-ring-holo{opacity:.85}
+.acv-ring-lock{opacity:0;transition:opacity 500ms ease}
+.acv-sigil-glow{fill:#ffe9b0;opacity:0}
+.acv-sigil-lit{fill:#fffaf0;opacity:0}
+.acv-aura{opacity:.5}
+.acv-core{opacity:.45}
+.acv-beam,.acv-beam-glow,.acv-socket{opacity:0;transition:opacity 500ms ease}
+.acv-lamp-glow{opacity:.2}
+.acv-streak{opacity:.9}
+.acv-door::after{content:"";position:absolute;top:-1px;right:-1px;bottom:-1px;left:-1px;border-radius:50%;box-shadow:0 30px 60px -20px rgba(0,0,0,.85),0 0 0 1px rgba(233,200,119,.25);pointer-events:none}
+
+/* ---------- 1. Teaser in the kiosk banner ---------- */
+.acv-teaser{position:relative;display:block;width:100%;margin:0;padding:8px 0 4px;border:0;background:none;color:var(--acv-cream);font:inherit;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.acv-teaser:focus{outline:none}
+.acv-teaser:focus-visible .acv-prompt{outline:2px solid #7ef2c8;outline-offset:4px}
+.acv-teaser-label{display:flex;align-items:center;justify-content:center;margin:0 0 10px;font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--acv-gold)}
+.acv-teaser-label i{display:block;width:1px;height:12px;margin:0 12px;background:var(--acv-gold);opacity:.6}
+.acv-teaser-stage{position:relative;display:block;width:200px;max-width:62%;margin:0 auto}
+.acv-teaser-float{position:relative;display:block}
+.acv-teaser-glow{position:absolute;top:-22%;right:-22%;bottom:-22%;left:-22%;border-radius:50%;background:radial-gradient(closest-side,rgba(201,164,255,.34) 0%,rgba(242,195,90,.16) 46%,rgba(242,195,90,0) 100%);pointer-events:none}
+.acv-prompt{position:relative;display:inline-flex;align-items:center;min-height:36px;margin:12px 0 0;padding:0 18px 0 14px;border:1px solid rgba(233,200,119,.6);border-radius:999px;background:rgba(8,5,11,.55);color:var(--acv-gold-hi);font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;line-height:1;white-space:nowrap}
+.acv-prompt-ring{position:relative;flex:none;width:9px;height:9px;margin-right:10px;border-radius:50%;background:var(--acv-gold)}
+.acv-prompt-ring::after{content:"";position:absolute;top:-5px;right:-5px;bottom:-5px;left:-5px;border-radius:50%;border:1px solid var(--acv-gold);opacity:0}
+.acv-teaser .acv-ringwrap--a .acv-ring{-webkit-transform:rotate(38deg);transform:rotate(38deg)}
+.acv-teaser .acv-ringwrap--b .acv-ring{-webkit-transform:rotate(-64deg);transform:rotate(-64deg)}
+.acv-teaser .acv-ringwrap--c .acv-ring{-webkit-transform:rotate(112deg);transform:rotate(112deg)}
+.acv-teaser .acv-beam,.acv-teaser .acv-beam-glow{opacity:.55}
+@media(hover:hover) and (pointer:fine){
+  .acv-teaser:hover .acv-prompt{background:rgba(233,200,119,.16)}
+}
+.ac-motion-ok .acv-teaser-float{animation:acv-float 7s ease-in-out infinite}
+.ac-motion-ok .acv-teaser-glow{animation:acv-breathe 5.5s ease-in-out infinite}
+.ac-motion-ok .acv-teaser .acv-ringwrap--a .acv-ring{animation:acv-spin 90s linear infinite}
+.ac-motion-ok .acv-teaser .acv-ringwrap--b .acv-ring{animation:acv-spin 120s linear infinite reverse}
+.ac-motion-ok .acv-teaser .acv-ringwrap--c .acv-ring{animation:acv-spin 70s linear infinite}
+.ac-motion-ok .acv-teaser .acv-streak{animation:acv-streak 8s var(--acv-inout) infinite}
+.ac-motion-ok .acv-teaser .acv-core{animation:acv-breathe 4.2s ease-in-out infinite}
+.ac-motion-ok .acv-prompt-ring::after{animation:acv-ping 2.4s var(--acv-out) infinite}
+/* Resting: off screen, while someone is searching or reading a card, or while the Vault itself is open. */
+.acv-teaser.is-resting *,.acv-teaser.is-resting *::after{-webkit-animation-play-state:paused!important;animation-play-state:paused!important}
+@keyframes acv-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes acv-breathe{0%,100%{opacity:.45}50%{opacity:.95}}
+@keyframes acv-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes acv-streak{0%,62%{transform:translateX(-46%)}100%{transform:translateX(46%)}}
+@keyframes acv-ping{0%{opacity:.9;transform:scale(.5)}100%{opacity:0;transform:scale(2.4)}}
+
+/* Banner layout around the teaser (this theme's kiosk only). */
+.ac-court-stage.ac-court-stage--vault{max-width:420px;padding-bottom:0}
+.acv-explore-link{display:inline-flex;align-items:center;min-height:44px;margin:16px 0 0;padding:0 20px;border:1px solid rgba(233,200,119,.7);border-radius:999px;background:transparent;color:var(--acv-gold-hi,#fff3cf);font:inherit;font-size:13px;font-weight:700;letter-spacing:.04em;line-height:1;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color 160ms ease}
+.acv-explore-link svg{flex:none;margin-left:10px}
+.acv-explore-link:active{-webkit-transform:scale(.97);transform:scale(.97)}
+.acv-explore-link:focus-visible{outline:2px solid #7ef2c8;outline-offset:3px}
+@media(hover:hover) and (pointer:fine){.acv-explore-link:hover{background:rgba(233,200,119,.14)}}
+@media(min-width:750px){
+  .ac-court-stage.ac-court-stage--vault{flex:0 0 46%;max-width:46%;margin:0 0 0 auto}
+  .acv-teaser-stage{width:230px}
+}
+@media(min-width:990px){
+  .acv-teaser-stage{width:250px}
+  .acv-teaser-label{font-size:11px}
+  .acv-prompt{min-height:40px;font-size:12px}
+}
+@media(min-width:1200px){.acv-teaser-stage{width:290px}}
+
+/* ---------- 2. The Vault (full screen) ---------- */
+.ac-vault-lock,.ac-vault-lock body{overflow:hidden}
+.acv-overlay{position:fixed;z-index:1200;text-align:left;top:0;right:0;bottom:0;left:0;display:block;overflow:hidden;background:#08050b;color:var(--acv-cream);opacity:0;transition:opacity 420ms ease;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
+.acv-overlay[hidden]{display:none}
+.acv-overlay.is-in{opacity:1}
+.acv-overlay[data-variant="2"]{--acv-accent:#f2c35a}
+.acv-overlay[data-variant="3"]{--acv-accent:#7ef2c8}
+.acv-overlay[data-variant="4"]{--acv-accent:#ff9e8a}
+.acv-backdrop{position:absolute;top:0;right:0;bottom:0;left:0;background:radial-gradient(ellipse 70% 78% at 50% 46%,#3a1f4c 0%,#1c0f24 46%,#08050b 100%)}
+.acv-pattern{position:absolute;top:0;right:0;bottom:0;left:0;opacity:.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='40'%3E%3Cg fill='none' stroke='%23e9c877' stroke-width='1'%3E%3Ccircle cx='40' cy='40' r='38'/%3E%3Ccircle cx='40' cy='40' r='26'/%3E%3Ccircle cx='40' cy='40' r='14'/%3E%3Ccircle cx='0' cy='20' r='38'/%3E%3Ccircle cx='0' cy='20' r='26'/%3E%3Ccircle cx='0' cy='20' r='14'/%3E%3Ccircle cx='80' cy='20' r='38'/%3E%3Ccircle cx='80' cy='20' r='26'/%3E%3Ccircle cx='80' cy='20' r='14'/%3E%3C/g%3E%3C/svg%3E");-webkit-mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(0,0,0,0) 30%,#000 100%);mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,rgba(0,0,0,0) 30%,#000 100%)}
+.acv-halo{position:absolute;left:50%;top:50%;width:120vmin;height:120vmin;margin:-60vmin 0 0 -60vmin;border-radius:50%;background:radial-gradient(closest-side,var(--acv-accent) 0%,rgba(0,0,0,0) 70%);opacity:.2;transition:opacity 900ms ease}
+.acv-dust{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+
+.acv-head{position:absolute;z-index:3;left:40px;top:34px;max-width:260px}
+.acv-brand{display:flex;align-items:center;margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--acv-gold)}
+.acv-brand::after{content:"";flex:none;width:34px;height:1px;margin-left:12px;background:var(--acv-gold);opacity:.6}
+.acv-title{margin:0;font-family:var(--acv-display);font-size:46px;font-weight:480;line-height:1;letter-spacing:-.02em;color:var(--acv-cream)}
+.acv-kana{margin:12px 0 0;font-size:12px;letter-spacing:.42em;line-height:1;color:var(--acv-gold);opacity:.6}
+.acv-tools{position:absolute;z-index:6;right:28px;top:26px;display:flex;align-items:center}
+.acv-tool{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:48px;margin:0 0 0 10px;padding:0 16px;border:1px solid rgba(233,200,119,.4);border-radius:999px;background:rgba(8,5,11,.5);color:var(--acv-cream);font:inherit;font-size:12px;font-weight:650;letter-spacing:.06em;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.acv-tool svg{flex:none}
+.acv-tool span{margin-left:8px}
+.acv-tool--close{padding:0}
+.acv-tool:focus-visible,.acv-btn:focus-visible{outline:2px solid #7ef2c8;outline-offset:3px}
+.acv-tool[aria-pressed="true"]{border-color:var(--acv-gold);color:var(--acv-gold-hi)}
+.acv-tool[aria-pressed="true"] .acv-sound-off,.acv-tool[aria-pressed="false"] .acv-sound-on{display:none}
+
+/* Landscape stage: copy on the left, the door in the middle, the exhibit text and actions on the right. */
+.acv-play{position:absolute;z-index:2;top:0;right:0;bottom:0;left:0}
+.acv-stage{position:absolute;left:47%;top:51%;width:62vh;max-width:50vw;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%)}
+.acv-doorbox{position:relative;width:100%;-webkit-transform-origin:50% 50%;transform-origin:50% 50%;transition:transform 1100ms var(--acv-out),opacity 700ms ease}
+.acv-handles{position:absolute;top:0;left:0;width:1px;height:1px;overflow:hidden;opacity:0}
+.acv-handle{position:absolute;width:1px;height:1px;padding:0;border:0;background:none}
+.acv-guidecopy{position:absolute;left:40px;bottom:44px;width:232px;transition:opacity 500ms ease,transform 600ms var(--acv-out)}
+.acv-step{margin:0;font-family:var(--acv-display);font-size:25px;font-weight:460;line-height:1.16;letter-spacing:-.01em;color:var(--acv-cream)}
+.acv-substep{margin:10px 0 0;font-size:13px;line-height:1.5;letter-spacing:.02em;color:var(--acv-mist)}
+.acv-pips{display:flex;margin:22px 0 0;padding:0;list-style:none}
+.acv-pips li{position:relative;width:34px;height:34px;margin:0 12px 0 0;border:1px solid rgba(233,200,119,.5);border-radius:50%;transition:border-color 400ms ease}
+.acv-pips li::after{content:"";position:absolute;top:7px;right:7px;bottom:7px;left:7px;border-radius:50%;background:radial-gradient(circle at 36% 30%,#fff6dc 0%,#f2c35a 55%,#a97f2c 100%);opacity:0;-webkit-transform:scale(.3);transform:scale(.3);transition:opacity 400ms ease,transform 600ms var(--acv-out)}
+.acv-pips li.is-set{border-color:var(--acv-gold-hi)}
+.acv-pips li.is-set::after{opacity:1;-webkit-transform:none;transform:none}
+.acv-count{margin:12px 0 0;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--acv-gold)}
+.acv-side{position:absolute;right:36px;bottom:44px;width:262px;text-align:left}
+.acv-exhibit{opacity:0;-webkit-transform:translateY(14px);transform:translateY(14px);transition:opacity 600ms ease,transform 800ms var(--acv-out);pointer-events:none}
+.acv-exhibit-no{margin:0 0 8px;font-size:11px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--acv-accent)}
+.acv-exhibit-name{margin:0;font-family:var(--acv-display);font-size:38px;font-weight:480;line-height:1.02;letter-spacing:-.02em;color:var(--acv-cream)}
+.acv-exhibit-text{margin:14px 0 0;font-size:13px;line-height:1.55;color:var(--acv-mist)}
+.acv-actions{margin:22px 0 0}
+.acv-btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;margin:0 0 10px;padding:0 20px;border-radius:999px;font:inherit;font-size:14px;font-weight:700;letter-spacing:.04em;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:background-color 160ms ease,opacity 400ms ease}
+.acv-btn svg{flex:none;margin-left:10px}
+.acv-btn:active{-webkit-transform:scale(.97);transform:scale(.97)}
+.acv-btn--gold{border:1px solid rgba(233,200,119,.75);background:rgba(8,5,11,.45);color:var(--acv-gold-hi)}
+.acv-btn--ghost{display:none;border:1px solid rgba(205,191,211,.4);background:transparent;color:var(--acv-cream)}
+@media(hover:hover) and (pointer:fine){.acv-btn--gold:hover{background:rgba(233,200,119,.16)}.acv-btn--ghost:hover{border-color:var(--acv-cream)}}
+
+/* The exhibit card. */
+.acv-reveal{position:absolute;left:50%;top:50%;width:62%;margin:0;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-perspective:1100px;perspective:1100px;pointer-events:none;opacity:0}
+.acv-card-tilt{position:relative;-webkit-transform-style:preserve-3d;transform-style:preserve-3d;will-change:transform}
+.acv-card{position:relative;height:0;padding-top:139.68%;border-radius:5.7%/4.1%;overflow:hidden;box-shadow:0 0 0 1px rgba(255,243,207,.35);-webkit-transform:translateZ(0);transform:translateZ(0)}
+.acv-card-art{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
+.acv-art{display:none}
+.acv-overlay[data-variant="1"] .acv-art--1,.acv-overlay[data-variant="2"] .acv-art--2,.acv-overlay[data-variant="3"] .acv-art--3,.acv-overlay[data-variant="4"] .acv-art--4{display:block}
+.acv-card-brand{font:700 21px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;letter-spacing:7px;fill:#e9c877}
+.acv-card-name{font-family:var(--acv-display);font-size:58px;font-weight:480;letter-spacing:-1px;fill:#f7efe4}
+.acv-card-no{font:700 19px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;letter-spacing:5px;fill:#e9c877}
+.acv-card-fine{font:700 15px/1 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;letter-spacing:4px;fill:#cdbfd3;opacity:.8}
+.acv-card-holo,.acv-card-glare,.acv-card-sheen{position:absolute;top:0;right:0;bottom:0;left:0;pointer-events:none}
+.acv-card-holo{background-image:repeating-linear-gradient(115deg,rgba(255,92,108,.5) 0%,rgba(255,216,74,.5) 6%,rgba(125,255,107,.5) 12%,rgba(72,240,255,.5) 18%,rgba(90,123,255,.5) 24%,rgba(212,92,255,.5) 30%,rgba(255,92,108,.5) 36%);background-size:320% 320%;background-position:var(--hx,50%) var(--hy,50%);mix-blend-mode:color-dodge;opacity:.2}
+.acv-card-glare{background-image:radial-gradient(farthest-corner circle at var(--gx,30%) var(--gy,20%),rgba(255,255,255,.34) 0%,rgba(255,255,255,.08) 26%,rgba(255,255,255,0) 54%)}
+.acv-card-sheen{background-image:linear-gradient(105deg,rgba(255,255,255,0) 36%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 64%);-webkit-transform:translateX(-120%);transform:translateX(-120%)}
+.acv-card-shadow{position:absolute;left:8%;right:8%;bottom:-9%;height:9%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.7),rgba(0,0,0,0));pointer-events:none}
+.acv-burst{position:absolute;left:50%;top:50%;width:60%;height:0;padding-top:60%;margin:-30% 0 0 -30%;border-radius:50%;background:radial-gradient(closest-side,#fffaf0 0%,rgba(255,233,176,.85) 22%,rgba(242,195,90,.3) 52%,rgba(242,195,90,0) 100%);opacity:0;-webkit-transform:scale(.2);transform:scale(.2);pointer-events:none}
+
+/* ---------- States ---------- */
+/* waking: the door settles into place and its light comes on. */
+.acv-overlay[data-state="waking"] .acv-doorbox{-webkit-transform:scale(.86);transform:scale(.86)}
+.acv-overlay.is-lit .acv-doorbox{-webkit-transform:none;transform:none}
+.acv-overlay.is-lit .acv-beam{opacity:.95}
+.acv-overlay.is-lit .acv-beam-glow{opacity:.6}
+.acv-overlay.is-lit .acv-socket{opacity:.75}
+.acv-overlay[data-state="waking"] .acv-guidecopy,.acv-overlay[data-state="closed"] .acv-guidecopy{opacity:0;-webkit-transform:translateY(12px);transform:translateY(12px)}
+/* play: the ring under the finger, the ring that is set, and the nudge after a pause. */
+.acv-overlay[data-state="play"] .acv-doorbox{cursor:grab}
+.acv-ringwrap.is-held .acv-ring-lock{opacity:.07}
+.acv-ringwrap .acv-sigil-glow{opacity:calc(var(--near,0) * .55)}
+.acv-ringwrap.is-locked .acv-ring-lock{opacity:.17}
+.acv-ringwrap.is-locked .acv-sigil-lit{opacity:.22}
+.acv-ringwrap.is-locked .acv-sigil-glow{opacity:.7}
+.acv-ringwrap.is-focus .acv-ring-lock{opacity:.12}
+.acv-ringwrap.is-thud{animation:acv-thud 520ms var(--acv-out)}
+.acv-overlay.is-hinting .acv-ringwrap.is-next .acv-sigil-glow{animation:acv-hint 1.3s ease-in-out infinite}
+@keyframes acv-thud{0%{transform:scale(1)}30%{transform:scale(1.022)}100%{transform:scale(1)}}
+@keyframes acv-hint{0%,100%{opacity:.1}50%{opacity:.95}}
+/* opening: marks flare, the rings fly apart, the hub gives way to light. */
+.acv-overlay[data-state="opening"] .acv-guidecopy,.acv-overlay[data-state="reveal"] .acv-guidecopy{opacity:0;-webkit-transform:translateY(12px);transform:translateY(12px);pointer-events:none}
+.acv-overlay[data-state="opening"] .acv-ringwrap,.acv-overlay[data-state="reveal"] .acv-ringwrap{opacity:0;transition:transform 1500ms var(--acv-inout),opacity 700ms ease 800ms}
+.acv-overlay[data-state="opening"] .acv-ringwrap--a,.acv-overlay[data-state="reveal"] .acv-ringwrap--a{-webkit-transform:scale(1.5) rotate(70deg);transform:scale(1.5) rotate(70deg);transition-delay:420ms,1100ms}
+.acv-overlay[data-state="opening"] .acv-ringwrap--b,.acv-overlay[data-state="reveal"] .acv-ringwrap--b{-webkit-transform:scale(1.75) rotate(-90deg);transform:scale(1.75) rotate(-90deg);transition-delay:300ms,980ms}
+.acv-overlay[data-state="opening"] .acv-ringwrap--c,.acv-overlay[data-state="reveal"] .acv-ringwrap--c{-webkit-transform:scale(2.1) rotate(120deg);transform:scale(2.1) rotate(120deg);transition-delay:180ms,860ms}
+.acv-overlay[data-state="opening"] .acv-hub,.acv-overlay[data-state="reveal"] .acv-hub{opacity:0;-webkit-transform:scale(.3);transform:scale(.3);transition:transform 900ms var(--acv-inout) 200ms,opacity 500ms ease 500ms}
+.acv-overlay[data-state="opening"] .acv-guide,.acv-overlay[data-state="reveal"] .acv-guide{opacity:0;transition:opacity 500ms ease 500ms}
+.acv-overlay[data-state="opening"] .acv-glass,.acv-overlay[data-state="reveal"] .acv-glass{opacity:.35;transition:opacity 900ms ease}
+.acv-overlay[data-state="opening"] .acv-burst{animation:acv-burst 1700ms var(--acv-out) 500ms both}
+.acv-overlay[data-state="opening"] .acv-halo,.acv-overlay[data-state="reveal"] .acv-halo{opacity:.42}
+.acv-overlay[data-state="reveal"] .acv-doorbox{-webkit-transform:scale(1.04);transform:scale(1.04);opacity:.42}
+@keyframes acv-burst{0%{opacity:0;transform:scale(.2)}30%{opacity:1}100%{opacity:0;transform:scale(3.4)}}
+/* reveal: the card rises; the exhibit text and "Unlock another" come in. */
+.acv-overlay[data-state="reveal"] .acv-reveal{opacity:1;pointer-events:auto;animation:acv-rise 1200ms var(--acv-out) both}
+.acv-overlay[data-state="reveal"] .acv-card-sheen{animation:acv-sheen 1300ms var(--acv-inout) 520ms both}
+.acv-overlay[data-state="reveal"] .acv-exhibit{opacity:1;-webkit-transform:none;transform:none;transition-delay:500ms;pointer-events:auto}
+.acv-overlay[data-state="reveal"] .acv-btn--ghost{display:flex}
+@keyframes acv-rise{0%{opacity:0;transform:translate(-50%,-34%) scale(.5) rotateX(62deg)}55%{opacity:1}100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotateX(0deg)}}
+@keyframes acv-sheen{0%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+/* Ambient motion inside the Vault. */
+.ac-motion-ok .acv-overlay .acv-core{animation:acv-breathe 3.6s ease-in-out infinite}
+.ac-motion-ok .acv-overlay .acv-lamp-glow{animation:acv-breathe 2.8s ease-in-out infinite}
+.ac-motion-ok .acv-overlay[data-state="play"] .acv-streak{animation:acv-streak 9s var(--acv-inout) infinite}
+.ac-motion-ok .acv-overlay .acv-halo{animation:acv-halo 14s ease-in-out infinite alternate}
+@keyframes acv-halo{from{transform:scale(1)}to{transform:scale(1.12)}}
+
+/* ---------- Lite: reduced motion, older browsers, or a device that cannot keep up ---------- */
+.acv-overlay.is-lite .acv-dust,.acv-overlay.is-lite .acv-pattern{display:none}
+.acv-overlay.is-lite .acv-card-holo{mix-blend-mode:normal;opacity:.12}
+.acv-overlay.is-lite .acv-halo,.acv-overlay.is-lite .acv-streak,.acv-overlay.is-lite .acv-core,.acv-overlay.is-lite .acv-lamp-glow{-webkit-animation:none!important;animation:none!important}
+@media(prefers-reduced-motion:reduce){
+  .acv-overlay,.acv-doorbox,.acv-exhibit,.acv-guidecopy,.acv-ring-lock{transition-duration:1ms!important}
+  .acv-overlay[data-state="opening"] .acv-ringwrap,.acv-overlay[data-state="reveal"] .acv-ringwrap,.acv-overlay[data-state="opening"] .acv-hub,.acv-overlay[data-state="reveal"] .acv-hub{-webkit-transform:none;transform:none;transition:opacity 300ms ease}
+  .acv-overlay[data-state="opening"] .acv-burst{animation:none}
+  .acv-overlay[data-state="reveal"] .acv-reveal{animation:acv-fade 400ms ease both}
+  .acv-overlay[data-state="reveal"] .acv-card-sheen,.acv-ringwrap.is-thud,.acv-overlay.is-hinting .acv-ringwrap.is-next .acv-sigil-glow{animation:none}
+  .acv-overlay.is-hinting .acv-ringwrap.is-next .acv-sigil-glow{opacity:.8}
+}
+@keyframes acv-fade{from{opacity:0}to{opacity:1}}
+
+/* ---------- Other shapes: short landscape, portrait tablets and phones ---------- */
+@media(max-height:700px) and (orientation:landscape){
+  .acv-head{top:22px}.acv-title{font-size:38px}.acv-kana{display:none}
+  .acv-guidecopy,.acv-side{bottom:26px}
+  .acv-step{font-size:21px}.acv-exhibit-name{font-size:30px}.acv-exhibit-text{font-size:12px}
+}
+@media(orientation:portrait),(max-width:899px){
+  .acv-overlay{overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+  .acv-backdrop{position:fixed}
+  .acv-dust{position:fixed}
+  .acv-head{position:relative;left:auto;top:auto;max-width:none;padding:22px 20px 0}
+  .acv-title{font-size:34px}.acv-kana{display:none}
+  .acv-tools{right:14px;top:14px}
+  .acv-tool span{display:none}.acv-tool{padding:0}
+  .acv-play{position:relative;padding:8px 20px 28px}
+  .acv-stage{position:relative;left:auto;top:auto;width:86vw;max-width:56vh;margin:14px auto 0;-webkit-transform:none;transform:none;touch-action:none}
+  .acv-guidecopy{position:relative;left:auto;bottom:auto;width:auto;margin:6px 0 0}
+  .acv-step{font-size:20px}
+  .acv-pips{margin-top:14px}
+  .acv-side{position:relative;right:auto;bottom:auto;width:auto;margin:18px 0 0}
+  .acv-exhibit{display:none}
+  .acv-overlay[data-state="reveal"] .acv-exhibit{display:block}
+  .acv-overlay[data-state="reveal"] .acv-guidecopy{display:none}
+  .acv-exhibit-name{font-size:30px}
+}
+
+/* ---------- A real card from today's inventory in the reveal ---------- */
+.acv-card-real{position:absolute;top:2.3%;right:3.2%;bottom:2.3%;left:3.2%;display:none;border-radius:4%/2.9%;overflow:hidden;background:#150b1b}
+.acv-card-real img{display:block;width:100%;height:100%;object-fit:contain}
+.acv-overlay.has-real .acv-card-real{display:block}
+.acv-exhibit-price{margin:10px 0 0;font-size:22px;font-weight:700;color:var(--acv-gold-hi)}
+.acv-exhibit-price:empty{display:none}
+.acv-btn[hidden]{display:none}
+.acv-overlay:not([data-state="reveal"]) .acv-btn--view{display:none}

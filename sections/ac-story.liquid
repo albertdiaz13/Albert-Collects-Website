@@ -1,0 +1,42 @@
+<section class="ac-story ac-wrap">{%- if settings.ac_aster_enabled -%}<button type="button" class="ac-story-aster ac-aster-rig" data-ac-aster-story aria-label="Say hi to Aster"><span class="ac-aster-figure" aria-hidden="true"><span class="ac-aster-sprite" style="background-image:url('{{ 'aster-idle.png' | asset_url }}')"></span><span class="ac-aster-look" data-look-src="{{ 'aster-look.png' | asset_url }}"></span><span class="ac-aster-walk" data-walk-src="{{ 'aster-walk.png' | asset_url }}"></span></span><span class="ac-aster-burst" data-ac-aster-burst aria-hidden="true"></span><span class="ac-aster-bubble" data-ac-aster-bubble aria-hidden="true"></span></button>{%- endif -%}<div class="ac-story-icon ac-story-logo"><img src="{{ 'albert-circle-logo.png' | asset_url }}" alt="Albert Collects mascot" width="1254" height="1254" loading="lazy"></div><div><p class="ac-kicker">{{ section.settings.eyebrow | escape }}</p><h2><span class="ac-spark" aria-hidden="true">✦</span> {{ section.settings.title | escape }} <span class="ac-spark" aria-hidden="true">✦</span></h2><p>{{ section.settings.body | escape }}</p></div>{% if section.settings.link != blank %}<a class="ac-story-link" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }} <span aria-hidden="true">↗</span></a>{% endif %}</section>
+{% schema %}
+{
+  "name": "Albert collector story",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small heading",
+      "default": "FROM ONE COLLECTOR TO ANOTHER"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "The best finds have a story."
+    },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Text",
+      "default": "A favorite Pokémon. A game you grew up with. That unexpected piece you cannot leave behind. Albert Collects is a home for the things worth keeping."
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link (optional)"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "Link label",
+      "default": "Meet Albert"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Albert collector story"
+    }
+  ]
+}
+{% endschema %}

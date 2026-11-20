@@ -1,0 +1,33 @@
+<header class="ac-header">
+  {% if section.settings.announcement != blank %}<div class="ac-announcement"><span aria-hidden="true">✦</span> {{ section.settings.announcement | escape }} <span aria-hidden="true">✦</span></div>{% endif %}
+  <div class="ac-header-main ac-wrap">
+    <form action="{{ routes.search_url }}" method="get" role="search" class="ac-search"><label class="visually-hidden" for="ac-search-{{ section.id }}">Search the collection</label><svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg><input id="ac-search-{{ section.id }}" type="search" name="q" placeholder="Find a little treasure…" value="{{ search.terms | escape }}"><input type="hidden" name="type" value="product"></form>
+    <a class="ac-brand" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }} home">{% if section.settings.logo != blank %}{{ section.settings.logo | image_url: width: 1000 | image_tag: class: 'ac-uploaded-logo', widths: '300,500,750,1000', sizes: '(max-width: 749px) 240px, 400px', loading: 'eager', alt: shop.name }}{% else %}<span class="ac-brand-frame"><span class="ac-brand-art"><img src="{{ 'albert-brand.png' | asset_url }}" width="1672" height="941" alt="Albert Collects" fetchpriority="high">{% if settings.ac_logo_life %}<span class="ac-logo-eye" aria-hidden="true"><span class="ac-logo-glance"><span class="ac-logo-pupil"></span></span><span class="ac-logo-lid"></span></span>{% endif %}</span></span>{% endif %}</a>
+    <a class="ac-bag" href="{{ routes.cart_url }}" id="cart-icon-bubble"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M5 7h14l1 14H4L5 7Z"/><path d="M8 8V6a4 4 0 0 1 8 0v2"/></svg><span>My bag</span><span class="ac-count" data-ac-cart-count>{{ cart.item_count }}</span><span class="visually-hidden">items</span></a>
+  </div>
+  <nav class="ac-nav ac-wrap" aria-label="Main navigation">{% if section.settings.menu != blank %}{% for link in section.settings.menu.links %}{% assign nav_title = link.title | strip | downcase %}{% unless nav_title == 'sourcing' or link.handle == 'sourcing' %}<div class="ac-nav-item">{% if link.links.size > 0 %}<details><summary>{{ link.title | escape }} <span aria-hidden="true">⌄</span></summary><div class="ac-subnav"><a href="{{ link.url }}">{{ link.title | escape }}</a>{% for child in link.links %}<a href="{{ child.url }}">{{ child.title | escape }}</a>{% endfor %}</div></details>{% else %}<a href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>{% endif %}</div>{% endunless %}{% endfor %}{% else %}<a href="{{ routes.all_products_collection_url }}">Shop the collection</a>{% if pages['contact'] != blank %}<a href="{{ pages['contact'].url }}">Get in touch</a>{% endif %}{% endif %}<div class="ac-nav-item ac-nav-motion" data-ac-motion-slot></div><span class="ac-nav-note">Curated in Orlando, FL <span aria-hidden="true">✦</span></span></nav>
+</header>
+{% schema %}
+{
+  "name": "Albert brand header",
+  "settings": [
+    {
+      "type": "text",
+      "id": "announcement",
+      "label": "Announcement",
+      "default": "A little treasure for every collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Your logo (optional)"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Navigation menu",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}

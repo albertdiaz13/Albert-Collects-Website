@@ -1,0 +1,138 @@
+{%- comment -%}
+  ALBERT COLLECTS | THE VAULT (generic theme, kiosk only): an optional extra, not the main display.
+  Driven by assets/albert-vault.js and styled by assets/albert-vault.css.
+
+  1. The way in: a small gold star in the corner of the kiosk hero. One button. Nothing opens by itself.
+  2. The Vault, a full-screen layer over the page: the door wakes and its three rings spin out of line; the visitor
+     turns each ring with a finger until its gold mark sits on the line of light; with all three set, the door opens
+     and a card rises.
+
+  The card that rises is a real one from today's inventory, picked from the kiosk's own grid on this page (its
+  photo, name and price), with a button to its listing. The text says plainly that it is not a prize and has not
+  been set aside. If there is no inventory, or the photo will not load, the Vault shows one of its own illustrated
+  exhibit cards instead, marked "for display only".
+  "Browse Available Cards" is on screen the whole time and returns to the cards. No sound unless switched on.
+{%- endcomment -%}
+<div class="acv" data-acv>
+  <button type="button" class="acv-egg" data-acv-open aria-haspopup="dialog" aria-label="The Vault: an optional extra. Opens a small interactive display.">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.500l2.900 7.600 7.600 2.900-7.600 2.900-2.900 7.600-2.900-7.600-7.600-2.900 7.600-2.900z" fill="currentColor"/></svg>
+  </button>
+
+  <div class="acv-overlay" data-acv-overlay role="dialog" aria-modal="true" aria-labelledby="acv-title" data-state="closed" data-variant="1" hidden>
+    <div class="acv-backdrop" aria-hidden="true"><span class="acv-pattern"></span><span class="acv-halo"></span></div>
+    <canvas class="acv-dust" data-acv-dust aria-hidden="true"></canvas>
+
+    <header class="acv-head">
+      <p class="acv-brand"><span>Albert Collects</span></p>
+      <h2 class="acv-title" id="acv-title">The Vault</h2>
+      <p class="acv-kana" aria-hidden="true">ザ・ヴォールト</p>
+    </header>
+
+    <div class="acv-tools">
+      <button type="button" class="acv-tool" data-acv-sound aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M4 9.500v5h3.500L12 18.500v-13L7.500 9.500z" fill="currentColor"/><path class="acv-sound-on" d="M15.500 9a4.200 4.200 0 0 1 0 6M18 6.500a7.800 7.800 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="acv-sound-off" d="M16 9.500l5 5M21 9.500l-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span data-acv-sound-text>Sound off</span></button>
+      <button type="button" class="acv-tool acv-tool--close" data-acv-close aria-label="Close the Vault and go back to the cards"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </div>
+
+    <div class="acv-play">
+      <div class="acv-guidecopy" data-acv-guide>
+        <p class="acv-step">Turn each ring until its mark meets the light.</p>
+        <p class="acv-substep">Three marks. One line of light.</p>
+        <ol class="acv-pips" aria-hidden="true"><li data-acv-pip></li><li data-acv-pip></li><li data-acv-pip></li></ol>
+        <p class="acv-count" data-acv-count>0 of 3 set</p>
+      </div>
+
+      <div class="acv-stage" data-acv-stage>
+        <span class="acv-burst" aria-hidden="true"></span>
+        <div class="acv-doorbox" data-acv-doorbox>
+          {% render 'ac-vault-door', uid: 'v' %}
+          <div class="acv-handles">
+            <button type="button" class="acv-handle" data-acv-handle="0" role="slider" aria-label="Outer ring" aria-valuemin="-180" aria-valuemax="180" aria-valuenow="0" aria-valuetext="not set"></button>
+            <button type="button" class="acv-handle" data-acv-handle="1" role="slider" aria-label="Middle ring" aria-valuemin="-180" aria-valuemax="180" aria-valuenow="0" aria-valuetext="not set"></button>
+            <button type="button" class="acv-handle" data-acv-handle="2" role="slider" aria-label="Inner ring" aria-valuemin="-180" aria-valuemax="180" aria-valuenow="0" aria-valuetext="not set"></button>
+          </div>
+        </div>
+        <div class="acv-reveal" aria-hidden="true">
+          <span class="acv-card-shadow"></span>
+          <div class="acv-card-tilt" data-acv-card>
+            <div class="acv-card">
+              <svg class="acv-card-art" viewBox="0 0 630 880" focusable="false">
+                <defs>
+                  <linearGradient id="acv-foil" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff3cf"/><stop offset=".22" stop-color="#e2bd66"/><stop offset=".5" stop-color="#9c7426"/><stop offset=".76" stop-color="#f0d48c"/><stop offset="1" stop-color="#7d5a1b"/></linearGradient>
+                  <linearGradient id="acv-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1b1030"/><stop offset="1" stop-color="#3b2358"/></linearGradient>
+                  <radialGradient id="acv-champ" cx=".5" cy=".46" r=".7"><stop offset="0" stop-color="#6b4a1a"/><stop offset=".5" stop-color="#2f1c2f"/><stop offset="1" stop-color="#150b1b"/></radialGradient>
+                  <linearGradient id="acv-jade" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0c2a26"/><stop offset="1" stop-color="#07120f"/></linearGradient>
+                  <linearGradient id="acv-ember" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1634"/><stop offset=".62" stop-color="#8a3b3f"/><stop offset="1" stop-color="#e59a6a"/></linearGradient>
+                  <radialGradient id="acv-moon" cx=".38" cy=".34" r=".8"><stop offset="0" stop-color="#fffaf0"/><stop offset="1" stop-color="#c9a4ff"/></radialGradient>
+                  <radialGradient id="acv-sun" cx=".5" cy=".4" r=".7"><stop offset="0" stop-color="#fff3cf"/><stop offset="1" stop-color="#f08a5d"/></radialGradient>
+                  <radialGradient id="acv-disc" cx=".4" cy=".34" r=".8"><stop offset="0" stop-color="#d9fff1"/><stop offset="1" stop-color="#2fae87"/></radialGradient>
+                  <pattern id="acv-seigaiha" width="60" height="30" patternUnits="userSpaceOnUse"><g fill="none" stroke="#c9a4ff" stroke-width="1.4"><circle cx="30" cy="30" r="29"/><circle cx="30" cy="30" r="20"/><circle cx="30" cy="30" r="11"/><circle cx="0" cy="15" r="29"/><circle cx="0" cy="15" r="20"/><circle cx="0" cy="15" r="11"/><circle cx="60" cy="15" r="29"/><circle cx="60" cy="15" r="20"/><circle cx="60" cy="15" r="11"/></g></pattern>
+                  <pattern id="acv-asanoha" width="56" height="97" patternUnits="userSpaceOnUse"><path d="M0 0L56 97M56 0L0 97M28 0V97M0 48.500H56M0 0L28 16.200L56 0M0 97L28 80.800L56 97M0 48.500L28 32.300L56 48.500M0 48.500L28 64.700L56 48.500" fill="none" stroke="#7ef2c8" stroke-width="1.1"/></pattern>
+                  <clipPath id="acv-window"><rect x="56" y="112" width="518" height="500" rx="12"/></clipPath>
+                </defs>
+                <rect width="630" height="880" rx="36" fill="url(#acv-foil)"/>
+                <rect x="20" y="20" width="590" height="840" rx="20" fill="#150b1b"/>
+                <rect x="30" y="30" width="570" height="820" rx="14" fill="none" stroke="#e9c877" stroke-width="1.2" opacity=".55"/>
+                <text x="315" y="82" text-anchor="middle" class="acv-card-brand">ALBERT COLLECTS</text>
+                <g clip-path="url(#acv-window)">
+                  <g class="acv-art acv-art--1">
+                    <rect x="56" y="112" width="518" height="500" fill="url(#acv-night)"/>
+                    <g fill="#fff6dc"><circle cx="126" cy="176" r="2.200"/><circle cx="208" cy="236" r="1.500"/><circle cx="472" cy="160" r="2"/><circle cx="520" cy="288" r="1.600"/><circle cx="110" cy="330" r="1.400"/><circle cx="430" cy="372" r="1.800"/></g>
+                    <path d="M352 196a112 112 0 1 0 0 224a150 150 0 0 1 0 -224z" fill="url(#acv-moon)"/>
+                    <rect x="56" y="452" width="518" height="160" fill="url(#acv-seigaiha)" opacity=".8"/>
+                    <rect x="56" y="452" width="518" height="160" fill="#1b1030" opacity=".25"/>
+                  </g>
+                  <g class="acv-art acv-art--2">
+                    <rect x="56" y="112" width="518" height="500" fill="url(#acv-champ)"/>
+                    <g fill="none" stroke="#e9c877" stroke-width="1" opacity=".5"><circle cx="315" cy="362" r="96"/><circle cx="315" cy="362" r="150"/><circle cx="315" cy="362" r="208"/></g>
+                    <g stroke="#f0d48c" stroke-width="1.6" stroke-linecap="round" opacity=".7"><path d="M315 142v92M315 490v92M95 362h92M443 362h92M159 206l64 64M407 454l64 64M471 206l-64 64M223 454l-64 64"/></g>
+                    <path d="M315 232l32 98 98 32-98 32-32 98-32-98-98-32 98-32z" fill="url(#acv-foil)" stroke="#fff6dc" stroke-width="2" stroke-linejoin="round"/>
+                    <circle cx="315" cy="362" r="12" fill="#150b1b" stroke="#fff6dc" stroke-width="2"/>
+                  </g>
+                  <g class="acv-art acv-art--3">
+                    <rect x="56" y="112" width="518" height="500" fill="url(#acv-jade)"/>
+                    <rect x="56" y="112" width="518" height="500" fill="url(#acv-asanoha)" opacity=".42"/>
+                    <circle cx="315" cy="362" r="128" fill="#07120f" opacity=".7"/>
+                    <circle cx="315" cy="362" r="104" fill="url(#acv-disc)"/>
+                    <circle cx="315" cy="362" r="128" fill="none" stroke="#7ef2c8" stroke-width="2"/>
+                    <circle cx="315" cy="362" r="140" fill="none" stroke="#e9c877" stroke-width="1" stroke-dasharray="2 8"/>
+                  </g>
+                  <g class="acv-art acv-art--4">
+                    <rect x="56" y="112" width="518" height="500" fill="url(#acv-ember)"/>
+                    <circle cx="315" cy="352" r="110" fill="url(#acv-sun)"/>
+                    <path d="M56 612L190 430L262 520L356 392L470 536L520 478L574 548V612Z" fill="#1c0f24" opacity=".92"/>
+                    <g fill="#fff6dc" opacity=".82"><rect x="76" y="300" width="190" height="16" rx="8"/><rect x="118" y="326" width="120" height="12" rx="6"/><rect x="372" y="412" width="182" height="16" rx="8"/><rect x="408" y="438" width="104" height="12" rx="6"/></g>
+                  </g>
+                </g>
+                <rect x="56" y="112" width="518" height="500" rx="12" fill="none" stroke="url(#acv-foil)" stroke-width="3"/>
+                <text x="315" y="690" text-anchor="middle" class="acv-card-name" data-acv-card-name>Moonlit Foil</text>
+                <path d="M235 722h160" stroke="#e9c877" stroke-width="1.2" opacity=".7"/>
+                <text x="315" y="760" text-anchor="middle" class="acv-card-no" data-acv-card-no>VAULT EXHIBIT · 01 / 04</text>
+                <text x="66" y="822" class="acv-card-fine">FOR DISPLAY ONLY</text>
+                <g transform="translate(548 804)"><rect x="-22" y="-22" width="44" height="44" rx="7" fill="#b3352f"/><path d="M0 -13l3.600 9.400 9.400 3.600-9.400 3.600-3.600 9.400-3.600-9.400-9.400-3.600 9.400-3.600z" fill="#fff3cf"/></g>
+              </svg>
+              <span class="acv-card-real" data-acv-real><img alt="" data-acv-real-img></span>
+              <span class="acv-card-holo"></span>
+              <span class="acv-card-glare"></span>
+              <span class="acv-card-sheen"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="acv-side">
+        <div class="acv-exhibit" data-acv-exhibit>
+          <p class="acv-exhibit-no" data-acv-exhibit-no>Vault exhibit 01 of 04</p>
+          <h3 class="acv-exhibit-name" data-acv-exhibit-name>Moonlit Foil</h3>
+          <p class="acv-exhibit-price" data-acv-exhibit-price></p>
+          <p class="acv-exhibit-text" data-acv-exhibit-text>A showpiece made for this screen. It is for display only: nothing here is a prize, and no card has been set aside. The cards you can take home are waiting just below.</p>
+        </div>
+        <div class="acv-actions">
+          <button type="button" class="acv-btn acv-btn--gold acv-btn--view" data-acv-view hidden><span>View This Card</span></button>
+          <button type="button" class="acv-btn acv-btn--gold" data-acv-explore><span>Browse Available Cards</span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M5 12h13M13 6.500l5.500 5.500-5.500 5.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="acv-btn acv-btn--ghost" data-acv-again>Unlock another</button>
+        </div>
+      </div>
+    </div>
+    <p class="visually-hidden" role="status" aria-live="polite" data-acv-live></p>
+  </div>
+</div>

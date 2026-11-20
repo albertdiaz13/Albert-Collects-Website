@@ -1,0 +1,221 @@
+{%- comment -%}
+  Desktop (990px+): the hero is a dark gallery stage. A fan of real cards from the showcase collection stands under drifting
+  light; each card lifts, tilts and catches the foil under the cursor and opens its listing on click. Aster peeks from behind
+  the fan.
+  Phones and tablets (under 990px) get their own composition from assets/albert-mobile.css: the same dark stage built for
+  touch, slow stars, both actions within thumb reach and "Catch the light": tap the gold star and a ribbon of foil light
+  runs across the cards while Aster reacts. The card-motion options sit in a closed "Card motion" disclosure.
+  The cards there are a wheel: one card in the middle, a neighbour peeking in on each side, swiped left or right. The
+  wheel can hold more cards than the desktop fan (up to eight from the same collection); the extra ones are marked
+  ac-fan-card--extra and never shown at desktop widths. The caption under the cards is a link to whichever card is in
+  the middle. Without JavaScript the phone hero falls back to a still three-card fan with working links.
+{%- endcomment -%}
+{%- liquid
+  assign showcase = section.settings.showcase_collection
+  if showcase == blank
+    assign showcase = collections['frontpage']
+  endif
+  assign showcase_items = 0
+  if showcase != blank
+    for p in showcase.products limit: section.settings.showcase_count
+      if p.featured_media != blank
+        assign showcase_items = showcase_items | plus: 1
+      endif
+    endfor
+  endif
+  assign hero_widths = '240,360,540' | split: ','
+  assign middle = showcase_items | minus: 1 | divided_by: 2
+  assign before_middle = middle | minus: 1
+  assign after_middle = middle | plus: 1
+  assign wheel_limit = section.settings.showcase_count | at_least: 8
+-%}
+<section class="ac-welcome ac-wrap{% if showcase_items > 0 %} ac-welcome--gallery{% endif %}" data-ac-context="hero">
+  <div class="ac-welcome-copy">
+    <p class="ac-kicker">{{ section.settings.eyebrow | escape }}</p>
+    <h1><span class="ac-spark" aria-hidden="true">✦</span> {{ section.settings.heading | escape }} <span class="ac-spark" aria-hidden="true">✦</span></h1>
+    <p class="ac-welcome-text">{{ section.settings.description | escape }}</p>
+    {%- if showcase_items > 0 -%}
+      <div class="ac-hero-actions">
+        <a class="ac-hero-button" href="{{ routes.all_products_collection_url }}">{{ section.settings.browse_label | default: 'Browse everything' | escape }} <span aria-hidden="true">→</span></a>
+        <a class="ac-hero-link" href="{{ showcase.url }}">{{ section.settings.button_label | default: 'Shop Fresh Finds' | escape }}</a>
+      </div>
+      <p class="ac-hero-live"><span class="ac-live-dot" aria-hidden="true"></span>{{ showcase.products_count }} {% if showcase.products_count == 1 %}piece{% else %}pieces{% endif %} in {{ showcase.title | escape }} right now</p>
+    {%- endif -%}
+    {% render 'ac-motion-controls' %}
+  </div>
+  {%- if showcase_items > 0 -%}
+    <script>document.documentElement.className += ' ac-js';</script>
+    <div class="ac-hero-stage" data-ac-showcase>
+      <span class="ac-hero-light ac-hero-light--a" aria-hidden="true"></span>
+      <span class="ac-hero-light ac-hero-light--b" aria-hidden="true"></span>
+      <span class="ac-hero-light ac-hero-light--c" aria-hidden="true"></span>
+      <div class="ac-fan" data-ac-fan style="--n:{{ showcase_items }}">
+        {%- if settings.ac_aster_enabled -%}
+          <button type="button" class="ac-hero-aster ac-aster-rig" data-ac-aster-rig aria-label="Say hi to Aster">
+            <span class="ac-aster-figure" aria-hidden="true">
+              <span class="ac-aster-sprite" style="background-image:url('{{ 'aster-idle.png' | asset_url }}')"></span>
+              <span class="ac-aster-look" data-look-src="{{ 'aster-look.png' | asset_url }}"></span>
+            </span>
+            <span class="ac-aster-burst" data-ac-aster-burst aria-hidden="true"></span>
+            <span class="ac-aster-bubble" data-ac-aster-bubble aria-hidden="true"></span>
+          </button>
+        {%- endif -%}
+        {%- assign slot = 0 -%}
+        {%- for p in showcase.products limit: wheel_limit -%}
+          {%- if p.featured_media != blank -%}
+            {%- liquid
+              assign ph = p.featured_media.preview_image
+              assign ph_alt = p.featured_media.alt | remove: '[card-back]' | remove: '[CARD-BACK]' | remove: '[Card-Back]' | strip | default: p.title
+              assign place = ''
+              if slot == middle
+                assign fan_title = p.title
+                assign fan_price = p.price | money
+                assign fan_url = p.url
+                assign place = ' is-featured'
+              elsif slot == before_middle
+                assign place = ' ac-fan-card--prev'
+              elsif slot == after_middle
+                assign place = ' ac-fan-card--next'
+              endif
+              if slot >= showcase_items
+                assign place = place | append: ' ac-fan-card--extra'
+              endif
+            -%}
+            {%- capture ph_srcset -%}{%- for w in hero_widths -%}{%- assign wn = w | plus: 0 -%}{%- if wn <= ph.width or forloop.first -%}{%- unless forloop.first -%}, {% endunless -%}{{ ph | image_url: width: wn }} {{ wn }}w{%- endif -%}{%- endfor -%}{%- endcapture -%}
+            <div class="ac-fan-card{{ place }}" style="--i:{{ slot }}" data-ac-fan-card data-title="{{ p.title | escape }}" data-price="{{ p.price | money | strip_html | escape }}">
+              <a class="ac-image-stage ac-fan-stage" href="{{ p.url }}" data-ac-tilt data-ac-holo aria-label="{{ p.title | escape }}, {{ p.price | money | strip_html | escape }}">
+                <div class="ac-image-plane" data-ac-tilt-plane>
+                  <div class="ac-flip">
+                    <div class="ac-face ac-face--front">
+                      <img
+                        class="ac-product-photo"
+                        src="{{ ph | image_url: width: 360 }}"
+                        srcset="{{ ph_srcset | strip }}"
+                        sizes="230px"
+                        width="{{ ph.width }}"
+                        height="{{ ph.height }}"
+                        alt="{{ ph_alt | escape }}"
+                        loading="lazy"
+                        decoding="async"
+                      >
+                      <span class="ac-holo" aria-hidden="true"><span class="ac-holo-spot"></span></span>
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            {%- assign slot = slot | plus: 1 -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+      <span class="ac-fan-floor" aria-hidden="true"></span>
+      <p class="ac-fan-caption">
+        <a class="ac-fan-link" href="{{ fan_url }}" data-ac-fan-link>
+          <span class="ac-fan-title" data-ac-fan-title>{{ fan_title | escape }}</span>
+          <span class="ac-fan-price" data-ac-fan-price>{{ fan_price }}</span>
+        </a>
+      </p>
+      <span class="ac-fan-dots" data-ac-fan-dots aria-hidden="true"></span>
+      <span class="ac-ribbon" aria-hidden="true"></span>
+      <button type="button" class="ac-catch" data-ac-catch aria-label="Catch the light">
+        <svg viewBox="0 0 48 48" width="48" height="48" aria-hidden="true" focusable="false"><path class="ac-catch-glow" d="M24 3l5.200 15.800L45 24l-15.800 5.200L24 45l-5.200-15.800L3 24l15.800-5.200z"/><path class="ac-catch-core" d="M24 12l3 9 9 3-9 3-3 9-3-9-9-3 9-3z"/></svg>
+        <span class="ac-catch-hint">Catch the light</span>
+      </button>
+      <span class="ac-glint ac-glint--1" aria-hidden="true"></span>
+      <span class="ac-glint ac-glint--2" aria-hidden="true"></span>
+      <span class="ac-glint ac-glint--3" aria-hidden="true"></span>
+      <span class="ac-glint ac-glint--4" aria-hidden="true"></span>
+      <span class="ac-glint ac-glint--5" aria-hidden="true"></span>
+    </div>
+  {%- endif -%}
+</section>
+<nav class="ac-categories ac-wrap" aria-label="Browse collections"><a class="ac-category" href="{{ routes.all_products_collection_url }}"><span aria-hidden="true">✦</span> All finds</a>{% for block in section.blocks %}{% assign cat = block.settings.collection %}{% if cat != blank and cat.products_count > 0 %}<a class="ac-category" href="{{ cat.url }}" {{ block.shopify_attributes }}><span aria-hidden="true">{{ block.settings.symbol | escape }}</span> {{ block.settings.title | default: cat.title | escape }}</a>{% endif %}{% endfor %}</nav>
+{% schema %}
+{
+  "name": "Albert welcome",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small heading",
+      "default": "JAPANESE CARDS & NOSTALGIC FINDS"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Collected with a little curiosity."
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Old favorites. Unexpected discoveries. Cards, games, and vintage finds, picked by a collector like you."
+    },
+    {
+      "type": "header",
+      "content": "Desktop showcase"
+    },
+    {
+      "type": "collection",
+      "id": "showcase_collection",
+      "label": "Showcase collection",
+      "info": "Cards fanned out on the desktop hero. Uses the Home page collection when empty."
+    },
+    {
+      "type": "range",
+      "id": "showcase_count",
+      "label": "Cards in the fan",
+      "info": "Desktop fan. On phones the cards become a swipeable wheel that holds up to 8 cards from the same collection.",
+      "min": 3,
+      "max": 7,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "browse_label",
+      "label": "Primary button label",
+      "info": "The gold button. Opens the full inventory.",
+      "default": "Browse everything"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Fresh Finds link label",
+      "default": "Shop Fresh Finds",
+      "info": "The text link beside the button. Opens the showcase collection."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Collection category",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Label",
+          "default": "Japanese vintage"
+        },
+        {
+          "type": "text",
+          "id": "symbol",
+          "label": "Symbol",
+          "default": "✧"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Albert welcome"
+    }
+  ]
+}
+{% endschema %}

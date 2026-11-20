@@ -1,0 +1,254 @@
+/* Albert v6 card motion: flip faces, holo foil on every inventory card, header logo life, Aster, and small transitions.
+   Loaded after albert-collects.css. Everything below is layered on top of photos and controls that are
+   already visible without JavaScript. Uses top/right/bottom/left (not inset) for iOS 12 Safari. */
+
+/* The desktop hero stage, actions, live line and the story Aster only exist from 990px (albert-desktop.css shows them). */
+.ac-hero-actions,.ac-hero-stage,.ac-hero-live,.ac-story-aster{display:none}
+
+/* ---------- Card faces (front always visible without JS) ---------- */
+.ac-card-media{position:relative}
+.ac-flip,.ac-face{position:absolute;top:0;right:0;bottom:0;left:0}
+.ac-face{display:flex;align-items:center;justify-content:center;isolation:isolate}
+.ac-face--back{visibility:hidden}
+
+/* ---------- Flip: every alternate photo turns over in 3D; simple swap for reduced motion / no 3D ---------- */
+.ac-has-back .ac-image-plane{perspective:1400px}
+html:not(.ac-flip-swap) .ac-has-back .ac-flip{transform-style:preserve-3d;transition:transform 640ms cubic-bezier(.42,0,.58,1)}
+html:not(.ac-flip-swap) .ac-has-back .ac-face{-webkit-backface-visibility:hidden;backface-visibility:hidden}
+html:not(.ac-flip-swap) .ac-has-back .ac-face--back{transform:rotateY(180deg)}
+html:not(.ac-flip-swap) .ac-has-back.is-flipped .ac-flip{transform:rotateY(180deg)}
+html:not(.ac-flip-swap) .ac-has-back.is-flipped.ac-flip-ccw .ac-flip{transform:rotateY(-180deg)}
+/* Swap visibility at the 90-degree point too (symmetric easing), as a safety net for engines with backface bugs. */
+html:not(.ac-flip-swap) .ac-has-back .ac-face{transition:visibility 0s linear 320ms}
+.ac-has-back.is-flipped .ac-face--front{visibility:hidden}
+.ac-has-back.is-flipped .ac-face--back{visibility:visible}
+.ac-flip-swap .ac-flip{transform:none!important;transition:none!important}
+.ac-flip-swap .ac-face{transition:none!important}
+
+/* Flip control. Touch, tablets and phones: its own row under the image (always visible).
+   Desktop with a mouse: a fixed spot in the image's top-right corner, revealed while the pointer is anywhere over the
+   tile (including a margin around the image) or when the control has keyboard focus. Always outside the product link. */
+/* Hidden until the script is ready (.ac-tilt-ready). This uses CSS only, with no `hidden` attribute, so strict
+   `[hidden]{display:none!important}` resets on a host page can't keep the control invisible. */
+.ac-flip-row{display:none}
+.ac-tilt-ready .ac-flip-row{display:flex;justify-content:center;align-items:center;min-height:42px;padding-top:8px}
+.ac-flip-button{display:none;align-items:center;gap:6px;min-height:32px;padding:7px 14px;border:1px solid #d9c9bb;border-radius:999px;background:var(--ac-cream);color:var(--ac-brown);font:inherit;font-size:12px;font-weight:700;line-height:1;letter-spacing:.02em;cursor:pointer;white-space:nowrap}
+.ac-tilt-ready .ac-flip-button{display:inline-flex}
+.ac-flip-icon{font-size:14px;line-height:1;display:inline-block}
+.ac-flip-button:hover{background:#fff;border-color:#b99fca}
+.ac-flip-button:focus-visible{outline:2px solid #8453a1;outline-offset:2px}
+.ac-flip-button[aria-pressed="true"]{background:var(--ac-brown);border-color:var(--ac-brown);color:var(--ac-cream)}
+.ac-flip-icon{margin-right:6px}
+@supports (gap:1px){.ac-flip-icon{margin-right:0}}
+@media(max-width:749px){.ac-tilt-ready .ac-flip-row{min-height:38px;padding-top:6px}.ac-flip-button{padding:7px 10px;font-size:11px;gap:4px}}
+@media (hover:hover) and (pointer:fine) and (min-width:990px){
+  .ac-card-media::before{content:"";position:absolute;top:-16px;right:-16px;bottom:-16px;left:-16px}
+  .ac-tilt-ready .ac-flip-row{position:absolute;top:12px;right:12px;z-index:4;display:block;min-height:0;padding:0}
+  .ac-flip-button{opacity:0;transform:translateY(-4px);pointer-events:none;background:rgba(251,248,243,.94);border-color:rgba(75,33,15,.18);box-shadow:0 6px 16px -8px rgba(43,24,50,.45);transition:opacity 160ms ease,transform 200ms cubic-bezier(.23,1,.32,1),background-color 160ms ease,color 160ms ease}
+  .ac-product-card:hover .ac-flip-button,.ac-card-media:hover .ac-flip-button,.ac-flip-button:focus-visible,.ac-flip-button[aria-pressed="true"]{opacity:1;transform:none;pointer-events:auto}
+}
+@media (prefers-reduced-motion:no-preference){.ac-flip-icon{transition:transform 260ms cubic-bezier(.23,1,.32,1)}.ac-flip-button[aria-pressed="true"] .ac-flip-icon{transform:rotate(-180deg)}}
+@media (prefers-reduced-motion:reduce){.ac-flip-button{transition:opacity 120ms ease!important;transform:none!important}}
+
+/* ---------- Holographic foil (every inventory photo; mouse hover on desktop, tilt on touch screens) ----------
+   Layers, all inside one colour-dodge group clipped to the photo:
+   1. a faint rainbow wash over the whole card (so the artwork and condition details stay clear),
+   2. .ac-holo-spot: a saturated rainbow hot spot masked to the area under the cursor (the distinct reflection),
+   3. ::before: a specular streak that slides with the cursor,
+   4. ::after: a soft glare under the cursor. */
+.ac-holo{display:none}
+@media (prefers-reduced-motion:no-preference){
+  .ac-holo{
+    display:block;position:absolute;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none;
+    border-radius:4px;overflow:hidden;opacity:0;transition:opacity 480ms ease;
+    background-image:repeating-linear-gradient(115deg,
+      rgba(255,92,108,.15) 0%,rgba(255,216,74,.15) 5%,rgba(125,255,107,.15) 10%,rgba(72,240,255,.15) 15%,rgba(90,123,255,.15) 20%,rgba(212,92,255,.15) 25%,rgba(255,92,108,.15) 30%);
+    background-size:300% 300%;
+    background-position:var(--ac-bx,50%) var(--ac-by,50%);
+    mix-blend-mode:color-dodge;
+  }
+  .ac-holo-spot{
+    position:absolute;top:0;right:0;bottom:0;left:0;
+    background-image:repeating-linear-gradient(115deg,#ff5c6c 0%,#ffd84a 4%,#7dff6b 8%,#48f0ff 12%,#5a7bff 16%,#d45cff 20%,#ff5c6c 24%);
+    background-size:220% 220%;
+    background-position:var(--ac-bx,50%) var(--ac-by,50%);
+    -webkit-mask-image:radial-gradient(circle at var(--ac-mx,50%) var(--ac-my,50%),rgba(0,0,0,.9) 0%,rgba(0,0,0,.45) 18%,rgba(0,0,0,0) 42%);
+    mask-image:radial-gradient(circle at var(--ac-mx,50%) var(--ac-my,50%),rgba(0,0,0,.9) 0%,rgba(0,0,0,.45) 18%,rgba(0,0,0,0) 42%);
+    opacity:calc(.5 + var(--ac-hyp,0) * .3);
+  }
+  .ac-holo::before{
+    content:"";position:absolute;top:0;right:0;bottom:0;left:0;
+    background-image:linear-gradient(115deg,rgba(255,255,255,0) 43%,rgba(255,255,255,.1) 48%,rgba(255,255,255,.22) 50%,rgba(255,255,255,.1) 52%,rgba(255,255,255,0) 57%);
+    background-size:250% 250%;background-repeat:no-repeat;
+    background-position:var(--ac-sx,50%) var(--ac-sy,50%);
+  }
+  .ac-holo::after{
+    content:"";position:absolute;top:0;right:0;bottom:0;left:0;
+    background-image:radial-gradient(farthest-corner circle at var(--ac-mx,50%) var(--ac-my,50%),rgba(255,255,255,.14) 0%,rgba(255,255,255,.05) 22%,rgba(255,255,255,0) 46%);
+  }
+  .ac-image-plane.is-holo .ac-holo{opacity:1;transition-duration:180ms}
+}
+/* Touch screens get the same foil, but only while a card is actually being tilted: by a finger dragged across it, by
+   phone motion (Card motion), or by the tilt preview. Idle cards carry no foil layer at all, so scrolling stays light. */
+@media (hover:none) and (prefers-reduced-motion:no-preference),(pointer:coarse) and (prefers-reduced-motion:no-preference){
+  .ac-holo{display:none}
+  .ac-image-plane.is-holo .ac-holo{display:block;animation:ac-holo-in 260ms ease both}
+}
+@keyframes ac-holo-in{from{opacity:0}to{opacity:1}}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+
+  /* Tile light: a warm pool that follows the cursor across a whole shelf, so the light visibly moves from one
+     tile to the next as you browse. JS sets --lx/--ly per tile; .ac-lit is on the grid while the pointer is inside. */
+  .ac-image-stage::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity 420ms ease;background:radial-gradient(260px circle at var(--lx,50%) var(--ly,50%),rgba(255,231,170,.5) 0%,rgba(255,231,170,0) 70%)}
+  .ac-lit .ac-image-stage::before{opacity:1;transition-duration:200ms}
+
+  /* Flip settle: the card lifts as it turns, lands, then one glint crosses the tile so the new face reads clearly. */
+  html:not(.ac-flip-swap) .ac-has-back.is-settling .ac-flip{animation:ac-flip-lift 640ms cubic-bezier(.42,0,.58,1)}
+  .ac-image-stage::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:2;border-radius:inherit;pointer-events:none;opacity:0;background:linear-gradient(110deg,rgba(255,255,255,0) 40%,rgba(255,255,255,.38) 50%,rgba(255,255,255,0) 60%) no-repeat;background-size:260% 100%;background-position:130% 0}
+  html:not(.ac-flip-swap) .is-landed .ac-image-stage::after{animation:ac-land-glint 720ms cubic-bezier(.23,1,.32,1)}
+}
+@keyframes ac-flip-lift{0%{scale:1}45%{scale:1.09}100%{scale:1}}
+@keyframes ac-land-glint{0%{opacity:1;background-position:130% 0}100%{opacity:1;background-position:-30% 0}}
+
+/* ---------- Card hover polish ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .ac-image-stage{transition:background-color 220ms ease,border-color 220ms ease,box-shadow 260ms ease}
+  .ac-image-stage:hover{box-shadow:0 14px 28px -18px rgba(75,33,15,.35);border-color:#dccbe6}
+  .ac-add-button{transition:background-color 180ms ease,color 180ms ease,border-color 180ms ease,transform 120ms ease}
+  .ac-add-button:active,.ac-motion-button:active,.ac-flip-button:active,.ac-category:active{transform:scale(.97)}
+  .ac-add-button.is-added{animation:ac-added 900ms ease}
+  .ac-category{transition:background-color 150ms ease,color 150ms ease,transform 120ms ease}
+  .ac-flip-button{transition:background-color 160ms ease,border-color 160ms ease,color 160ms ease,transform 120ms ease}
+  .ac-nav details[open] > .ac-subnav{animation:ac-menu-in 180ms cubic-bezier(.2,.7,.2,1)}
+  .ac-nav summary span{display:inline-block;transition:transform 180ms ease}
+  .ac-nav details[open] summary span{transform:rotate(180deg)}
+  .ac-count.is-bumped{animation:ac-bump 420ms ease}
+}
+@keyframes ac-menu-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@keyframes ac-added{0%{transform:scale(1)}30%{transform:scale(1.04)}100%{transform:scale(1)}}
+@keyframes ac-bump{0%{transform:scale(1)}40%{transform:scale(1.25)}100%{transform:scale(1)}}
+
+/* ---------- Header logo: occasional blink and sideways glance (built-in logo only) ---------- */
+/* The built-in logo PNG has wide empty margins. Instead of a fixed-height crop (which clipped the tail and wordmark at some
+   widths), the frame takes its shape from the artwork's own bounds: x 47-1631, y 253-680 of the 1672 x 941 image (artwork plus a
+   12px margin). Height comes from padding, so it scales with the logo's width and can never cut into the artwork. */
+.ac-brand-frame{height:0!important;padding-top:26.957%;overflow:hidden}
+.ac-brand-frame .ac-brand-art{position:absolute;left:-2.967%;top:-59.251%;width:105.556%;display:block;-webkit-transform:none;transform:none}
+.ac-brand-frame .ac-brand-art img{position:static;display:block;width:100%;height:auto;-webkit-transform:none;transform:none}
+/* Eye geometry measured from albert-brand.png (1672 x 941): sclera centre 297.6,514.5 r 57.9; pupil centre 315.5,497.5 r 29.8. */
+.ac-logo-eye{position:absolute;left:14.337%;top:48.52%;width:6.927%;height:12.308%;pointer-events:none;display:none}
+.ac-logo-lid{position:absolute;top:-7%;right:-7%;bottom:-7%;left:-7%;border-radius:50%;background:#4c1e11;-webkit-transform:scaleY(0);transform:scaleY(0);-webkit-transform-origin:50% 0;transform-origin:50% 0}
+.ac-logo-glance{position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;overflow:hidden;background:#fbfaff;opacity:0}
+.ac-logo-pupil{position:absolute;left:39.75%;top:9.6%;width:51.37%;height:51.37%;border-radius:50%;background:#4c1e11}
+.ac-logo-pupil::after{content:"";position:absolute;left:43.6%;top:12%;width:32.4%;height:32.4%;border-radius:50%;background:#fbfaff}
+@media (prefers-reduced-motion:no-preference){
+  .ac-life-ready .ac-logo-eye{display:block}
+  .ac-life-ready .ac-logo-lid{-webkit-animation:ac-blink 7.3s ease-in-out 2.2s infinite;animation:ac-blink 7.3s ease-in-out 2.2s infinite}
+  .ac-life-ready .ac-logo-glance{-webkit-animation:ac-glance-cover 17s linear 6s infinite;animation:ac-glance-cover 17s linear 6s infinite}
+  .ac-life-ready .ac-logo-pupil{-webkit-animation:ac-glance 17s ease-in-out 6s infinite;animation:ac-glance 17s ease-in-out 6s infinite}
+  .ac-life-paused .ac-logo-lid,.ac-life-paused .ac-logo-glance,.ac-life-paused .ac-logo-pupil{-webkit-animation-play-state:paused;animation-play-state:paused}
+}
+@-webkit-keyframes ac-blink{0%,93%,100%{-webkit-transform:scaleY(0)}95.5%{-webkit-transform:scaleY(1)}}
+@keyframes ac-blink{0%,93%,100%{transform:scaleY(0)}95.5%{transform:scaleY(1)}}
+@-webkit-keyframes ac-glance-cover{0%,0.4%{opacity:0}0.5%,23.4%{opacity:1}23.5%,100%{opacity:0}}
+@keyframes ac-glance-cover{0%,0.4%{opacity:0}0.5%,23.4%{opacity:1}23.5%,100%{opacity:0}}
+@-webkit-keyframes ac-glance{0%,2%{-webkit-transform:none}5%,13%{-webkit-transform:translate(-62%,22%)}16%,100%{-webkit-transform:none}}
+@keyframes ac-glance{0%,2%{transform:none}5%,13%{transform:translate(-62%,22%)}16%,100%{transform:none}}
+
+/* ---------- Aster companion ---------- */
+/* 96px on desktop, 72px on tablets, 56px on phones. Only his own two buttons take clicks. */
+.ac-aster{position:fixed;bottom:12px;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;left:calc(12px + env(safe-area-inset-left));z-index:20;width:72px;height:72px;pointer-events:none;transition:opacity 200ms ease,visibility 0s linear 0s,transform 320ms cubic-bezier(.23,1,.32,1)}
+.ac-aster--right{left:auto;right:12px;right:calc(12px + env(safe-area-inset-right))}
+.ac-aster[hidden]{display:none}
+.ac-aster-poke{pointer-events:none;position:relative;display:block;width:100%;height:100%;padding:0;margin:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ac-aster-poke:focus-visible{outline:none}
+.ac-aster-poke:focus-visible .ac-aster-figure{border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 4px #8453a1}
+/* Walk cycle (8 frames, sprite sheet row 2): used once, when Aster walks in to settle at the collector story. */
+.ac-aster-walk{position:absolute;top:0;left:0;display:block;width:100%;height:100%;background-repeat:no-repeat;background-size:800% 100%;background-position:0 0;opacity:0}
+/* Exactly one pose at a time: while he waits he is out of sight; while he walks the idle and look layers are switched
+   off instantly (no cross-fade, no idle loop underneath), and the same on the way back to idle. */
+.ac-story-aster.is-waiting{visibility:hidden}
+.ac-story-aster .ac-aster-sprite,.ac-story-aster .ac-aster-look,.ac-story-aster .ac-aster-walk{transition:none!important}
+.is-walking .ac-aster-walk{opacity:1}
+.is-walking .ac-aster-sprite,.is-walking .ac-aster-look{opacity:0!important;-webkit-animation:none!important;animation:none!important}
+@media (prefers-reduced-motion:no-preference){
+  .is-walking .ac-aster-walk{animation:ac-aster-walk 720ms steps(8,jump-none) infinite}
+  .ac-story-aster.is-walking{animation:ac-aster-walk-in 3400ms linear both}
+}
+@keyframes ac-aster-walk{from{background-position:0 0}to{background-position:100% 0}}
+@keyframes ac-aster-walk-in{from{transform:translateX(-560px)}to{transform:none}}
+/* Only his body takes clicks, so the transparent corners of the sprite never block the page. */
+.ac-aster-hit{position:absolute;left:18%;top:22%;width:64%;height:70%;border-radius:50%;pointer-events:auto}
+.ac-aster.is-shy .ac-aster-hit{pointer-events:none}
+.ac-aster-figure{position:relative;display:block;width:100%;height:100%;transform-origin:50% 100%}
+.ac-aster-sprite,.ac-aster-look{position:absolute;top:0;left:0;display:block;width:100%;height:100%;background-repeat:no-repeat;background-position:0 0}
+.ac-aster-sprite{background-size:400% 100%}
+.ac-aster-look{background-size:1600% 100%;opacity:0}
+.is-looking .ac-aster-look{opacity:1}
+.is-looking .ac-aster-sprite{opacity:0}
+.ac-aster-burst{position:absolute;left:50%;top:38%;width:0;height:0;pointer-events:none}
+.ac-aster-spark{position:absolute;left:-7px;top:-9px;font-size:16px;line-height:1;color:#f2b632;text-shadow:0 0 1px #8a5a00,0 1px 0 #8a5a00;opacity:0}
+.ac-aster-close{pointer-events:auto;position:absolute;top:-6px;right:-6px;display:none;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border:1px solid #d9c9bb;border-radius:50%;background:var(--ac-cream);color:var(--ac-brown);font:inherit;font-size:15px;line-height:1;cursor:pointer;box-shadow:0 2px 6px rgba(48,30,12,.12)}
+.ac-aster--right .ac-aster-close{right:auto;left:-6px}
+.ac-aster.is-ready .ac-aster-close{display:flex}
+.ac-aster-close:focus-visible{outline:2px solid #8453a1;outline-offset:2px}
+/* Steps aside when he would sit over a link, button or form control. Clicks pass straight through. */
+.ac-aster.is-shy{opacity:.55;transform:translateY(46%)}
+.ac-aster.is-shy .ac-aster-poke,.ac-aster.is-shy .ac-aster-close{pointer-events:none}
+.ac-aster.is-shy .ac-aster-close{opacity:0}
+/* He pops back up to say his line, then ducks again; clicks still pass through while he is shy. */
+.ac-aster.is-shy.is-talking{opacity:1;transform:none}
+/* While the hero Aster is on screen, the corner Aster waits off-stage so there is only ever one of him. */
+.ac-aster.is-away{opacity:0;transform:translateY(60%);visibility:hidden;transition:opacity 140ms ease,transform 240ms cubic-bezier(.23,1,.32,1),visibility 0s linear 140ms}
+/* Once a placed Aster is actually on screen the corner Aster is gone outright, with no fade, so two are never visible together. */
+.ac-aster.is-offstage{opacity:0!important;visibility:hidden!important;transition:none!important}
+.ac-aster.is-away .ac-aster-hit,.ac-aster.is-away .ac-aster-close{pointer-events:none}
+/* A short line of speech after a click (decorative; the button keeps its own label). */
+.ac-aster-bubble{position:absolute;bottom:100%;left:50%;z-index:2;width:-webkit-max-content;width:max-content;max-width:230px;padding:9px 13px;border-radius:14px;background:#fff;color:var(--ac-brown);font-size:13px;font-weight:700;line-height:1.35;letter-spacing:0;text-align:center;white-space:normal;box-shadow:0 8px 22px -10px rgba(43,24,50,.45);opacity:0;transform:translate(-50%,0) scale(.92);transform-origin:50% 100%;pointer-events:none;transition:opacity 160ms ease,transform 220ms cubic-bezier(.23,1,.32,1)}
+.ac-aster-bubble::after{content:"";position:absolute;top:100%;left:50%;margin-left:-6px;border:6px solid transparent;border-top-color:#fff}
+.is-talking .ac-aster-bubble{opacity:1;transform:translate(-50%,-8px) scale(1)}
+.ac-aster .ac-aster-bubble{left:60%}
+@media (prefers-reduced-motion:reduce){.ac-aster-bubble{transition:opacity 160ms ease!important}}
+/* Second placement, used when the space above him holds a price, link or control: beside him instead. */
+.ac-aster-bubble.is-side{left:100%;bottom:auto;top:18%;margin-left:10px;transform:translate(-6px,0) scale(.92);transform-origin:0 50%}
+.is-talking .ac-aster-bubble.is-side{transform:translate(0,0) scale(1)}
+.ac-aster-bubble.is-side::after{top:50%;left:-12px;margin:-6px 0 0;border-color:transparent;border-right-color:#fff}
+.ac-aster--right .ac-aster-bubble.is-side{left:auto;right:100%;margin:0 10px 0 0;transform:translate(6px,0) scale(.92);transform-origin:100% 50%}
+.ac-aster--right.is-talking .ac-aster-bubble.is-side{transform:translate(0,0) scale(1)}
+.ac-aster--right .ac-aster-bubble.is-side::after{left:auto;right:-12px;border-right-color:transparent;border-left-color:#fff}
+.ac-aster--right .ac-aster-bubble{left:30%}
+/* Step aside whenever Dawn opens a drawer, menu, modal, search, or cart popup. */
+body.overflow-hidden .ac-aster,body.overflow-hidden-mobile .ac-aster,body.overflow-hidden-tablet .ac-aster,body.overflow-hidden-desktop .ac-aster,body.ac-overlay-open .ac-aster{opacity:0;visibility:hidden;transition:opacity 150ms ease,visibility 0s linear 150ms}
+@media(min-width:990px){.ac-aster{width:112px;height:112px;bottom:16px;bottom:calc(16px + env(safe-area-inset-bottom));left:16px;left:calc(16px + env(safe-area-inset-left))}.ac-aster--right{left:auto;right:16px;right:calc(16px + env(safe-area-inset-right))}.ac-aster-spark{font-size:20px}}
+@media(max-width:749px){.ac-aster{width:56px;height:56px;bottom:10px;bottom:calc(10px + env(safe-area-inset-bottom))}}
+@media print{.ac-aster{display:none}}
+@media (prefers-reduced-motion:no-preference){
+  .is-animated .ac-aster-sprite{-webkit-animation:ac-aster-idle 4.8s steps(1,end) infinite;animation:ac-aster-idle 4.8s steps(1,end) infinite}
+  .is-paused .ac-aster-sprite{-webkit-animation-play-state:paused;animation-play-state:paused}
+  .ac-aster.is-ready{-webkit-animation:ac-aster-in 420ms cubic-bezier(.23,1,.32,1) backwards;animation:ac-aster-in 420ms cubic-bezier(.23,1,.32,1) backwards}
+  .ac-aster-sprite,.ac-aster-look{transition:opacity 120ms ease}
+  .ac-aster-figure.is-hop{-webkit-animation:ac-aster-hop 560ms cubic-bezier(.23,1,.32,1);animation:ac-aster-hop 560ms cubic-bezier(.23,1,.32,1)}
+  .ac-aster-spark.is-on{-webkit-animation:ac-aster-spark 640ms cubic-bezier(.23,1,.32,1) forwards;animation:ac-aster-spark 640ms cubic-bezier(.23,1,.32,1) forwards}
+}
+/* Reduced motion keeps a gentle sparkle fade with no movement and no hop. */
+@media (prefers-reduced-motion:reduce){.ac-aster-spark.is-on{-webkit-animation:ac-aster-glow 500ms ease forwards;animation:ac-aster-glow 500ms ease forwards}}
+/* Frames: 1 open, 2 blink, 3 + 4 small glance. Percent offsets keep every size in step. */
+@-webkit-keyframes ac-aster-idle{0%{background-position:0 0}52%{background-position:33.333% 0}55%{background-position:0 0}70%{background-position:66.667% 0}78%{background-position:100% 0}86%{background-position:66.667% 0}90%{background-position:0 0}95%{background-position:33.333% 0}97%{background-position:0 0}}
+@keyframes ac-aster-idle{0%{background-position:0 0}52%{background-position:33.333% 0}55%{background-position:0 0}70%{background-position:66.667% 0}78%{background-position:100% 0}86%{background-position:66.667% 0}90%{background-position:0 0}95%{background-position:33.333% 0}97%{background-position:0 0}}
+@-webkit-keyframes ac-aster-in{from{opacity:0;-webkit-transform:translateY(14px)}to{opacity:1;-webkit-transform:none}}
+@keyframes ac-aster-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes ac-aster-hop{0%{transform:scale(1.06,.92)}30%{transform:translateY(-24%) scale(.96,1.05)}62%{transform:translateY(0) scale(1.05,.95)}82%{transform:translateY(-4%) scale(.99,1.01)}100%{transform:none}}
+@-webkit-keyframes ac-aster-hop{0%{-webkit-transform:scale(1.06,.92)}30%{-webkit-transform:translateY(-24%) scale(.96,1.05)}62%{-webkit-transform:translateY(0) scale(1.05,.95)}82%{-webkit-transform:translateY(-4%) scale(.99,1.01)}100%{-webkit-transform:none}}
+@keyframes ac-aster-spark{0%{opacity:1;transform:translate(0,0) scale(.6) rotate(0)}70%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1) rotate(var(--rot))}}
+@-webkit-keyframes ac-aster-spark{0%{opacity:1;-webkit-transform:translate(0,0) scale(.6)}70%{opacity:1}100%{opacity:0;-webkit-transform:translate(var(--dx),var(--dy)) scale(1)}}
+@keyframes ac-aster-glow{0%{opacity:0;transform:translate(var(--dx),var(--dy))}40%{opacity:1;transform:translate(var(--dx),var(--dy))}100%{opacity:0;transform:translate(var(--dx),var(--dy))}}
+@-webkit-keyframes ac-aster-glow{0%{opacity:0}40%{opacity:1}100%{opacity:0}}
+
+/* ---------- Scroll reveals: play once per section; JS only arms sections that start below the fold ---------- */
+@media (prefers-reduced-motion:no-preference){
+  .ac-reveal{opacity:0;transform:translateY(14px);transition:opacity 480ms cubic-bezier(.23,1,.32,1),transform 560ms cubic-bezier(.23,1,.32,1)}
+  .ac-reveal.is-revealed{opacity:1;transform:none}
+  /* Product grids move but never fade, so photos and shopping controls stay visible and usable. */
+  .ac-reveal-grid>*{transform:translateY(22px);transition:transform 600ms cubic-bezier(.23,1,.32,1)}
+  .ac-reveal-grid.is-revealed>*{transform:none}
+}

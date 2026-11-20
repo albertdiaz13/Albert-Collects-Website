@@ -1,0 +1,285 @@
+/* Albert Collects on phones and small tablets (under 990px). Loaded with a media attribute, like albert-desktop.css.
+   The phone gets its own composition, not a squeezed desktop: a dark, lit opening built for thumbs, one signature
+   touch moment ("Catch the light"), shelves with a clear rhythm, and cards that read well two to a row.
+   1. Tokens  2. Hero  3. Catch the light  4. Category chips  5. Shelves and bands  6. Cards  7. Story and footer
+   8. Collection pages  9. Aster on touch screens  10. Card motion disclosure  11. Small tablets  12. Motion
+   Old Safari (first-generation iPad Air): no `inset`, no flex `gap`, no aspect-ratio, plain values before clamp()/env().
+   Ambient motion runs only under html.ac-motion-ok and pauses off screen; everything is composed without it. */
+
+:root{--acm-ink:#170c1d;--acm-plum:#2a1634;--acm-cream:#f7efe4;--acm-mist:#d6c6da;--acm-gold:#f2c35a;--acm-lav:#c9a4ff;--acm-mint:#7ef2c8;--acm-line:#e5dcd1;--acm-display:"Fraunces Variable","Fraunces",var(--font-heading-family),Georgia,serif;--acm-out:cubic-bezier(.23,1,.32,1);--acm-inout:cubic-bezier(.77,0,.175,1)}
+
+/* ---------- 2. Hero ---------- */
+.ac-welcome.ac-welcome--gallery{display:block;position:relative;z-index:0;width:auto;margin:0;padding:24px 20px 20px;text-align:left;color:var(--acm-cream);background:#1d1026!important;background:radial-gradient(120% 70% at 88% 0%,rgba(132,83,161,.6) 0%,rgba(132,83,161,0) 60%),radial-gradient(90% 55% at 0% 100%,rgba(242,195,90,.2) 0%,rgba(242,195,90,0) 62%),linear-gradient(172deg,#2b1736 0%,#1d1026 55%,#170c1d 100%)!important;border-radius:0 0 28px 28px;overflow:hidden;overflow:clip;isolation:isolate}
+.ac-welcome--gallery .ac-welcome-copy{position:relative;z-index:2;max-width:none;margin:0}
+.ac-welcome--gallery .ac-kicker{margin:0 0 10px;color:var(--acm-gold);font-size:10px;letter-spacing:.16em}
+.ac-welcome--gallery h1{max-width:none;margin:0 0 12px;font-family:var(--acm-display);font-weight:560;font-size:44px;line-height:.98;letter-spacing:-.03em;color:var(--acm-cream)}
+.ac-welcome--gallery h1 .ac-spark{display:none}
+.ac-welcome--gallery .ac-welcome-text{max-width:30em;margin:0;font-size:15px;line-height:1.55;color:var(--acm-mist)}
+.ac-welcome--gallery .ac-hero-actions{display:flex;flex-wrap:wrap;align-items:center;margin:18px 0 0}
+.ac-hero-button{display:inline-flex;align-items:center;justify-content:center;min-height:52px;margin:0 18px 0 0;padding:0 24px;border-radius:999px;background:var(--acm-gold);color:#241103;font-size:15px;font-weight:750;letter-spacing:.01em;line-height:1.2;text-decoration:none;box-shadow:0 12px 30px -14px rgba(242,195,90,.9);-webkit-tap-highlight-color:transparent}
+.ac-hero-button span{display:inline-block;margin-left:10px}
+.ac-hero-button:active{-webkit-transform:scale(.97);transform:scale(.97)}
+.ac-hero-link{display:inline-block;padding:12px 0 4px;border-bottom:1px solid var(--acm-lav);color:var(--acm-cream);font-size:14px;font-weight:700;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.ac-hero-button:focus-visible,.ac-hero-link:focus-visible,.ac-catch:focus-visible{outline:2px solid var(--acm-mint);outline-offset:4px}
+.ac-welcome--gallery .ac-hero-live{display:flex;align-items:center;margin:14px 0 0;font-size:12px;font-weight:650;color:#a9e6cf}
+.ac-live-dot{display:inline-block;flex:none;width:8px;height:8px;margin-right:9px;border-radius:50%;background:var(--acm-mint);box-shadow:0 0 10px 1px rgba(126,242,200,.7)}
+
+/* The stage: real cards lit from above, with slow stars. A padding box keeps its shape everywhere.
+   With JavaScript the cards are a swipeable wheel (section 2b). Without it they are this still three-card fan. */
+.ac-welcome--gallery .ac-hero-stage{display:block;position:relative;z-index:1;height:0;padding-top:84%;margin:10px -20px 0}
+.ac-hero-light{position:absolute;border-radius:50%;pointer-events:none}
+.ac-hero-light--a{width:70%;height:0;padding-top:70%;right:-22%;top:-18%;background:radial-gradient(circle,rgba(201,164,255,.38) 0%,rgba(201,164,255,0) 66%)}
+.ac-hero-light--b{width:64%;height:0;padding-top:64%;left:-24%;bottom:-30%;background:radial-gradient(circle,rgba(242,195,90,.3) 0%,rgba(242,195,90,0) 66%)}
+.ac-hero-light--c{width:36%;height:0;padding-top:36%;left:30%;top:22%;background:radial-gradient(circle,rgba(126,242,200,.16) 0%,rgba(126,242,200,0) 68%)}
+.ac-fan{position:absolute;top:0;right:0;bottom:0;left:0}
+.ac-hero-aster{display:none}
+.ac-fan-card{position:absolute;z-index:1;display:none;width:35%;left:10%;top:23%;-webkit-transform:rotate(-10deg);transform:rotate(-10deg);-webkit-transform-origin:50% 100%;transform-origin:50% 100%}
+html:not(.ac-js) .ac-fan-card:nth-of-type(-n+3){display:block}
+html:not(.ac-js) .ac-fan-card:not(.is-featured)~.ac-fan-card:not(.is-featured){left:55%;-webkit-transform:rotate(10deg);transform:rotate(10deg)}
+html:not(.ac-js) .ac-fan-card.is-featured{z-index:2;left:32.5%;top:13%;-webkit-transform:none;transform:none}
+.ac-fan-stage{border:0;border-radius:12px;background:#f3ede4;box-shadow:0 22px 40px -18px rgba(0,0,0,.75),0 0 0 1px rgba(255,255,255,.08)}
+.ac-fan-stage .ac-image-plane{top:6px;right:6px;bottom:6px;left:6px}
+.ac-fan-floor{position:absolute;left:14%;right:14%;bottom:11%;height:18px;border-radius:50%;background:radial-gradient(ellipse at center,rgba(201,164,255,.5) 0%,rgba(201,164,255,0) 70%);pointer-events:none}
+.ac-fan-caption{position:absolute;z-index:4;left:0;right:0;bottom:2.5%;margin:0;padding:0 20px;text-align:center;font-size:13px;line-height:1.3;color:var(--acm-cream)}
+.ac-fan-link{color:inherit;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.ac-fan-link:focus-visible{outline:2px solid var(--acm-mint);outline-offset:4px;border-radius:8px}
+.ac-fan-title{font-family:var(--acm-display);font-size:16px;font-weight:540;letter-spacing:-.01em}
+.ac-fan-price{margin-left:8px;color:var(--acm-gold);font-weight:750}
+.ac-fan-dots{display:none}
+
+/* ---------- 2b. The card wheel ---------- */
+/* One card in the middle, a neighbour peeking in on each side, more waiting off both edges. These rules draw the wheel at
+   rest, so the first paint already matches what the script lays out; the script then moves the cards with the finger.
+   Sideways drags turn the wheel and up-and-down drags scroll the page (touch-action leaves vertical panning to the browser). */
+/* Height = a 38px band for the star, the middle card (44% of the stage wide, trading-card shape), then the caption and the dots. */
+.ac-js .ac-welcome--gallery .ac-hero-stage{padding-top:calc(69% + 144px);touch-action:pan-y pinch-zoom}
+.ac-js .ac-fan{z-index:1;-webkit-perspective:900px;perspective:900px}
+.ac-js .ac-fan-card{display:block;z-index:1;left:50%;top:38px;width:44%;margin-left:-22%;opacity:0;pointer-events:none;-webkit-transform:translate3d(0,7%,0) scale(.68);transform:translate3d(0,7%,0) scale(.68);-webkit-transform-origin:50% 50%;transform-origin:50% 50%;will-change:transform,opacity}
+.ac-js .ac-fan-card.is-featured{z-index:3;opacity:1;pointer-events:auto;-webkit-transform:translate3d(0,0,0);transform:translate3d(0,0,0)}
+.ac-js .ac-fan-card--prev,.ac-js .ac-fan-card--next{z-index:2;opacity:.72;pointer-events:auto}
+.ac-js .ac-fan-card--prev{-webkit-transform:translate3d(-80%,4%,0) scale(.8);transform:translate3d(-80%,4%,0) scale(.8)}
+.ac-js .ac-fan-card--next{-webkit-transform:translate3d(80%,4%,0) scale(.8);transform:translate3d(80%,4%,0) scale(.8)}
+@supports (aspect-ratio:1/1){
+  @media(prefers-reduced-motion:no-preference){
+    .ac-js .ac-fan-card--prev{transform:translate3d(-80%,4%,0) rotateY(-30deg) rotate(-3deg) scale(.8)}
+    .ac-js .ac-fan-card--next{transform:translate3d(80%,4%,0) rotateY(30deg) rotate(3deg) scale(.8)}
+  }
+}
+/* The wheel's cards are the cards themselves: no cream mount or inset around the scan, a trading card's 63:88 shape,
+   and the shadow under the photo. (Only this carousel; shelf and kiosk tiles keep their mounts.) */
+.ac-js .ac-fan-stage{aspect-ratio:63/88;border-radius:0;background:transparent;box-shadow:none}
+.ac-js .ac-fan-stage .ac-image-plane{top:0;right:0;bottom:0;left:0;border-radius:0}
+.ac-js .ac-fan-stage .ac-product-photo{border-radius:4.4%/3.2%;-webkit-filter:drop-shadow(0 14px 16px rgba(0,0,0,.55));filter:drop-shadow(0 14px 16px rgba(0,0,0,.55))}
+@supports not (aspect-ratio:1/1){
+  .ac-js .ac-fan-stage{padding-top:139.68%}
+}
+.ac-js .ac-fan-stage,.ac-js .ac-fan-stage img{-webkit-user-drag:none;-webkit-user-select:none;user-select:none}
+.ac-js .ac-hero-stage.is-dragging .ac-fan-card{cursor:grabbing}
+.ac-js .ac-fan-floor{z-index:0;left:20%;right:20%;bottom:92px;height:24px}
+/* The star keeps to the band above the cards, so it never covers a card you might tap. */
+.ac-js .ac-catch{top:-4px}
+.ac-js .ac-catch[data-perch="1"]{top:-4px;right:auto;left:5%}
+.ac-js .ac-catch[data-perch="2"]{top:-4px;right:auto;left:44%}
+.ac-js .ac-catch[data-perch="3"]{top:-4px;right:26%}
+.ac-js .ac-glint--4{left:30%;top:1%}
+/* The caption names the middle card and is its link: a two-line title box, then the price, so the price never jumps. */
+.ac-js .ac-fan-caption{bottom:26px;height:72px;padding:0 22px;font-size:15px}
+.ac-js .ac-fan-link{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.ac-js .ac-fan-title{display:block;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-width:19em;max-height:2.5em;overflow:hidden;font-size:17px;line-height:1.25}
+.ac-js .ac-fan-price{display:block;margin:5px 0 0;font-size:15px}
+.ac-js .ac-fan-dots{display:block;position:absolute;z-index:4;left:0;right:0;bottom:10px;height:8px;font-size:0;line-height:0;text-align:center;pointer-events:none}
+.ac-fan-dot{display:inline-block;width:6px;height:6px;margin:1px 3px;border-radius:50%;background:rgba(255,255,255,.26);vertical-align:top;transition:background-color 180ms ease,transform 180ms ease}
+.ac-fan-dot.is-on{background:var(--acm-gold);-webkit-transform:scale(1.35);transform:scale(1.35)}
+/* Slow stars. Four-point glints cut with clip-path; they simply stay as soft squares where clip-path is missing. */
+.ac-glint{position:absolute;z-index:3;width:10px;height:10px;background:#ffe9b8;opacity:.55;pointer-events:none;-webkit-clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);clip-path:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%)}
+.ac-glint--1{left:7%;top:12%}
+.ac-glint--2{left:86%;top:46%;width:8px;height:8px;background:var(--acm-lav)}
+.ac-glint--3{left:18%;top:70%;width:7px;height:7px}
+.ac-glint--4{left:64%;top:3%;width:6px;height:6px;background:var(--acm-mint)}
+.ac-glint--5{left:92%;top:78%;width:9px;height:9px}
+.ac-glint--4,.ac-glint--5{display:block}
+
+/* ---------- 3. Catch the light ---------- */
+.ac-catch{display:block;position:absolute;z-index:5;top:0;right:5%;width:48px;height:48px;margin:0;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.ac-catch svg{display:block;width:100%;height:100%;overflow:visible}
+.ac-catch-glow{fill:rgba(242,195,90,.3)}
+.ac-catch-core{fill:#ffe08a;stroke:#fff6dc;stroke-width:1.2;stroke-linejoin:round}
+.ac-catch-hint{position:absolute;right:100%;top:50%;margin:-9px 2px 0 0;padding:0;white-space:nowrap;font-size:11px;font-weight:700;line-height:18px;letter-spacing:.04em;color:#f6dfa4;transition:opacity 200ms ease}
+.ac-hero-stage.has-caught .ac-catch-hint{opacity:0}
+.ac-catch[data-perch="1"]{top:44%;right:auto;left:2%}
+.ac-catch[data-perch="2"]{top:0;right:auto;left:40%}
+.ac-catch[data-perch="3"]{top:52%;right:2%}
+.ac-ribbon{display:block;position:absolute;z-index:4;top:-30%;left:0;width:46%;height:160%;opacity:0;pointer-events:none;background:linear-gradient(90deg,rgba(255,255,255,0) 0%,rgba(201,164,255,.5) 22%,rgba(126,242,200,.55) 42%,rgba(255,246,220,.92) 52%,rgba(242,195,90,.6) 64%,rgba(255,150,200,.45) 80%,rgba(255,255,255,0) 100%);-webkit-transform:translateX(60%) rotate(18deg);transform:translateX(60%) rotate(18deg);mix-blend-mode:screen}
+/* Without motion: the ribbon glows once where it stands and the star dims and returns. Nothing travels. */
+.ac-hero-stage.is-caught .ac-ribbon{-webkit-animation:acm-ribbon-still 1000ms ease both;animation:acm-ribbon-still 1000ms ease both}
+.ac-hero-stage.is-caught .ac-catch svg{-webkit-animation:acm-catch-still 1000ms ease both;animation:acm-catch-still 1000ms ease both}
+@-webkit-keyframes acm-ribbon-still{0%,100%{opacity:0}35%,60%{opacity:.75}}
+@keyframes acm-ribbon-still{0%,100%{opacity:0}35%,60%{opacity:.75}}
+@-webkit-keyframes acm-catch-still{0%,100%{opacity:1}40%{opacity:.25}}
+@keyframes acm-catch-still{0%,100%{opacity:1}40%{opacity:.25}}
+
+/* ---------- 4. Category chips: one row you can swipe ---------- */
+.ac-categories{display:flex;flex-wrap:nowrap;justify-content:flex-start;width:auto;margin:0;padding:16px 16px 6px;border-bottom:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.ac-categories::-webkit-scrollbar{display:none}
+.ac-category{flex:none;min-height:44px;margin:0 8px 0 0;padding:0 16px;border-color:#e3d6c8;background:#fff;font-size:13px;white-space:nowrap}
+.ac-category:first-child{background:var(--acm-plum);border-color:var(--acm-plum);color:var(--acm-cream)}
+.ac-category span{margin-right:8px;font-size:15px}
+
+/* ---------- 5. Shelves: a small star rule between sections, then kicker, display title, link ---------- */
+.ac-shelf{position:relative;z-index:0;padding:26px 0 12px;text-align:left}
+.ac-shelf::before{content:"✦";display:block;height:14px;margin:0 0 22px;text-align:center;font-size:11px;line-height:14px;color:#b783db;background:-webkit-linear-gradient(left,rgba(229,220,209,0),#e5dcd1 18%,#e5dcd1 44%,rgba(229,220,209,0) 46%,rgba(229,220,209,0) 54%,#e5dcd1 56%,#e5dcd1 82%,rgba(229,220,209,0)) center/100% 1px no-repeat;background:linear-gradient(to right,rgba(229,220,209,0),#e5dcd1 18%,#e5dcd1 44%,rgba(229,220,209,0) 46%,rgba(229,220,209,0) 54%,#e5dcd1 56%,#e5dcd1 82%,rgba(229,220,209,0)) center/100% 1px no-repeat}
+.ac-shelf-header{display:block;margin:0 0 18px;text-align:left}
+.ac-shelf-header .ac-kicker{margin:0 0 6px;color:#8453a1;font-size:10px;letter-spacing:.16em}
+.ac-shelf-header h2{margin:0;font-family:var(--acm-display);font-weight:560;font-size:34px;line-height:1;letter-spacing:-.028em;color:var(--acm-plum)}
+.ac-shelf-header .ac-spark{display:none}
+.ac-shelf-header .ac-text-link{display:inline-block;max-width:none;margin:12px 0 0;padding:0 0 3px;border-bottom:1px solid #b99fd0;font-size:12px;font-weight:700;text-align:left;white-space:nowrap}
+.ac-shelf-header .ac-text-link span{margin-left:8px}
+/* Bands give the page its rhythm: a lavender wash for the vintage shelf, a dark vault for slabs. */
+.ac-shelf[data-ac-context="vintage"],.ac-shelf--vault{margin-top:18px;padding:28px 0 22px}
+.ac-shelf[data-ac-context="vintage"]::before,.ac-shelf--vault::before{display:none}
+.ac-shelf[data-ac-context="vintage"]::after,.ac-shelf--vault::after{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:-16px;right:-16px;border-radius:28px}
+.ac-shelf[data-ac-context="vintage"]::after{background:#f1e7f6;background:linear-gradient(180deg,#efe3f6 0%,#f7efe6 100%)}
+.ac-shelf--vault::after{background:#1d1026;background:radial-gradient(110% 60% at 100% 0%,rgba(132,83,161,.5) 0%,rgba(132,83,161,0) 62%),linear-gradient(172deg,#2b1736 0%,#1c0f24 70%)}
+.ac-shelf--vault .ac-shelf-header .ac-kicker{color:var(--acm-gold)}
+.ac-shelf--vault .ac-shelf-header h2,.ac-shelf--vault .ac-shelf-header .ac-text-link,.ac-shelf--vault .ac-product-card,.ac-shelf--vault .ac-product-info h3,.ac-shelf--vault .ac-product-info h3 a,.ac-shelf--vault .ac-product-price{color:var(--acm-cream)}
+.ac-shelf--vault .ac-shelf-header .ac-text-link{border-bottom-color:var(--acm-lav)}
+.ac-shelf--vault .ac-product-type{color:#cdb1e0}
+.ac-shelf--vault .ac-product-price s,.ac-shelf--vault .ac-sold-label{color:#bfa8b8}
+.ac-shelf--vault .ac-sold-label{border-top-color:rgba(247,239,228,.18)}
+.ac-shelf--vault .ac-add-button{color:var(--acm-cream);border-color:rgba(247,239,228,.34)}
+.ac-shelf--vault .ac-image-stage{background:#efe6d9;border-color:transparent}
+.ac-shelf--vault .ac-flip-button{background:var(--acm-cream)}
+
+/* ---------- 6. Cards, two to a row: art first, then a title you can read and a price you can find ---------- */
+.ac-product-grid{grid-template-columns:repeat(2,minmax(0,1fr));grid-column-gap:12px;column-gap:12px;grid-row-gap:22px;row-gap:22px}
+.ac-product-card,.ac-product-info,.ac-product-info h3,.ac-product-type,.ac-product-price,.ac-sold-label{text-align:left}
+.ac-product-info{padding:10px 2px 10px}
+.ac-product-type{margin:0 0 4px;font-size:9px;letter-spacing:.12em}
+.ac-product-info h3{display:-webkit-box;margin:0 0 6px;font-size:13px;line-height:1.35;font-weight:650;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.ac-product-price{font-size:16px;line-height:1.3}
+.ac-product-price s{margin-left:8px;font-size:12px;font-weight:500;color:#9a8474}
+.ac-add-button{min-height:44px;padding:0 12px;border-radius:10px;font-size:12px;justify-content:space-between}
+.ac-sold-label{padding:12px 2px}
+.ac-flip-row{justify-content:flex-start;min-height:44px;padding-top:6px}
+.ac-flip-button{min-height:36px}
+.ac-status{font-size:9px}
+
+/* ---------- 7. Collector story and footer ---------- */
+.ac-story{position:relative;z-index:0;display:block;margin:34px auto 6px;padding:26px 22px 24px;border:0;border-radius:24px;background:#1d1026;background:radial-gradient(100% 70% at 0% 0%,rgba(242,195,90,.2) 0%,rgba(242,195,90,0) 60%),linear-gradient(165deg,#2b1736 0%,#1c0f24 75%);color:var(--acm-cream);text-align:left;overflow:hidden;overflow:clip}
+.ac-story-icon{margin:0 0 14px}
+.ac-story .ac-kicker{margin:0 0 8px;color:var(--acm-gold);font-size:10px;letter-spacing:.16em}
+.ac-story h2{margin:0 0 10px;font-family:var(--acm-display);font-weight:540;font-size:30px;line-height:1.04;letter-spacing:-.025em;color:var(--acm-cream)}
+.ac-story p:not(.ac-kicker){margin:0;font-size:14px;line-height:1.65;color:var(--acm-mist)}
+.ac-story-link{display:inline-block;margin-top:14px;color:var(--acm-cream)}
+.ac-story h2 .ac-spark{display:none}
+/* Event titles share the display face. */
+.ac-racket h2,.ac-court h1{font-family:var(--acm-display);font-weight:560;letter-spacing:-.025em}
+.ac-racket h2{font-size:30px;line-height:1.02}
+.ac-court h1{font-size:26px;line-height:1.04}
+.ac-footer{margin-top:44px}
+
+/* ---------- 8. Collection pages: a lit title band, then the same cards ---------- */
+.ac-template-collection:not(.ac-kiosk-page) .collection-hero{margin:0 0 6px;padding:0;background:#1d1026;background:radial-gradient(110% 80% at 90% 0%,rgba(132,83,161,.55) 0%,rgba(132,83,161,0) 62%),linear-gradient(172deg,#2b1736 0%,#1c0f24 80%);border-radius:0 0 24px 24px;color:var(--acm-cream);text-align:left}
+.ac-template-collection:not(.ac-kiosk-page) .collection-hero__inner{padding-top:0;padding-bottom:0}
+.ac-template-collection:not(.ac-kiosk-page) .collection-hero__title{margin:22px 0 20px;font-family:var(--acm-display);font-weight:560;font-size:38px;line-height:1;letter-spacing:-.028em;color:var(--acm-cream);text-align:left}
+.ac-template-collection:not(.ac-kiosk-page) .collection-hero__description{margin:-8px 0 20px;max-width:34em;color:var(--acm-mist);text-align:left}
+
+/* ---------- 9. Aster on touch screens ----------
+   One layout for every appearance: he stands at the left, the bubble sits to his right, level with him, and wraps
+   inward. The script sets --ac-bubble-max from the space to the screen edge, so it never clips. He always takes the
+   bottom-left corner here (above the browser bar and inside the safe area), whatever the desktop corner setting says. */
+.ac-aster,.ac-aster.ac-aster--right{width:60px;height:60px;right:auto;left:10px;left:calc(10px + env(safe-area-inset-left));bottom:12px;bottom:calc(12px + env(safe-area-inset-bottom))}
+.ac-aster .ac-aster-close,.ac-aster--right .ac-aster-close{top:-9px;right:-9px;left:auto;width:28px;height:28px}
+.ac-aster .ac-aster-close::before{content:"";position:absolute;top:-8px;right:-8px;bottom:-8px;left:-8px}
+.ac-aster .ac-aster-bubble,.ac-aster--right .ac-aster-bubble,.ac-aster .ac-aster-bubble.is-side,.ac-aster--right .ac-aster-bubble.is-side,.ac-aster-rig .ac-aster-bubble,.ac-court-aster .ac-aster-bubble{top:50%;bottom:auto;left:100%;right:auto;margin:0 0 0 13px;max-width:210px;max-width:var(--ac-bubble-max,210px);padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.3;text-align:left;box-shadow:0 10px 26px -12px rgba(23,12,29,.6);-webkit-transform:translate(-6px,-50%) scale(.94)!important;transform:translate(-6px,-50%) scale(.94)!important;-webkit-transform-origin:0 50%;transform-origin:0 50%}
+.ac-aster.is-talking .ac-aster-bubble,.ac-aster-rig.is-talking .ac-aster-bubble{-webkit-transform:translate(0,-50%) scale(1)!important;transform:translate(0,-50%) scale(1)!important}
+.ac-aster .ac-aster-bubble::after,.ac-aster--right .ac-aster-bubble::after,.ac-aster .ac-aster-bubble.is-side::after,.ac-aster-rig .ac-aster-bubble::after,.ac-court-aster .ac-aster-bubble::after{top:50%;left:-11px;right:auto;margin:-6px 0 0;border:6px solid transparent;border-right-color:#fff}
+
+/* ---------- 10. Card motion: one small disclosure, closed until asked for ---------- */
+.ac-welcome--gallery .ac-motion-controls{max-width:none;margin:16px 0 0;text-align:left}
+.ac-welcome--gallery .ac-motion-summary{border-color:rgba(247,239,228,.28);color:var(--acm-mist)}
+.ac-welcome--gallery .ac-motion-summary-icon{color:var(--acm-gold)}
+.ac-welcome--gallery .ac-motion-actions{justify-content:flex-start}
+.ac-welcome--gallery .ac-motion-button{border-color:rgba(247,239,228,.34);color:var(--acm-cream)}
+.ac-welcome--gallery .ac-motion-status,.ac-welcome--gallery .ac-motion-help{color:var(--acm-mist)!important}
+.ac-welcome--gallery .ac-motion-help a{color:var(--acm-cream)}
+main>.ac-motion-controls{margin:6px auto 30px;padding:0 16px}
+/* Card motion lives in the header on phones and small tablets: a compact pill beside the menu links. Its panel drops
+   below the navigation. The pill turns gold while phone motion is on. */
+.ac-header{z-index:5}
+.ac-nav{position:relative}
+.ac-nav-motion{display:none}
+.ac-nav-motion.has-control{display:block}
+.ac-nav .ac-nav-motion,.ac-nav .ac-nav-motion details{position:static}
+.ac-nav-motion .ac-motion-controls{max-width:none;margin:0;text-align:left}
+/* The menu's own rule turns every span in an open summary upside down (for its chevron). Not this one. */
+.ac-nav .ac-nav-motion .ac-motion-summary span,.ac-nav .ac-nav-motion details[open] .ac-motion-summary span{-webkit-transform:none;transform:none;transition:none}
+.ac-nav .ac-nav-motion .ac-motion-summary .ac-motion-chevron{-webkit-transform:rotate(45deg);transform:rotate(45deg)}
+.ac-nav .ac-nav-motion details[open] .ac-motion-summary .ac-motion-chevron{-webkit-transform:rotate(225deg);transform:rotate(225deg)}
+.ac-nav-motion .ac-motion-summary{position:relative;min-height:32px;padding:0 12px 0 10px;border-color:#cbb8d5;font-size:12px;font-weight:650;white-space:nowrap}
+.ac-nav-motion .ac-motion-summary::after{content:"";position:absolute;top:-7px;right:-4px;bottom:-7px;left:-4px}
+.ac-nav-motion .ac-motion-summary-icon{margin-right:6px}
+.ac-nav-motion .ac-motion-chevron{margin-left:8px}
+.ac-nav-motion .ac-motion-controls.is-on .ac-motion-summary{border-color:#b98a1c;background:#f7e3ad}
+.ac-nav-motion .ac-motion-controls.is-on .ac-motion-summary-icon{color:#7a5200}
+.ac-nav-motion .ac-motion-panel{position:absolute;z-index:12;top:100%;left:0;right:0;max-width:420px;margin:-4px auto 0;padding:12px 14px 14px;border:1px solid var(--acm-line);border-radius:14px;background:#fffaf3;box-shadow:0 14px 30px -12px rgba(36,19,44,.35);text-align:center}
+.ac-nav-motion .ac-motion-actions{justify-content:center}
+
+/* ---------- 11. Small tablets (first-generation iPad Air portrait is 768 wide) ---------- */
+@media(min-width:750px){
+  .ac-welcome.ac-welcome--gallery{display:flex;align-items:center;padding:34px 32px 30px;border-radius:0 0 34px 34px}
+  .ac-welcome--gallery .ac-welcome-copy{flex:0 0 50%;max-width:50%;padding-right:18px}
+  .ac-welcome--gallery h1{font-size:54px}
+  .ac-welcome--gallery .ac-welcome-text{font-size:16px}
+  .ac-welcome--gallery .ac-hero-stage{flex:1 1 0;min-width:0;margin:0 -32px 0 0;padding-top:42%}
+  .ac-js .ac-welcome--gallery .ac-hero-stage{padding-top:calc(32% + 150px)}
+  .ac-js .ac-fan-card{width:42%;margin-left:-21%}
+  .ac-categories{padding:20px 24px 8px}
+  .ac-product-grid{grid-template-columns:repeat(3,minmax(0,1fr));grid-column-gap:18px;column-gap:18px;grid-row-gap:30px;row-gap:30px}
+  .ac-shelf-header h2{font-size:40px}
+  .ac-shelf[data-ac-context="vintage"]::after,.ac-shelf--vault::after{left:-24px;right:-24px}
+  .ac-story{padding:34px 34px 32px}
+  .ac-story h2{font-size:36px}
+  .ac-aster,.ac-aster.ac-aster--right{width:72px;height:72px}
+  .ac-template-collection:not(.ac-kiosk-page) .collection-hero__title{font-size:46px}
+  main>.ac-motion-controls{padding:0 24px}
+}
+
+/* ---------- 12. Motion (modern browsers, motion allowed) ---------- */
+.ac-motion-ok .ac-hero-light--a{animation:acm-drift-a 26s ease-in-out infinite alternate}
+.ac-motion-ok .ac-hero-light--b{animation:acm-drift-b 32s ease-in-out infinite alternate}
+.ac-motion-ok .ac-hero-light--c{animation:acm-drift-a 38s ease-in-out infinite alternate-reverse}
+.ac-motion-ok .ac-glint{animation:acm-twinkle 5.5s ease-in-out infinite}
+.ac-motion-ok .ac-glint--2{animation-duration:7s;animation-delay:-2s}
+.ac-motion-ok .ac-glint--3{animation-duration:6.2s;animation-delay:-4s}
+.ac-motion-ok .ac-glint--4{animation-duration:8s;animation-delay:-1s}
+.ac-motion-ok .ac-glint--5{animation-duration:6.6s;animation-delay:-3s}
+.ac-motion-ok .ac-catch svg{animation:acm-catch-idle 3.4s ease-in-out infinite}
+.ac-motion-ok .ac-live-dot{animation:acm-pulse 2.6s ease-in-out infinite}
+@keyframes acm-drift-a{from{transform:translate(0,0) scale(1)}to{transform:translate(-9%,7%) scale(1.1)}}
+@keyframes acm-drift-b{from{transform:translate(0,0) scale(1)}to{transform:translate(10%,-6%) scale(.94)}}
+@keyframes acm-twinkle{0%,100%{opacity:.25;transform:scale(.7) rotate(0deg)}50%{opacity:.95;transform:scale(1.15) rotate(45deg)}}
+@keyframes acm-catch-idle{0%,100%{transform:scale(.92) rotate(0deg)}50%{transform:scale(1.06) rotate(12deg)}}
+@keyframes acm-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+/* Catch the light, with motion: the star pops, a ribbon of foil light crosses the stage, each card flares as it passes,
+   the glints answer. About a second, then the star settles on a new perch. */
+.ac-motion-ok .ac-hero-stage.is-caught .ac-ribbon{animation:acm-ribbon 900ms var(--acm-inout) both}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-catch svg{animation:acm-catch-pop 620ms var(--acm-out) both}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-fan-card .ac-image-plane{animation:acm-card-flare 620ms var(--acm-out) 120ms both}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-fan-card.is-featured .ac-image-plane{animation-delay:260ms}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-fan-card:not(.is-featured)~.ac-fan-card:not(.is-featured) .ac-image-plane{animation-delay:400ms}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-glint{animation:acm-glint-pop 760ms var(--acm-out) both}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-glint--2{animation-delay:120ms}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-glint--3{animation-delay:60ms}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-glint--4{animation-delay:200ms}
+.ac-motion-ok .ac-hero-stage.is-caught .ac-glint--5{animation-delay:280ms}
+.ac-motion-ok .ac-hero-stage.is-landing .ac-catch svg{animation:acm-catch-land 420ms var(--acm-out) both}
+@keyframes acm-ribbon{0%{opacity:0;transform:translateX(-140%) rotate(18deg)}14%{opacity:1}86%{opacity:1}100%{opacity:0;transform:translateX(330%) rotate(18deg)}}
+@keyframes acm-catch-pop{0%{opacity:1;transform:scale(1) rotate(0deg)}35%{opacity:1;transform:scale(1.5) rotate(60deg)}100%{opacity:0;transform:scale(.6) rotate(140deg)}}
+@keyframes acm-catch-land{0%{opacity:0;transform:scale(.6) rotate(-60deg)}100%{opacity:1;transform:scale(1) rotate(0deg)}}
+@keyframes acm-card-flare{0%,100%{filter:none;transform:translateY(0)}40%{filter:brightness(1.3) saturate(1.3);transform:translateY(-6px)}}
+@keyframes acm-glint-pop{0%{opacity:.4;transform:scale(.7)}40%{opacity:1;transform:scale(1.9) rotate(45deg)}100%{opacity:.5;transform:scale(1) rotate(90deg)}}
+.ac-hero-stage.is-offscreen *,.ac-life-paused .ac-hero-stage *{-webkit-animation-play-state:paused!important;animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+  .ac-hero-button,.ac-catch-hint,.ac-fan-dot{transition:none}
+}

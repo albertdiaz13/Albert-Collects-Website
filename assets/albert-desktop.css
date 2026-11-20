@@ -1,0 +1,299 @@
+/* Albert Collects desktop gallery (990px and wider; loaded with a media attribute, so phones keep their layout).
+   Idea: a collectibles gallery after hours. The opening room is deep plum-ink with slow drifting light; real cards
+   stand fanned under it and respond to the hand. Shelves below are the catalogue: every card alone on a flat field.
+   Gold is the light, lavender and a little mint neon are the play, Aster is the guide.
+   Legacy-safe: no `inset`, no flex `gap`, clamp() always follows a plain fallback, and every ambient animation is
+   gated behind `.ac-motion-ok` (set by albert-store.js only for modern browsers without reduced motion). */
+
+:root{
+  --acd-ink:#170c1d;
+  --acd-plum:#24132c;
+  --acd-plum-2:#38204a;
+  --acd-plum-ink:#f7efe4;
+  --acd-mist:#d6c6da;
+  --acd-lavender:#e6d6f0;
+  --acd-neon-lav:#c9a4ff;
+  --acd-mint:#7ef2c8;
+  --acd-gold:#f2c35a;
+  --acd-gold-deep:#a8771c;
+  --acd-gold-tile:#f4e5c3;
+  --acd-cream-tile:#efe6d9;
+  --acd-text:#2f1509;
+  --acd-soft:#6f5546;
+  --acd-radius:16px;
+  --acd-ease:cubic-bezier(.23,1,.32,1);
+  --acd-display:"Fraunces Variable","Fraunces",var(--font-heading-family),Georgia,serif;
+  --acd-side:48px;
+  --acd-side:calc((100% - min(1280px,100% - 96px)) / 2);
+}
+
+/* ---------- Frame and type ---------- */
+body,body.gradient{background:var(--ac-cream)!important}
+#MainContent{overflow-x:hidden;overflow-x:clip;background:var(--ac-cream);--color-background:251,248,243;--gradient-background:var(--ac-cream)}
+.ac-wrap{width:calc(100% - 96px);width:min(1280px,calc(100% - 96px))}
+.ac-kicker{font-size:11px;letter-spacing:.2em;color:#8a6a2a}
+
+/* ---------- Header: a slimmer awning over the gallery ---------- */
+.ac-header{border-bottom:0}
+.ac-header-main{min-height:124px;padding-top:12px;padding-bottom:12px}
+.ac-nav{min-height:50px;padding-top:10px;padding-bottom:10px}
+.ac-nav a,.ac-nav summary{position:relative;font-size:14px}
+.ac-nav a::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;border-radius:2px;background:var(--acd-gold);transform:scaleX(0);transform-origin:0 50%;transition:transform 220ms var(--acd-ease)}
+.ac-nav a:hover{text-decoration:none}
+.ac-nav a:hover::after,.ac-nav a[aria-current]::after{transform:scaleX(1)}
+.ac-subnav{border-radius:12px;border-color:rgba(75,33,15,.1);box-shadow:0 18px 40px -20px rgba(36,19,44,.4)}
+
+/* ---------- Opening room: statement left, a fan of real cards under drifting light ---------- */
+.ac-welcome{position:relative;display:block;padding:44px 0 36px;text-align:left;isolation:isolate}
+.ac-welcome-copy{max-width:560px;margin:0}
+.ac-welcome h1{font-family:var(--acd-display);font-weight:560;font-size:60px;font-size:clamp(50px,4.8vw,76px);line-height:1.02;letter-spacing:-.03em;margin:0 0 24px;color:var(--acd-text)}
+.ac-welcome h1 .ac-spark:first-child{display:none}
+.ac-welcome h1 .ac-spark{color:var(--acd-gold-deep);font-size:.42em;vertical-align:.7em}
+.ac-welcome-text{font-size:18px;line-height:1.6;max-width:30em;margin:0;color:var(--acd-soft)}
+.ac-welcome .ac-motion-controls{display:none}
+
+.ac-welcome--gallery{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);grid-column-gap:40px;align-items:center;width:auto;max-width:none;min-height:640px;margin:0;padding:64px 48px 40px;padding:64px var(--acd-side) 40px;overflow:hidden;color:var(--acd-plum-ink);background:var(--acd-ink)!important;background:radial-gradient(120% 90% at 78% 8%,#3a2150 0%,rgba(58,33,80,0) 58%),linear-gradient(180deg,#1c0f24 0%,#24132c 55%,#1c0f24 100%)!important}
+.ac-welcome--gallery .ac-kicker{color:var(--acd-gold)}
+.ac-welcome--gallery h1{font-size:68px;font-size:clamp(58px,5.6vw,92px);line-height:.98;color:var(--acd-plum-ink)}
+.ac-welcome--gallery h1 .ac-spark{color:var(--acd-gold)}
+.ac-welcome--gallery .ac-welcome-text{color:var(--acd-mist)}
+.ac-hero-actions{display:flex;flex-wrap:wrap;align-items:center;margin-top:36px}
+.ac-hero-button{display:inline-flex;align-items:center;justify-content:center;min-height:54px;padding:0 30px;margin-right:26px;border-radius:999px;background:var(--acd-gold);color:#241103;font-size:15px;font-weight:750;letter-spacing:.01em;text-decoration:none;box-shadow:0 0 0 0 rgba(242,195,90,0);transition:background-color 180ms ease,box-shadow 260ms ease,transform 140ms ease}
+.ac-hero-button span{display:inline-block;margin-left:10px;transition:transform 220ms var(--acd-ease)}
+.ac-hero-button:hover{background:#ffd778;box-shadow:0 10px 34px -8px rgba(242,195,90,.55)}
+.ac-hero-button:hover span{transform:translateX(4px)}
+.ac-hero-button:active{transform:scale(.97)}
+.ac-hero-link{color:var(--acd-plum-ink);font-size:15px;font-weight:650;text-decoration:none;padding-bottom:4px;background:linear-gradient(var(--acd-neon-lav),var(--acd-neon-lav)) 0 100%/100% 1px no-repeat;transition:color 180ms ease}
+.ac-hero-link:hover{color:var(--acd-neon-lav)}
+.ac-hero-button:focus-visible,.ac-hero-link:focus-visible{outline:2px solid var(--acd-mint);outline-offset:4px}
+.ac-hero-live{display:flex;align-items:center;margin:30px 0 0;font-size:13px;letter-spacing:.02em;color:#a9d9c6}
+.ac-live-dot{flex:none;width:8px;height:8px;margin-right:10px;border-radius:50%;background:var(--acd-mint);box-shadow:0 0 10px 1px rgba(126,242,200,.7)}
+
+.ac-hero-stage{position:relative;display:block;min-height:520px;padding-top:86px}
+.ac-fan{position:relative;z-index:2;width:230px;height:288px;margin:0 auto;--gap:96px;--gap:min(140px,calc(384px / (var(--n) - 1)))}
+.ac-fan-card{position:absolute;top:0;left:0;width:230px;--o:calc(var(--i) - (var(--n) - 1) / 2);z-index:calc(10 - var(--o) * var(--o));transform:translateX(calc(var(--o) * var(--gap))) translateY(calc(var(--o) * var(--o) * 10px)) rotate(calc(var(--o) * 7deg));transform-origin:50% 120%;transition:transform 460ms var(--acd-ease),filter 320ms ease}
+.ac-fan-card::after{content:"";position:absolute;left:0;right:0;top:100%;height:34px}
+.ac-fan .ac-fan-stage,.ac-fan .ac-fan-stage:hover{background:transparent;border:0;border-radius:10px;box-shadow:none;transform:none}
+.ac-fan .ac-image-plane{top:0;right:0;bottom:0;left:0}
+.ac-fan .ac-image-stage::before,.ac-fan .ac-image-stage::after{display:none}
+.ac-fan .ac-product-photo{filter:drop-shadow(0 22px 26px rgba(0,0,0,.5))}
+.ac-fan-card:focus-within{z-index:30;transform:translateX(calc(var(--o) * var(--gap))) translateY(-22px) rotate(0deg) scale(1.1)}
+.ac-fan-stage:focus-visible{outline:2px solid var(--acd-mint);outline-offset:6px}
+@media (hover:hover) and (pointer:fine){
+  .ac-fan-card:hover{z-index:30;transform:translateX(calc(var(--o) * var(--gap))) translateY(-22px) rotate(0deg) scale(1.1)}
+  /* The light follows the hand: the card you pick up stays lit, the others fall back into shadow. */
+  .ac-fan:hover .ac-fan-card:not(:hover){filter:brightness(.6) saturate(.85)}
+}
+/* A lit floor under the fan: a warm gold pool. (The thin lavender-to-mint line that used to sit here is gone.) */
+.ac-fan-floor{position:relative;z-index:1;display:block;width:620px;max-width:100%;height:84px;margin:6px auto 0;border-radius:50%;background:radial-gradient(ellipse at 50% 40%,rgba(242,195,90,.34) 0%,rgba(242,195,90,0) 68%)}
+.ac-fan-caption{position:relative;z-index:2;display:flex;justify-content:center;align-items:baseline;margin:2px 0 0;font-size:16px;line-height:1.3;color:var(--acd-plum-ink)}
+/* The caption is a link to the card it names. Cards past the fan's own count belong to the phone wheel only. */
+.ac-fan-link{display:flex;justify-content:center;align-items:baseline;min-width:0;color:inherit;text-decoration:none;border-radius:6px}
+.ac-fan-link:focus-visible{outline:2px solid var(--acd-mint);outline-offset:6px}
+.ac-fan-title{font-family:var(--acd-display);font-size:22px;font-weight:520;letter-spacing:-.01em;max-width:22em;padding-right:16px}
+.ac-fan-dots,.ac-fan-card.ac-fan-card--extra{display:none}
+.ac-fan-price{color:var(--acd-gold);font-weight:750;white-space:nowrap}
+.ac-fan-caption.is-swapping{opacity:0}
+/* Aster peeks over the fan from behind the cards; he rises while you handle them. */
+.ac-hero-aster{position:absolute;left:262px;top:-84px;z-index:0;width:124px;height:124px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transform:translateY(14px);transition:transform 420ms var(--acd-ease)}
+.ac-hero-stage:hover .ac-hero-aster,.ac-hero-aster:focus-visible,.ac-hero-aster.is-talking{transform:translateY(-12px)}
+.ac-hero-aster:focus-visible{outline:none}
+.ac-hero-aster:focus-visible .ac-aster-figure{border-radius:50%;box-shadow:0 0 0 2px var(--acd-ink),0 0 0 4px var(--acd-mint)}
+.ac-hero-aster .ac-aster-bubble{left:50%}
+/* Light that lives in the room. */
+.ac-hero-light{position:absolute;z-index:-1;border-radius:50%;pointer-events:none}
+.ac-hero-light--a{width:680px;height:680px;right:-180px;top:-300px;background:radial-gradient(circle,rgba(201,164,255,.34) 0%,rgba(201,164,255,0) 64%)}
+/* The warm light behind the fan and the caption. A wide ellipse that lies wholly inside the hero and fades to nothing at
+   its own edge (closest-side), with clear plum between it and the hero's bottom edge, so nothing is ever cut off. */
+.ac-hero-light--b{width:960px;max-width:116%;height:430px;left:50%;bottom:6px;border-radius:0;background:radial-gradient(closest-side,rgba(242,195,90,.3) 0%,rgba(242,195,90,.17) 32%,rgba(242,195,90,.06) 64%,rgba(242,195,90,.015) 86%,rgba(242,195,90,0) 100%);-webkit-transform:translateX(-50%);transform:translateX(-50%)}
+/* The mint light is measured from the stage's bottom and fades at its own edge too, so its drift cannot reach the hero's edge. */
+.ac-hero-light--c{width:300px;height:300px;left:-90px;bottom:60px;background:radial-gradient(closest-side,rgba(126,242,200,.16) 0%,rgba(126,242,200,.05) 62%,rgba(126,242,200,0) 100%)}
+.ac-glint{position:absolute;z-index:6;width:18px;height:18px;pointer-events:none;opacity:0}
+.ac-glint::before,.ac-glint::after{content:"";position:absolute;left:50%;top:50%;width:2px;height:100%;margin:-50% 0 0 -1px;border-radius:2px;background:var(--acd-gold)}
+.ac-glint::after{transform:rotate(90deg)}
+.ac-glint--1{left:9%;top:120px}
+.ac-glint--2{right:7%;top:300px;width:12px;height:12px}
+.ac-glint--2::before,.ac-glint--2::after{background:var(--acd-mint)}
+.ac-glint--3{left:46%;top:40px;width:14px;height:14px}
+
+/* Wayfinding pills continue the dark room and close it with a soft curve. */
+.ac-categories{justify-content:flex-start;padding-top:8px;padding-bottom:40px;border-bottom:0}
+.ac-category{padding:11px 22px;border-color:rgba(75,33,15,.16);font-size:13px;margin:0 10px 10px 0}
+@supports (gap:1px){.ac-categories{gap:10px}.ac-category{margin:0}}
+.ac-welcome--gallery + .ac-categories{width:auto;max-width:none;margin:0;padding:6px 48px 48px;padding:6px var(--acd-side) 48px;background:#1c0f24;border-radius:0 0 36px 36px}
+.ac-welcome--gallery + .ac-categories .ac-category{color:var(--acd-plum-ink);border-color:rgba(247,239,228,.22);background:transparent;transition:border-color 180ms ease,color 180ms ease,box-shadow 220ms ease,transform 120ms ease}
+.ac-welcome--gallery + .ac-categories .ac-category:first-child{background:rgba(247,239,228,.1);border-color:rgba(247,239,228,.34);color:var(--acd-plum-ink)}
+.ac-welcome--gallery + .ac-categories .ac-category:hover{background:transparent;color:var(--acd-mint);border-color:var(--acd-mint);box-shadow:0 0 18px -4px rgba(126,242,200,.55)}
+.ac-welcome--gallery + .ac-categories .ac-category:focus-visible{outline:2px solid var(--acd-mint);outline-offset:3px}
+
+/* ---------- Shelves: catalogue headings, specimen tiles ---------- */
+.ac-shelf{padding-top:112px;padding-bottom:24px}
+.ac-shelf-header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;text-align:left;margin-bottom:44px}
+.ac-shelf-header h2{font-family:var(--acd-display);font-weight:540;font-size:46px;font-size:clamp(40px,3.6vw,56px);line-height:1.04;letter-spacing:-.025em;color:var(--acd-text)}
+.ac-shelf-header h2 .ac-spark:first-child{display:none}
+.ac-shelf-header h2 .ac-spark{color:var(--acd-gold-deep);font-size:.42em;vertical-align:.8em}
+.ac-shelf-header>div{position:relative;padding-bottom:22px}
+.ac-shelf-header>div::after{content:"";position:absolute;left:0;bottom:0;width:72px;height:3px;border-radius:3px;background:var(--acd-gold);transform-origin:0 50%}
+.ac-text-link{border-bottom:0;padding:0 0 6px;margin-bottom:22px;font-size:14px;color:var(--acd-text);background:linear-gradient(var(--acd-gold),var(--acd-gold)) 0 100%/100% 2px no-repeat;transition:background-size 220ms var(--acd-ease)}
+.ac-text-link:hover{background-size:0 2px;background-position:100% 100%}
+.ac-text-link span{display:inline-block;margin-left:10px;transition:transform 200ms var(--acd-ease)}
+.ac-text-link:hover span{transform:translate(3px,-3px)}
+
+.ac-product-grid{grid-column-gap:28px;grid-row-gap:56px}
+.ac-product-card,.ac-product-info,.ac-product-info h3,.ac-product-type,.ac-product-price,.ac-sold-label{text-align:left}
+.ac-image-stage{border:0;border-radius:var(--acd-radius);background:var(--acd-cream-tile);transition:background-color 220ms ease,box-shadow 320ms var(--acd-ease),transform 320ms var(--acd-ease)}
+.ac-image-plane{top:22px;right:22px;bottom:22px;left:22px}
+.ac-product-photo{filter:drop-shadow(0 10px 14px rgba(36,18,12,.22))}
+/* Tile fields rotate through the palette; deep plum lets bright cards glow. */
+.ac-product-grid>.ac-product-card:nth-child(4n+1) .ac-image-stage,.product-grid>li:nth-child(4n+1) .ac-image-stage{background:var(--acd-plum)}
+.ac-product-grid>.ac-product-card:nth-child(4n+2) .ac-image-stage,.product-grid>li:nth-child(4n+2) .ac-image-stage{background:var(--acd-lavender)}
+.ac-product-grid>.ac-product-card:nth-child(4n+3) .ac-image-stage,.product-grid>li:nth-child(4n+3) .ac-image-stage{background:var(--acd-gold-tile)}
+.ac-product-grid>.ac-product-card:nth-child(4n+4) .ac-image-stage,.product-grid>li:nth-child(4n+4) .ac-image-stage{background:var(--acd-cream-tile)}
+.ac-image-stage:hover{background-color:var(--acd-cream-tile)}
+.ac-product-card:hover .ac-image-stage{transform:translateY(-6px);box-shadow:0 30px 44px -28px rgba(36,19,44,.65)}
+.ac-status{left:14px;bottom:14px;font-size:11px;font-weight:700;padding:6px 12px}
+.ac-product-info{padding:20px 2px 16px}
+.ac-product-type{font-size:11px;letter-spacing:.14em;color:#8a6a2a;margin-bottom:8px}
+.ac-product-info h3{font-size:17px;line-height:1.4;font-weight:650;margin-bottom:8px;color:var(--acd-text)}
+.ac-product-price{font-size:17px;color:var(--acd-text)}
+.ac-add-button{justify-content:space-between;min-height:46px;padding:0 20px;border-radius:999px;border-color:rgba(75,33,15,.22);font-size:13px}
+.ac-add-button:hover{background:var(--acd-plum);border-color:var(--acd-plum);color:var(--acd-plum-ink)}
+.ac-sold-label{border-top:0;padding-top:12px;font-size:13px}
+
+/* ---------- The vault: one shelf set in a full-width ink room ---------- */
+.ac-shelf--vault{position:relative;width:auto;max-width:none;margin-top:96px;padding:104px 48px 96px;padding:104px var(--acd-side) 96px;border-radius:36px;background:var(--acd-ink);background:linear-gradient(180deg,#1c0f24 0%,#24132c 100%);color:var(--acd-plum-ink);overflow:hidden;isolation:isolate}
+.ac-shelf--vault::before,.ac-shelf--vault::after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none}
+.ac-shelf--vault::before{width:900px;height:900px;left:-260px;top:-420px;background:radial-gradient(circle,rgba(201,164,255,.26) 0%,rgba(201,164,255,0) 64%)}
+.ac-shelf--vault::after{width:760px;height:760px;right:-200px;bottom:-380px;background:radial-gradient(circle,rgba(242,195,90,.2) 0%,rgba(242,195,90,0) 64%)}
+.ac-shelf--vault .ac-kicker{color:var(--acd-gold)}
+.ac-shelf--vault .ac-shelf-header h2,.ac-shelf--vault .ac-product-info h3,.ac-shelf--vault .ac-product-price,.ac-shelf--vault .ac-text-link,.ac-shelf--vault .ac-add-button{color:var(--acd-plum-ink)}
+.ac-shelf--vault .ac-shelf-header h2 .ac-spark{color:var(--acd-gold)}
+.ac-shelf--vault .ac-product-type{color:#cdb1e0}
+.ac-shelf--vault .ac-product-price s,.ac-shelf--vault .ac-sold-label{color:#bfa8b8}
+.ac-shelf--vault .ac-add-button{border-color:rgba(247,239,228,.3)}
+.ac-shelf--vault .ac-add-button:hover{background:var(--acd-gold);border-color:var(--acd-gold);color:#241103}
+.ac-shelf--vault .ac-add-button:focus-visible,.ac-shelf--vault .ac-image-stage:focus-visible,.ac-shelf--vault .ac-text-link:focus-visible{outline:2px solid var(--acd-mint);outline-offset:4px}
+/* Inside the vault the tiles turn light so the slabs stand out against the room. */
+.ac-shelf--vault .ac-product-grid>.ac-product-card:nth-child(4n+1) .ac-image-stage{background:var(--acd-lavender)}
+.ac-shelf--vault .ac-product-grid>.ac-product-card:nth-child(4n+2) .ac-image-stage{background:var(--acd-gold-tile)}
+.ac-shelf--vault .ac-product-grid>.ac-product-card:nth-child(4n+3) .ac-image-stage{background:#f6f0e8}
+.ac-shelf--vault .ac-product-grid>.ac-product-card:nth-child(4n+4) .ac-image-stage{background:#d9c3e6}
+.ac-shelf--vault .ac-product-card:hover .ac-image-stage{box-shadow:0 30px 48px -24px rgba(0,0,0,.75),0 0 0 1px rgba(126,242,200,.45),0 0 26px -6px rgba(126,242,200,.35)}
+
+/* ---------- Collector story: where Aster settles ---------- */
+.ac-story{position:relative;margin-left:auto;margin-right:auto;grid-template-columns:150px minmax(0,1fr) auto;justify-items:start;text-align:left;margin-top:168px;padding:60px 64px;border:0;border-radius:28px;background:var(--acd-lavender)}
+.ac-story p{margin-inline:0!important}
+.ac-story h2{font-family:var(--acd-display);font-weight:540;font-size:40px;letter-spacing:-.02em;color:var(--acd-text)}
+.ac-story p:not(.ac-kicker){font-size:17px;color:var(--acd-soft)}
+.ac-story-icon.ac-story-logo{width:140px;height:140px}
+.ac-story-aster{display:block;position:absolute;right:84px;top:-101px;z-index:2;width:112px;height:112px;padding:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ac-story-aster:focus-visible{outline:none}
+.ac-story-aster:focus-visible .ac-aster-figure{border-radius:50%;box-shadow:0 0 0 2px #fff,0 0 0 4px #8453a1}
+
+/* ---------- Footer: the back of the card ---------- */
+.ac-footer{margin-top:120px;padding:76px 0 28px;border-top:0;border-radius:36px 36px 0 0;background:var(--acd-ink)!important;color:var(--acd-plum-ink)}
+.ac-footer-top{align-items:flex-start;text-align:left;flex-direction:row;justify-content:space-between}
+.ac-footer-title{font-family:var(--acd-display);font-weight:540;font-size:64px;letter-spacing:-.03em;color:var(--acd-plum-ink)}
+.ac-footer-title span{color:var(--acd-gold);font-size:.5em;vertical-align:.6em}
+.ac-footer p{color:#cdb9c9;font-size:14px}
+.ac-footer a{color:var(--acd-plum-ink)}
+.ac-footer-links a{text-decoration:none;padding-bottom:3px;background:linear-gradient(var(--acd-neon-lav),var(--acd-neon-lav)) 0 100%/0 1px no-repeat;transition:background-size 220ms var(--acd-ease),color 180ms ease}
+.ac-footer-links a:hover{background-size:100% 1px;color:var(--acd-neon-lav)}
+.ac-footer-links{justify-content:flex-end;font-size:14px}
+.ac-footer-bottom{flex-direction:row;justify-content:space-between;border-top-color:rgba(247,239,228,.14);color:#bfa8b8;font-size:12px}
+
+/* ---------- Collection pages: same treatment ---------- */
+.collection-hero__inner,.collection-hero__text-wrapper{text-align:left}
+.collection-hero__title{font-family:var(--acd-display);font-weight:540;font-size:60px;letter-spacing:-.03em;color:var(--acd-text)}
+/* Catalog and search pages use the screen: header, filters and grid share one wider measure on wide desktops. */
+.ac-template-collection .ac-wrap,.ac-template-search .ac-wrap{width:calc(100% - 96px);width:min(1840px,calc(100% - 96px))}
+.ac-template-collection #MainContent .page-width,.ac-template-search #MainContent .page-width{max-width:none;width:calc(100% - 96px);width:min(1840px,calc(100% - 96px));padding-left:0;padding-right:0}
+.product-grid .ac-product-card{text-align:left}
+
+/* ---------- Small desktops and landscape tablets (990-1199px): a tighter fan so it never crowds the statement ---------- */
+@media (max-width:1199px){
+  .ac-welcome--gallery{grid-template-columns:minmax(0,11fr) minmax(0,13fr);grid-column-gap:24px;min-height:560px}
+  .ac-welcome--gallery h1{font-size:54px;font-size:clamp(50px,5.6vw,64px)}
+  .ac-welcome-text{font-size:16px}
+  .ac-hero-stage{min-height:440px;padding-top:70px}
+  .ac-fan{width:176px;height:220px;--gap:68px;--gap:min(100px,calc(272px / (var(--n) - 1)))}
+  .ac-fan-card{width:176px}
+  .ac-hero-aster{left:196px;top:-74px;width:104px;height:104px}
+  .ac-fan-title{font-size:19px}
+  .ac-product-grid{grid-column-gap:20px;grid-row-gap:44px}
+  .ac-image-plane{top:16px;right:16px;bottom:16px;left:16px}
+  .ac-story{padding:44px 40px;grid-template-columns:120px minmax(0,1fr) auto}
+  .ac-footer-title{font-size:48px}
+}
+
+/* ---------- Older Safari (first-generation iPad Air in landscape): fixed fan positions, everything static ---------- */
+@supports not (aspect-ratio:1/1){
+  .ac-fan-card:nth-of-type(1){z-index:1;transform:translateX(-192px) translateY(40px) rotate(-14deg)}
+  .ac-fan-card:nth-of-type(2){z-index:2;transform:translateX(-96px) translateY(10px) rotate(-7deg)}
+  .ac-fan-card:nth-of-type(3){z-index:3;transform:none}
+  .ac-fan-card:nth-of-type(4){z-index:2;transform:translateX(96px) translateY(10px) rotate(7deg)}
+  .ac-fan-card:nth-of-type(5){z-index:1;transform:translateX(192px) translateY(40px) rotate(14deg)}
+  .ac-fan-card:nth-of-type(n+6){display:none}
+  .ac-fan .ac-product-photo{filter:none}
+  .ac-hero-actions>*,.ac-hero-live>*{margin-right:20px}
+}
+@supports not (aspect-ratio:1/1){
+  @media (max-width:1199px){
+    .ac-fan-card:nth-of-type(1){transform:translateX(-136px) translateY(40px) rotate(-14deg)}
+    .ac-fan-card:nth-of-type(2){transform:translateX(-68px) translateY(10px) rotate(-7deg)}
+    .ac-fan-card:nth-of-type(4){transform:translateX(68px) translateY(10px) rotate(7deg)}
+    .ac-fan-card:nth-of-type(5){transform:translateX(136px) translateY(40px) rotate(14deg)}
+  }
+}
+
+/* ---------- Motion. Ambient light runs quietly; the stronger moves belong to the hand. ---------- */
+@media (prefers-reduced-motion:no-preference){
+  /* Ambient (paused when the tab is hidden) */
+  .ac-motion-ok .ac-hero-light--a{animation:acd-drift-a 28s ease-in-out infinite alternate}
+  .ac-motion-ok .ac-hero-light--b{animation:acd-warm 34s ease-in-out infinite alternate}
+  .ac-motion-ok .ac-hero-light--c{animation:acd-drift-c 22s ease-in-out infinite alternate}
+  .ac-motion-ok .ac-glint{animation:acd-glint 6.5s ease-in-out infinite}
+  .ac-motion-ok .ac-glint--2{animation-delay:2.2s}
+  .ac-motion-ok .ac-glint--3{animation-delay:4.1s}
+  .ac-motion-ok .ac-live-dot{animation:acd-pulse 2.6s ease-in-out infinite}
+  .ac-motion-ok .ac-shelf--vault::before{animation:acd-drift-a 30s ease-in-out infinite alternate}
+  .ac-motion-ok .ac-shelf--vault::after{animation:acd-drift-b 36s ease-in-out infinite alternate}
+  .ac-motion-ok .ac-shelf-header h2 .ac-spark:last-child,.ac-motion-ok .ac-welcome h1 .ac-spark:last-child{display:inline-block;animation:acd-twinkle 5.5s ease-in-out infinite}
+  .ac-life-paused .ac-hero-light,.ac-life-paused .ac-glint,.ac-life-paused .ac-live-dot,.ac-life-paused .ac-shelf--vault::before,.ac-life-paused .ac-shelf--vault::after,.ac-life-paused .ac-spark{animation-play-state:paused!important}
+
+  /* Opening: the copy rises, then the cards are dealt into the fan, then Aster peeks. */
+  .ac-motion-ok .ac-welcome--gallery .ac-welcome-copy>*{animation:acd-rise 700ms var(--acd-ease) both}
+  .ac-motion-ok .ac-welcome--gallery .ac-welcome-copy>:nth-child(2){animation-delay:70ms}
+  .ac-motion-ok .ac-welcome--gallery .ac-welcome-copy>:nth-child(3){animation-delay:140ms}
+  .ac-motion-ok .ac-welcome--gallery .ac-welcome-copy>:nth-child(4){animation-delay:210ms}
+  .ac-motion-ok .ac-welcome--gallery .ac-welcome-copy>:nth-child(5){animation-delay:280ms}
+  .ac-motion-ok .ac-fan-card{animation:acd-deal 900ms var(--acd-ease) backwards;animation-delay:calc(180ms + var(--i) * 90ms)}
+  .ac-motion-ok .ac-fan-floor,.ac-motion-ok .ac-fan-caption{animation:acd-fade 900ms ease 500ms backwards}
+  .ac-motion-ok .ac-hero-aster{animation:acd-peek 900ms var(--acd-ease) 1100ms backwards}
+  .ac-fan-caption{transition:opacity 140ms ease}
+
+  /* Shelves enter like cards being laid out: the heading sets itself, then each tile is dealt with a small turn.
+     Tiles only move; photos never fade. */
+  .ac-shelf-header.ac-reveal{opacity:1;transform:none}
+  .ac-shelf-header.ac-reveal .ac-kicker,.ac-shelf-header.ac-reveal h2,.ac-shelf-header.ac-reveal .ac-text-link{opacity:0;transform:translateY(16px);transition:opacity 520ms var(--acd-ease),transform 620ms var(--acd-ease)}
+  .ac-shelf-header.ac-reveal h2{transition-delay:70ms}
+  .ac-shelf-header.ac-reveal .ac-text-link{transition-delay:160ms}
+  .ac-shelf-header.ac-reveal>div::after{transform:scaleX(0);transition:transform 700ms var(--acd-ease) 220ms}
+  .ac-shelf-header.ac-reveal.is-revealed .ac-kicker,.ac-shelf-header.ac-reveal.is-revealed h2,.ac-shelf-header.ac-reveal.is-revealed .ac-text-link{opacity:1;transform:none}
+  .ac-shelf-header.ac-reveal.is-revealed>div::after{transform:scaleX(1)}
+  .ac-reveal-grid>*{transform:translateY(40px) rotate(-1.6deg);transform-origin:0 100%;transition:transform 760ms var(--acd-ease)}
+  .ac-reveal-grid>:nth-child(even){transform:translateY(40px) rotate(1.6deg);transform-origin:100% 100%}
+  .ac-reveal-grid.is-revealed>*{transform:none}
+}
+@keyframes acd-drift-a{from{transform:translate(0,0) scale(1)}to{transform:translate(-110px,70px) scale(1.14)}}
+@keyframes acd-drift-b{from{transform:translate(0,0) scale(1)}to{transform:translate(130px,-60px) scale(.9)}}
+/* The warm light breathes sideways and slightly upward only; it never moves toward the hero's bottom edge. */
+@keyframes acd-warm{from{transform:translateX(-50%) translateY(0) scale(1);opacity:1}to{transform:translateX(-46%) translateY(-16px) scale(1.05);opacity:.86}}
+@keyframes acd-drift-c{from{transform:translate(0,0) scale(1)}to{transform:translate(70px,30px) scale(1.15)}}
+@keyframes acd-glint{0%,62%,100%{opacity:0;transform:scale(.3) rotate(0)}72%{opacity:1;transform:scale(1) rotate(45deg)}84%{opacity:0;transform:scale(.4) rotate(90deg)}}
+@keyframes acd-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(.8)}}
+@keyframes acd-twinkle{0%,100%{transform:scale(1) rotate(0);opacity:1}50%{transform:scale(.72) rotate(30deg);opacity:.6}}
+@keyframes acd-rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes acd-fade{from{opacity:0}to{opacity:1}}
+@keyframes acd-deal{from{opacity:0;transform:translateX(0) translateY(60px) rotate(0deg) scale(.94)}}
+@keyframes acd-peek{from{transform:translateY(90px)}}

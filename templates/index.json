@@ -1,0 +1,154 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "welcome": {
+      "type": "ac-intro",
+      "blocks": {
+        "vintage_japanese": {
+          "type": "category",
+          "settings": {
+            "collection": "vintage",
+            "title": "Vintage Japanese",
+            "symbol": "✧"
+          }
+        },
+        "modern_japanese": {
+          "type": "category",
+          "settings": {
+            "collection": "japanese",
+            "title": "Modern Japanese",
+            "symbol": "✦"
+          }
+        },
+        "mixed_english": {
+          "type": "category",
+          "settings": {
+            "collection": "english",
+            "title": "Mixed English",
+            "symbol": "◇"
+          }
+        },
+        "slabs": {
+          "type": "category",
+          "settings": {
+            "collection": "graded-slabs",
+            "title": "Slabs",
+            "symbol": "▣"
+          }
+        }
+      },
+      "block_order": [
+        "vintage_japanese",
+        "modern_japanese",
+        "mixed_english",
+        "slabs"
+      ],
+      "settings": {
+        "eyebrow": "JAPANESE CARDS & NOSTALGIC FINDS",
+        "heading": "Collected with curiosity.",
+        "description": "Old favorites. Unexpected discoveries. Cards, games, and vintage finds, picked by a collector like you.",
+        "showcase_collection": "frontpage"
+      }
+    },
+    "fresh": {
+      "type": "ac-shelf",
+      "settings": {
+        "eyebrow": "THE LATEST ADDITIONS",
+        "title": "Fresh finds",
+        "collection": "frontpage",
+        "limit": 8,
+        "slab_layout": false,
+        "band": "standard"
+      }
+    },
+    "vintage_japanese": {
+      "type": "ac-shelf",
+      "settings": {
+        "eyebrow": "CLASSIC ARTWORK AND EXCLUSIVES",
+        "title": "Vintage Japanese",
+        "collection": "vintage",
+        "limit": 8,
+        "slab_layout": false
+      }
+    },
+    "modern_japanese": {
+      "type": "ac-shelf",
+      "settings": {
+        "eyebrow": "HIGH QUALITY TEXTURED SINGLES",
+        "title": "Modern Japanese",
+        "collection": "japanese",
+        "limit": 8,
+        "slab_layout": false
+      }
+    },
+    "slabs": {
+      "type": "ac-shelf",
+      "settings": {
+        "eyebrow": "GRADED & AUTHENTIC",
+        "title": "Slabs",
+        "collection": "graded-slabs",
+        "limit": 8,
+        "slab_layout": true,
+        "band": "vault"
+      }
+    },
+    "mixed_english": {
+      "type": "ac-shelf",
+      "settings": {
+        "eyebrow": "A LITTLE BIT OF EVERYTHING",
+        "title": "Mixed English",
+        "collection": "english",
+        "limit": 8,
+        "slab_layout": false
+      }
+    },
+    "story": {
+      "type": "ac-story",
+      "settings": {
+        "eyebrow": "FROM ONE COLLECTOR TO ANOTHER",
+        "title": "The best finds have a story.",
+        "body": "A favorite Pokémon. A game you grew up with. That unexpected piece you cannot leave behind. Albert Collects is a home for the things worth keeping.",
+        "link": "",
+        "link_label": "Meet Albert"
+      }
+    },
+    "games": {
+      "type": "ac-shelf",
+      "settings": {
+        "eyebrow": "PRESS START AGAIN",
+        "title": "Nostalgia, unlocked",
+        "collection": "games",
+        "limit": 4,
+        "slab_layout": false
+      }
+    },
+    "racket": {
+      "type": "ac-racket",
+      "settings": {
+        "eyebrow": "LIVE AT TODAY'S SHOW",
+        "title": "Discover What's on Display",
+        "text": "Explore the cards available at today's show.",
+        "button_label": "Browse Available Cards"
+      }
+    }
+  },
+  "order": [
+    "welcome",
+    "fresh",
+    "racket",
+    "vintage_japanese",
+    "modern_japanese",
+    "slabs",
+    "mixed_english",
+    "story",
+    "games"
+  ]
+}

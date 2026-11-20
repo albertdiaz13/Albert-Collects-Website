@@ -1,0 +1,142 @@
+{%- comment -%}
+  The Vault's door (generic Albert Collects theme). Drawn once here and rendered twice by snippets/ac-vault.liquid:
+  small and slowly turning in the kiosk banner, and large and touchable in the full-screen Vault.
+  Layers, back to front: the champagne bezel and back plate; three rings, each its own element so it can turn on its
+  own layer; the hub; the guide (the keystone lamp, the line of light and three sockets); a sheet of glass.
+  Each ring carries one gold mark at the top of the ring. A ring is "aligned" when it is turned so that mark sits in
+  its socket on the line of light (rotation 0). Everything is decorative; the controls live in ac-vault.liquid.
+  Param: uid (unique suffix for gradient ids).
+{%- endcomment -%}
+{%- assign radii = '250,196,142' | split: ',' -%}
+<div class="acv-door" data-acv-door>
+  <svg class="acv-layer acv-bezel" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="acv-gold-{{ uid }}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#fff3cf"/><stop offset=".28" stop-color="#e9c877"/><stop offset=".55" stop-color="#a97f2c"/><stop offset=".8" stop-color="#f0d48c"/><stop offset="1" stop-color="#8a6420"/>
+      </linearGradient>
+      <radialGradient id="acv-plate-{{ uid }}" cx=".5" cy=".42" r=".62">
+        <stop offset="0" stop-color="#2c1838"/><stop offset=".6" stop-color="#170c1f"/><stop offset="1" stop-color="#08040b"/>
+      </radialGradient>
+      <radialGradient id="acv-aura-{{ uid }}" cx=".5" cy=".5" r=".5">
+        <stop offset=".55" stop-color="#f2c35a" stop-opacity="0"/><stop offset=".78" stop-color="#f2c35a" stop-opacity=".2"/><stop offset="1" stop-color="#f2c35a" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <circle cx="300" cy="300" r="298" fill="#050307"/>
+    <circle cx="300" cy="300" r="290" fill="none" stroke="url(#acv-gold-{{ uid }})" stroke-width="13"/>
+    <circle cx="300" cy="300" r="281.5" fill="none" stroke="#0a060d" stroke-width="5"/>
+    <circle cx="300" cy="300" r="278" fill="url(#acv-plate-{{ uid }})"/>
+    <circle cx="300" cy="300" r="290" fill="none" stroke="#3b2a10" stroke-width="5" stroke-dasharray="1.200 13.984" opacity=".7"/>
+    <circle cx="300" cy="300" r="276" fill="none" stroke="#e9c877" stroke-width="1" opacity=".35"/>
+    <circle class="acv-aura" cx="300" cy="300" r="278" fill="url(#acv-aura-{{ uid }})"/>
+  </svg>
+  {%- for r in radii -%}
+    {%- liquid
+      assign radius = r | plus: 0
+      assign top = 300 | minus: radius
+      assign step = radius | times: 6.283185 | divided_by: 36.0
+      assign gap = step | minus: 1.6
+      assign outer = radius | plus: 21
+      assign inner = radius | minus: 21
+      assign letter = 'a'
+      if forloop.index0 == 1
+        assign letter = 'b'
+      elsif forloop.index0 == 2
+        assign letter = 'c'
+      endif
+    -%}
+    <div class="acv-ringwrap acv-ringwrap--{{ letter }}">
+      <div class="acv-ring" data-acv-ring="{{ forloop.index0 }}">
+        <svg viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="acv-metal-{{ uid }}-{{ forloop.index0 }}" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#3a2548"/><stop offset=".35" stop-color="#1d1026"/><stop offset=".62" stop-color="#34203f"/><stop offset="1" stop-color="#120a18"/>
+            </linearGradient>
+            <linearGradient id="acv-holo-{{ uid }}-{{ forloop.index0 }}" x1="{% if forloop.index0 == 1 %}1{% else %}0{% endif %}" y1="0" x2="{% if forloop.index0 == 1 %}0{% else %}1{% endif %}" y2="1">
+              <stop offset="0" stop-color="#c9a4ff" stop-opacity=".0"/><stop offset=".18" stop-color="#c9a4ff" stop-opacity=".5"/><stop offset=".36" stop-color="#7ef2c8" stop-opacity=".36"/><stop offset=".52" stop-color="#fff3cf" stop-opacity=".5"/><stop offset=".68" stop-color="#ff9ec4" stop-opacity=".34"/><stop offset=".84" stop-color="#8fd0ff" stop-opacity=".44"/><stop offset="1" stop-color="#c9a4ff" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <circle cx="300" cy="300" r="{{ radius }}" fill="none" stroke="url(#acv-metal-{{ uid }}-{{ forloop.index0 }})" stroke-width="42"/>
+          <circle class="acv-ring-holo" cx="300" cy="300" r="{{ radius }}" fill="none" stroke="url(#acv-holo-{{ uid }}-{{ forloop.index0 }})" stroke-width="42"/>
+          <circle cx="300" cy="300" r="{{ outer }}" fill="none" stroke="#e9c877" stroke-width="1.4" opacity=".7"/>
+          <circle cx="300" cy="300" r="{{ inner }}" fill="none" stroke="#e9c877" stroke-width="1.4" opacity=".45"/>
+          <circle cx="300" cy="300" r="{{ radius }}" fill="none" stroke="#e9c877" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="1.600 {{ gap | round: 3 }}" opacity=".5"/>
+          <circle class="acv-ring-lock" cx="300" cy="300" r="{{ radius }}" fill="none" stroke="#f2c35a" stroke-width="42"/>
+          <g class="acv-ring-ticks" stroke="#e9c877" stroke-width="2" stroke-linecap="round" opacity=".75">
+            <g transform="rotate(120 300 300)"><path d="M300 {{ top | minus: 13 }}V{{ top | plus: 13 }}M293 {{ top | minus: 8 }}V{{ top | plus: 8 }}M307 {{ top | minus: 8 }}V{{ top | plus: 8 }}"/></g>
+            <g transform="rotate(240 300 300)"><path d="M300 {{ top | minus: 13 }}V{{ top | plus: 13 }}M293 {{ top | minus: 8 }}V{{ top | plus: 8 }}M307 {{ top | minus: 8 }}V{{ top | plus: 8 }}"/></g>
+            <g transform="rotate(180 300 300)"><circle cx="300" cy="{{ top }}" r="4" fill="#e9c877" stroke="none"/></g>
+          </g>
+          <g transform="translate(300 {{ top }})">
+            <path class="acv-sigil-glow" d="M0 -30L22 -11V11L0 30L-22 11V-11Z"/>
+            <path d="M0 -22L16 -8V8L0 22L-16 8V-8Z" fill="url(#acv-gold-{{ uid }})" stroke="#2a1806" stroke-width="1.4" stroke-linejoin="round"/>
+            {%- case forloop.index0 -%}
+              {%- when 0 -%}<path d="M0 -11l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#2a1806"/>
+              {%- when 1 -%}<path d="M3.500 -9.500a10 10 0 1 0 0 19a7.600 7.600 0 1 1 0 -19z" fill="#2a1806"/>
+              {%- else -%}<circle r="7" fill="none" stroke="#2a1806" stroke-width="3"/><circle r="1.800" fill="#2a1806"/>
+            {%- endcase -%}
+            <path class="acv-sigil-lit" d="M0 -22L16 -8V8L0 22L-16 8V-8Z"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  {%- endfor -%}
+  <div class="acv-hub">
+    <svg viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+      <defs>
+        <radialGradient id="acv-hub-{{ uid }}" cx=".42" cy=".34" r=".8">
+          <stop offset="0" stop-color="#4a2f63"/><stop offset=".45" stop-color="#1f1129"/><stop offset="1" stop-color="#07040a"/>
+        </radialGradient>
+        <radialGradient id="acv-core-{{ uid }}" cx=".5" cy=".5" r=".5">
+          <stop offset="0" stop-color="#fff6dc" stop-opacity=".9"/><stop offset=".4" stop-color="#f2c35a" stop-opacity=".35"/><stop offset="1" stop-color="#f2c35a" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="300" cy="300" r="110" fill="#050307"/>
+      <circle cx="300" cy="300" r="105" fill="url(#acv-hub-{{ uid }})" stroke="url(#acv-gold-{{ uid }})" stroke-width="4"/>
+      <circle cx="300" cy="300" r="90" fill="none" stroke="#e9c877" stroke-width="1" stroke-dasharray="2 7.425" opacity=".6"/>
+      <circle class="acv-core" cx="300" cy="300" r="78" fill="url(#acv-core-{{ uid }})"/>
+      <path d="M300 246l14 40 40 14-40 14-14 40-14-40-40-14 40-14z" fill="url(#acv-gold-{{ uid }})" stroke="#2a1806" stroke-width="1.2" stroke-linejoin="round"/>
+      <circle cx="300" cy="300" r="7" fill="#1a0d22" stroke="#fff3cf" stroke-width="1.2"/>
+    </svg>
+  </div>
+  <svg class="acv-layer acv-guide" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="acv-beam-{{ uid }}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fff6dc"/><stop offset="1" stop-color="#f2c35a" stop-opacity=".25"/>
+      </linearGradient>
+      <linearGradient id="acv-beamglow-{{ uid }}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#f2c35a" stop-opacity="0"/><stop offset=".5" stop-color="#ffe9b0" stop-opacity=".5"/><stop offset="1" stop-color="#f2c35a" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <rect class="acv-beam-glow" x="274" y="22" width="52" height="172" fill="url(#acv-beamglow-{{ uid }})"/>
+    <rect class="acv-beam" x="299" y="22" width="2" height="172" fill="url(#acv-beam-{{ uid }})"/>
+    {%- for r in radii -%}
+      {%- assign top = 300 | minus: r -%}
+      <g class="acv-socket acv-socket--{{ forloop.index0 }}" transform="translate(300 {{ top }})" fill="none" stroke="#fff3cf" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M-24 -17v-9h9M24 -17v-9h-9M-24 17v9h9M24 17v9h-9"/>
+      </g>
+    {%- endfor -%}
+    <g transform="translate(300 12)">
+      <circle class="acv-lamp-glow" r="22" fill="#ffe9b0" opacity=".28"/>
+      <path d="M0 -11L10 0L0 13L-10 0Z" fill="#fff6dc" stroke="#a97f2c" stroke-width="1.5" stroke-linejoin="round"/>
+    </g>
+  </svg>
+  <svg class="acv-layer acv-glass" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="acv-shine-{{ uid }}" cx=".3" cy=".2" r=".62">
+        <stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset=".5" stop-color="#fff" stop-opacity=".04"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+      </radialGradient>
+      <radialGradient id="acv-vig-{{ uid }}" cx=".5" cy=".5" r=".5">
+        <stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/>
+      </radialGradient>
+      <linearGradient id="acv-streak-{{ uid }}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset=".38" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".13"/><stop offset=".58" stop-color="#fff" stop-opacity="0"/>
+      </linearGradient>
+      <clipPath id="acv-clip-{{ uid }}"><circle cx="300" cy="300" r="278"/></clipPath>
+    </defs>
+    <g clip-path="url(#acv-clip-{{ uid }})">
+      <circle cx="300" cy="300" r="278" fill="url(#acv-shine-{{ uid }})"/>
+      <rect class="acv-streak" x="-300" y="0" width="1200" height="600" fill="url(#acv-streak-{{ uid }})"/>
+      <circle cx="300" cy="300" r="278" fill="url(#acv-vig-{{ uid }})"/>
+    </g>
+  </svg>
+</div>

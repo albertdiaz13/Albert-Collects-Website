@@ -1,0 +1,23 @@
+{% comment %}
+  Aster, the storefront companion. Theme settings > Albert extras > Show Aster turns him off.
+  Frames come from the Aster sprite sheet:
+  - assets/aster-idle.png: 4 idle frames (row 1), 160 x 160 each.
+  - assets/aster-look.png: 16 look-around frames (rows 10-11), loaded only on desktop when he first looks at the cursor.
+  He stays static until albert-store.js confirms a modern browser and no reduced-motion preference.
+  Clicking him is a small, decorative reaction (hop + gold-star sparkle); the button is labelled for assistive tech.
+{% endcomment %}
+{%- if settings.ac_aster_enabled -%}
+  <div class="ac-aster{% if settings.ac_aster_corner == 'right' %} ac-aster--right{% endif %}" data-ac-aster hidden>
+    <button type="button" class="ac-aster-poke" data-ac-aster-poke aria-label="Say hi to Aster">
+      <span class="ac-aster-figure" aria-hidden="true">
+        <span class="ac-aster-sprite" style="background-image:url('{{ 'aster-idle.png' | asset_url }}')"></span>
+        <span class="ac-aster-look" data-look-src="{{ 'aster-look.png' | asset_url }}"></span>
+      </span>
+      <span class="ac-aster-hit" aria-hidden="true"></span>
+    </button>
+    <span class="ac-aster-burst" data-ac-aster-burst aria-hidden="true"></span>
+    <span class="ac-aster-bubble" data-ac-aster-bubble aria-hidden="true"></span>
+    <button type="button" class="ac-aster-close" data-ac-aster-close aria-label="Hide Aster">&times;</button>
+  </div>
+  <noscript><style>.ac-aster{display:none!important}</style></noscript>
+{%- endif -%}

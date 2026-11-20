@@ -1,0 +1,16 @@
+{%- comment -%}
+  Phone card-motion options, tucked into one compact "Card motion" disclosure that starts closed.
+  Shown only on touch devices with motion allowed (albert-card-tilt.js removes `hidden`). Nothing asks for the motion
+  sensor until "Enable card motion" is tapped. Dragging a card sideways to tilt it, and swiping to flip, work without
+  opening this at all. One instance per page. Under 990px wide albert-card-tilt.js moves it into the header's navigation
+  (the [data-ac-motion-slot] in sections/ac-header.liquid), next to the menu links; at desktop widths it stays where it is
+  rendered (the homepage hero, or after the content on other pages).
+{%- endcomment -%}
+<details class="ac-motion-controls" data-ac-motion-controls hidden>
+  <summary class="ac-motion-summary"><span class="ac-motion-summary-icon" aria-hidden="true">✦</span><span>Card motion</span><span class="ac-motion-chevron" aria-hidden="true"></span></summary>
+  <div class="ac-motion-panel">
+    <div class="ac-motion-actions"><button type="button" class="ac-motion-button" data-ac-motion-toggle aria-pressed="false">Enable card motion</button><button type="button" class="ac-motion-button" data-ac-motion-recenter hidden>Recenter</button><button type="button" class="ac-motion-button" data-ac-motion-demo>Preview tilt (demo)</button></div>
+    <p class="ac-motion-status" data-ac-motion-status role="status" aria-live="polite">Enable phone motion, or drag sideways across a card to try the tilt.</p>
+    <p class="ac-motion-help" data-ac-motion-help hidden>For real phone motion, open this page directly in Safari rather than an in-app viewer or theme-editor frame. <a href="#" data-ac-motion-standalone target="_blank" rel="noopener">Open page separately ↗</a></p>
+  </div>
+</details>

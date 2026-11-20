@@ -1,0 +1,15 @@
+# Local credentials and Shopify CLI state — never commit
+.env
+.env.*
+*.pem
+.shopify/
+.shopifyignore.local
+config.yml
+shopify.theme.toml
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules/

@@ -1,0 +1,14 @@
+<footer class="ac-footer"><div class="ac-wrap ac-footer-top"><div><a class="ac-footer-title" href="{{ routes.root_url }}"><span aria-hidden="true">✦</span> albert collects <span aria-hidden="true">✦</span></a><p>Curated Finds | Cards • Games • Vintage Finds</p><p class="ac-footer-location">Orlando, Florida</p></div><div class="ac-footer-links">{% for link in section.settings.menu.links %}<a href="{{ link.url }}">{{ link.title | escape }}</a>{% endfor %}{% if shop.email != blank %}<a href="mailto:{{ shop.email }}">Get in touch ↗</a>{% endif %}</div></div><div class="ac-wrap ac-footer-bottom"><span>© {{ 'now' | date: '%Y' }} {{ shop.name | escape }}</span><div>{% for policy in shop.policies %}{% if policy != blank %}<a href="{{ policy.url }}">{{ policy.title | escape }}</a>{% endif %}{% endfor %}</div></div></footer>
+{% schema %}
+{
+  "name": "Albert footer",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Footer menu",
+      "default": "footer"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,50 @@
+{%- comment -%}
+  The Showcase (generic Albert Collects theme): a continuously moving display of real cards, shared by the kiosk hero
+  and the homepage preview. Styles: assets/albert-showcase.css. Script: assets/albert-showcase.js.
+
+  What it shows: cards from today's inventory, gliding slowly along a curved line under drifting light, with a second,
+  fainter row behind for depth. It is made to be watched from a distance, with nobody touching it.
+  What a touch does (never a game, never a sequence):
+  - a swipe sends the cards gliding with momentum, then they ease back to their slow drift;
+  - a tap on a card brings it forward with one slow turn and a sweep of foil light, shows its name and price, and
+    offers its real listing;
+  - a touch on empty space moves the light to the finger.
+
+  Where the cards come from: no new data. On the kiosk the script reads the kiosk's own card grid on the same page
+  (products and scanned cards, sold ones left out). On the homepage this snippet is given the event collection's
+  products as plain data elements (param: items).
+  Without JavaScript, with no inventory, or if the effects fail, the stage is a quiet lit backdrop and the heading,
+  text and button beside it still work.
+
+  Params:
+  - mode: 'kiosk' or 'home'
+  - items: (home) HTML of <i data-acs-item ...> elements, one per card
+  - listing_label: text of the button shown when a card is brought forward
+{%- endcomment -%}
+<div class="acs acs--{{ mode }}" data-acs="{{ mode }}">
+  <div class="acs-bg" aria-hidden="true">
+    <span class="acs-aurora acs-aurora--a"></span>
+    <span class="acs-aurora acs-aurora--b"></span>
+    <span class="acs-pattern"></span>
+    <span class="acs-spot" data-acs-spot></span>
+    <span class="acs-floor"></span>
+  </div>
+  {%- if items != blank -%}<div class="acs-data" hidden>{{ items }}</div>{%- endif -%}
+  <div class="acs-stage" data-acs-stage>
+    <div class="acs-row acs-row--back" data-acs-back aria-hidden="true"></div>
+    <div class="acs-row acs-row--front" data-acs-front></div>
+    <span class="acs-pulse" data-acs-pulse aria-hidden="true"></span>
+  </div>
+  <span class="acs-veil" aria-hidden="true"></span>
+  <div class="acs-panel" data-acs-panel aria-live="polite">
+    <p class="acs-panel-tag" data-acs-tag></p>
+    <p class="acs-panel-name" data-acs-name></p>
+    <p class="acs-panel-meta" data-acs-meta></p>
+    <p class="acs-panel-price" data-acs-price></p>
+    <div class="acs-panel-actions">
+      <a class="acs-btn acs-btn--gold" data-acs-listing href="#"><span>{{ listing_label | default: 'View This Card' | escape }}</span><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path d="M5 12h13M13 6.500l5.500 5.500-5.500 5.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <button type="button" class="acs-btn acs-btn--ghost" data-acs-back-to-flow>Back to the showcase</button>
+    </div>
+  </div>
+  <p class="acs-hint" data-acs-hint aria-hidden="true"><span class="acs-hint-ring"></span>Touch to Explore</p>
+</div>

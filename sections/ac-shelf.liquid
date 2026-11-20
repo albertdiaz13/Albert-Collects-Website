@@ -1,0 +1,124 @@
+{% assign shelf = section.settings.collection %}
+{%- liquid
+  assign aster_context = section.settings.aster_context
+  if aster_context == 'auto'
+    assign shelf_words = shelf.handle | append: ' ' | append: section.settings.title | downcase
+    assign aster_context = 'browse'
+    if shelf_words contains 'vintage'
+      assign aster_context = 'vintage'
+    elsif section.settings.slab_layout or shelf_words contains 'slab' or shelf_words contains 'graded'
+      assign aster_context = 'slabs'
+    elsif shelf_words contains 'fresh' or shelf.handle == 'frontpage'
+      assign aster_context = 'fresh'
+    elsif shelf_words contains 'modern' or shelf.handle == 'japanese'
+      assign aster_context = 'modern'
+    elsif shelf_words contains 'english'
+      assign aster_context = 'english'
+    elsif shelf_words contains 'game' or shelf_words contains 'nostalgia'
+      assign aster_context = 'games'
+    endif
+  endif
+-%}
+{% if shelf != blank and shelf.products_count > 0 %}
+<section data-ac-context="{{ aster_context }}" class="ac-shelf ac-wrap{% if section.settings.slab_layout %} ac-shelf--slabs{% endif %}{% if section.settings.band == 'vault' %} ac-shelf--vault{% endif %}"><header class="ac-shelf-header"><div><p class="ac-kicker">{{ section.settings.eyebrow | escape }}</p><h2><span class="ac-spark" aria-hidden="true">✦</span> {{ section.settings.title | escape }} <span class="ac-spark" aria-hidden="true">✦</span></h2></div><a class="ac-text-link" href="{{ shelf.url }}">Explore the collection <span aria-hidden="true">↗</span></a></header><div class="ac-product-grid">{%- liquid
+  assign above_fold = false
+  if section.index != blank and section.index <= 2
+    assign above_fold = true
+  endif
+-%}{% for item in shelf.products limit: section.settings.limit %}{% liquid
+  assign card_eager = false
+  if above_fold and forloop.index <= 4
+    assign card_eager = true
+  endif
+%}{% render 'ac-product-card', product: item, eager: card_eager %}{% endfor %}</div></section>
+{% elsif request.design_mode %}<div class="ac-editor-note ac-wrap">Choose a populated collection for “{{ section.settings.title | escape }}”. This section stays hidden from customers until products are available.</div>{% endif %}
+
+{% schema %}
+{
+  "name": "Albert product shelf",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small heading",
+      "default": "THE LATEST ADDITIONS"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Fresh finds"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Products to show",
+      "min": 4,
+      "max": 24,
+      "step": 4,
+      "default": 8
+    },
+    {
+      "type": "checkbox",
+      "id": "slab_layout",
+      "label": "Taller image frames for slabs",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "band",
+      "label": "Desktop display",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "vault",
+          "label": "Vault (deep plum band)"
+        }
+      ],
+      "default": "standard",
+      "info": "Vault sets this shelf on a full-width deep plum band on desktop. Phones keep the standard look."
+    },
+    {
+      "type": "select",
+      "id": "aster_context",
+      "label": "Aster's remarks for this shelf",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Automatic (from the collection and heading)"
+        },
+        {
+          "value": "fresh",
+          "label": "Fresh finds"
+        },
+        {
+          "value": "vintage",
+          "label": "Vintage"
+        },
+        {
+          "value": "slabs",
+          "label": "Slabs and graded"
+        },
+        {
+          "value": "browse",
+          "label": "General browsing"
+        }
+      ],
+      "default": "auto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Albert product shelf"
+    }
+  ]
+}
+{% endschema %}

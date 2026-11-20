@@ -1,0 +1,223 @@
+{% comment %}
+  Albert product card.
+  Params:
+  - product: product object (required)
+  - eager: true for cards that are visible on first paint (loads the photo immediately)
+
+  Every card gets the cursor-driven holographic foil on its inventory photo (desktop mouse only).
+
+  Alternate photo (enables the "Flip card" / "Flip back" control + swipe), first match wins:
+  1. Product metafield custom.card_back (type: file / image reference), if you create one. Confirmed back.
+  2. Any product image whose alt text contains [card-back]. The marker is stripped from shopper-facing alt text. Confirmed back.
+  3. Otherwise the product's second image. Its contents are unconfirmed, so nothing calls it the back.
+
+  data-ac-traits feeds Aster's remarks: "holo" or "graded" are only set when the product's own tags, type or title
+  confirm them, and "soldout" when it is unavailable. Otherwise he keeps to general remarks.
+
+  Photos are plain <img> tags with an explicit JPEG/PNG-compatible fallback src, so they render
+  without JavaScript and on older Safari. Theme setting "Product photo format" can force JPEG.
+{% endcomment %}
+{%- if product != blank -%}
+  {%- liquid
+    assign force_jpg = false
+    if settings.ac_photo_format == 'jpg'
+      assign force_jpg = true
+    endif
+    assign card_widths = '240,360,540,720,900' | split: ','
+
+    assign photo = product.featured_media.preview_image
+    assign photo_alt = product.featured_media.alt | remove: '[card-back]' | remove: '[CARD-BACK]' | remove: '[Card-Back]' | strip
+    if photo_alt == blank
+      assign photo_alt = product.title
+    endif
+
+    assign back = nil
+    assign has_back = false
+    assign back_alt = ''
+    assign back_meta = product.metafields.custom.card_back.value
+    if back_meta != blank and back_meta.width
+      assign back = back_meta
+      assign has_back = true
+      assign back_alt = back_meta.alt
+    elsif back_meta != blank and back_meta.preview_image
+      assign back = back_meta.preview_image
+      assign has_back = true
+      assign back_alt = back_meta.alt
+    else
+      for m in product.media
+        if m.media_type == 'image'
+          assign m_alt = m.alt | downcase
+          if m_alt contains '[card-back]' and m.id != product.featured_media.id
+            assign back = m.preview_image
+            assign has_back = true
+            assign back_alt = m.alt
+            break
+          endif
+        endif
+      endfor
+    endif
+    assign back_kind = 'back'
+    if has_back == false
+      for m in product.media
+        if m.media_type == 'image' and m.id != product.featured_media.id
+          assign back = m.preview_image
+          assign has_back = true
+          assign back_kind = 'second'
+          assign back_alt = m.alt
+          break
+        endif
+      endfor
+    endif
+    assign back_alt = back_alt | remove: '[card-back]' | remove: '[CARD-BACK]' | remove: '[Card-Back]' | strip
+    if back_alt == blank
+      if back_kind == 'second'
+        assign back_alt = 'Another photo of ' | append: product.title
+      else
+        assign back_alt = 'Back of ' | append: product.title
+      endif
+    endif
+    if back_kind == 'second'
+      assign flip_label = 'Flip card: show another photo of ' | append: product.title
+      assign unflip_label = 'Flip back: show the main photo of ' | append: product.title
+    else
+      assign flip_label = 'Flip card: show the back of ' | append: product.title
+      assign unflip_label = 'Flip back: show the front of ' | append: product.title
+    endif
+
+    assign trait_text = product.tags | join: ' ' | append: ' ' | append: product.type | append: ' ' | append: product.title | downcase
+    assign traits = ''
+    if trait_text contains 'holo' or trait_text contains 'foil'
+      assign traits = traits | append: ' holo'
+    endif
+    if trait_text contains 'graded' or trait_text contains 'psa' or trait_text contains 'bgs' or trait_text contains 'cgc' or trait_text contains 'slab'
+      assign traits = traits | append: ' graded'
+    endif
+    unless product.available
+      assign traits = traits | append: ' soldout'
+    endunless
+    if eager
+      assign photo_loading = 'eager'
+    else
+      assign photo_loading = 'lazy'
+    endif
+    assign photo_sizes = '(max-width: 749px) 45vw, (max-width: 989px) 30vw, 300px'
+  -%}
+  <article class="ac-product-card{% if has_back %} ac-has-back ac-alt--{{ back_kind }}{% endif %}"{% if has_back %} data-ac-card{% endif %} data-ac-traits="{{ traits | strip }}">
+    <div class="ac-card-media">
+      <a
+        class="ac-image-stage"
+        href="{{ product.url }}"
+        data-ac-tilt
+        data-ac-holo
+        {% if has_back %}data-ac-flip{% endif %}
+        aria-label="{{ product.title | escape }}"
+      >
+        <div class="ac-image-plane" data-ac-tilt-plane>
+          <div class="ac-flip" data-ac-flip-inner>
+            <div class="ac-face ac-face--front">
+              {%- if photo != blank -%}
+                {%- liquid
+                  capture photo_srcset
+                    for w in card_widths
+                      assign wn = w | plus: 0
+                      if wn <= photo.width or forloop.first
+                        unless forloop.first
+                          echo ', '
+                        endunless
+                        if force_jpg
+                          echo photo | image_url: width: wn, format: 'pjpg'
+                        else
+                          echo photo | image_url: width: wn
+                        endif
+                        echo ' ' | append: wn | append: 'w'
+                      endif
+                    endfor
+                  endcapture
+                  if force_jpg
+                    assign photo_src = photo | image_url: width: 540, format: 'pjpg'
+                  else
+                    assign photo_src = photo | image_url: width: 540
+                  endif
+                -%}
+                <img
+                  class="ac-product-photo"
+                  src="{{ photo_src }}"
+                  srcset="{{ photo_srcset | strip }}"
+                  sizes="{{ photo_sizes }}"
+                  width="{{ photo.width }}"
+                  height="{{ photo.height }}"
+                  alt="{{ photo_alt | escape }}"
+                  loading="{{ photo_loading }}"
+                  {% if eager %}fetchpriority="high"{% endif %}
+                  decoding="async"
+                >
+                <span class="ac-holo" aria-hidden="true"><span class="ac-holo-spot"></span></span>
+              {%- else -%}
+                <span class="ac-no-photo">Photo coming soon</span>
+              {%- endif -%}
+            </div>
+            {%- if has_back -%}
+              {%- liquid
+                capture back_srcset
+                  for w in card_widths
+                    assign wn = w | plus: 0
+                    if wn <= back.width or forloop.first
+                      unless forloop.first
+                        echo ', '
+                      endunless
+                      if force_jpg
+                        echo back | image_url: width: wn, format: 'pjpg'
+                      else
+                        echo back | image_url: width: wn
+                      endif
+                      echo ' ' | append: wn | append: 'w'
+                    endif
+                  endfor
+                endcapture
+                if force_jpg
+                  assign back_src = back | image_url: width: 540, format: 'pjpg'
+                else
+                  assign back_src = back | image_url: width: 540
+                endif
+              -%}
+              <div class="ac-face ac-face--back" aria-hidden="true">
+                {%- comment -%}Loaded only after intent (button focus/hover, a touch on the card, or a flip).{%- endcomment -%}
+                <img
+                  class="ac-product-photo ac-back-photo"
+                  data-src="{{ back_src }}"
+                  data-srcset="{{ back_srcset | strip }}"
+                  sizes="{{ photo_sizes }}"
+                  width="{{ back.width }}"
+                  height="{{ back.height }}"
+                  alt="{{ back_alt | escape }}"
+                  decoding="async"
+                >
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+        {% unless product.available %}<span class="ac-status">Sold out</span>{% else %}{% if product.compare_at_price > product.price %}<span class="ac-status ac-status-sale">A special find</span>{% endif %}{% endunless %}
+      </a>
+      <div class="ac-flip-row">
+        {%- if has_back -%}
+          <button
+            type="button"
+            class="ac-flip-button"
+            data-ac-flip-toggle
+            aria-pressed="false"
+            aria-label="{{ flip_label | escape }}"
+            data-label-alt="{{ flip_label | escape }}"
+            data-label-front="{{ unflip_label | escape }}"
+            data-text-alt="Flip card"
+            data-text-front="Flip back"
+          >
+            <span aria-hidden="true" class="ac-flip-icon">↻</span>
+            <span class="ac-flip-text" aria-hidden="true">Flip card</span>
+          </button>
+        {%- endif -%}
+      </div>
+    </div>
+    <div class="ac-product-info">{% if product.type != blank %}<p class="ac-product-type">{{ product.type | escape }}</p>{% endif %}<h3><a href="{{ product.url }}">{{ product.title | escape }}</a></h3><div class="ac-product-price">{{ product.price | money }}{% if product.price_varies %}<span class="ac-from"> & up</span>{% endif %}{% if product.compare_at_price > product.price %}<s>{{ product.compare_at_price | money }}</s>{% endif %}</div></div>
+    {% if product.available %}{% if product.has_only_default_variant %}<form method="post" action="{{ routes.cart_add_url }}" class="ac-quick-add" data-ac-add-form><input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}"><input type="hidden" name="quantity" value="1"><button type="submit" name="add" class="ac-add-button">Add to bag <span aria-hidden="true">+</span></button><span class="ac-add-status visually-hidden" role="status"></span></form>{% else %}<a class="ac-add-button" href="{{ product.url }}">Choose options <span aria-hidden="true">↗</span></a>{% endif %}{% else %}<span class="ac-sold-label">Found a new home</span>{% endif %}
+  </article>
+{%- endif -%}

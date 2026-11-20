@@ -1,0 +1,125 @@
+{%- comment -%}
+  Kiosk card for one scanned physical copy (an `ors_card` metaobject entry saved by the Import Cards admin app).
+  It looks and behaves like the shared inventory card (tilt, foil, Flip card when a back scan exists). The photo opens
+  the kiosk's own detail view. The card itself has no purchase action: the kiosk section adds Add to bag below it only
+  for a scan linked to a listing whose variant Shopify reports as available.
+
+  Only shopper-facing fields are read here: name, set_name, card_number, language, condition, price, front_image,
+  back_image. Box locations and import notes live in a separate admin-only entry type that the storefront cannot read.
+
+  Params:
+  - card: the metaobject entry (required)
+  - state: 'available' or 'sold'
+  - price_text: formatted price (the linked variant's for a linked scan), or blank when no price is set
+  - eager: true for the first cards on the page
+{%- endcomment -%}
+{%- liquid
+  assign name = card.name.value | default: 'Card'
+  assign front_media = card.front_image.value
+  assign front = front_media.preview_image | default: front_media
+  assign back_media = card.back_image.value
+  assign back = back_media.preview_image | default: back_media
+  assign has_back = false
+  if back != blank and back.width
+    assign has_back = true
+  endif
+  assign set_line = card.set_name.value
+  if card.card_number.value != blank
+    if set_line != blank
+      assign set_line = set_line | append: ' · ' | append: card.card_number.value
+    else
+      assign set_line = card.card_number.value
+    endif
+  endif
+  assign meta_line = card.language.value
+  if card.condition.value != blank
+    if meta_line != blank
+      assign meta_line = meta_line | append: ' · ' | append: card.condition.value
+    else
+      assign meta_line = card.condition.value
+    endif
+  endif
+  if eager
+    assign photo_loading = 'eager'
+  else
+    assign photo_loading = 'lazy'
+  endif
+  assign photo_sizes = '(max-width: 749px) 45vw, (max-width: 989px) 30vw, 300px'
+  assign flip_label = 'Flip card: show the back of ' | append: name
+  assign unflip_label = 'Flip back: show the front of ' | append: name
+-%}
+<article class="ac-product-card ac-kiosk-card{% if has_back %} ac-has-back ac-alt--back{% endif %}"{% if has_back %} data-ac-card{% endif %} data-ac-traits="{% if state == 'sold' %}soldout{% endif %}">
+  <div class="ac-card-media">
+    <button
+      type="button"
+      class="ac-image-stage ac-kiosk-stage"
+      data-ac-tilt
+      data-ac-holo
+      {% if has_back %}data-ac-flip{% endif %}
+      data-ac-kiosk-open
+      aria-label="{{ name | escape }}: open the card photo and reference ID"
+    >
+      <span class="ac-image-plane" data-ac-tilt-plane>
+        <span class="ac-flip" data-ac-flip-inner>
+          <span class="ac-face ac-face--front">
+            {%- if front != blank and front.width -%}
+              <img
+                class="ac-product-photo"
+                src="{{ front | image_url: width: 540 }}"
+                srcset="{{ front | image_url: width: 360 }} 360w, {{ front | image_url: width: 540 }} 540w, {{ front | image_url: width: 900 }} 900w"
+                sizes="{{ photo_sizes }}"
+                width="{{ front.width }}"
+                height="{{ front.height }}"
+                alt="{{ name | escape }}{% if card.card_number.value != blank %}, {{ card.card_number.value | escape }}{% endif %}"
+                loading="{{ photo_loading }}"
+                decoding="async"
+              >
+              <span class="ac-holo" aria-hidden="true"><span class="ac-holo-spot"></span></span>
+            {%- else -%}
+              <span class="ac-no-photo">Photo coming soon</span>
+            {%- endif -%}
+          </span>
+          {%- if has_back -%}
+            <span class="ac-face ac-face--back" aria-hidden="true">
+              <img
+                class="ac-product-photo ac-back-photo"
+                data-src="{{ back | image_url: width: 540 }}"
+                data-srcset="{{ back | image_url: width: 360 }} 360w, {{ back | image_url: width: 540 }} 540w, {{ back | image_url: width: 900 }} 900w"
+                sizes="{{ photo_sizes }}"
+                width="{{ back.width }}"
+                height="{{ back.height }}"
+                alt="Back of {{ name | escape }}"
+                decoding="async"
+              >
+            </span>
+          {%- endif -%}
+        </span>
+      </span>
+      {%- if state == 'sold' -%}<span class="ac-status">Sold</span>{%- endif -%}
+    </button>
+    <div class="ac-flip-row">
+      {%- if has_back -%}
+        <button
+          type="button"
+          class="ac-flip-button"
+          data-ac-flip-toggle
+          aria-pressed="false"
+          aria-label="{{ flip_label | escape }}"
+          data-label-alt="{{ flip_label | escape }}"
+          data-label-front="{{ unflip_label | escape }}"
+          data-text-alt="Flip card"
+          data-text-front="Flip back"
+        >
+          <span aria-hidden="true" class="ac-flip-icon">↻</span>
+          <span class="ac-flip-text" aria-hidden="true">Flip card</span>
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+  <div class="ac-product-info">
+    {%- if set_line != blank -%}<p class="ac-product-type">{{ set_line | escape }}</p>{%- endif -%}
+    <h3>{{ name | escape }}</h3>
+    {%- if meta_line != blank -%}<p class="ac-kiosk-meta">{{ meta_line | escape }}</p>{%- endif -%}
+    <div class="ac-product-price">{%- if price_text != blank -%}{{ price_text }}{%- else -%}<span class="ac-kiosk-ask">Ask for price</span>{%- endif -%}</div>
+  </div>
+</article>

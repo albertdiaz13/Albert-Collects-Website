@@ -1,0 +1,385 @@
+{%- comment -%}
+  Event kiosk (event-neutral edition). It renders in two places:
+  1. On the normal collection template (templates/collection.json), but only when the collection being viewed is the one
+     chosen in Theme settings > Albert extras > Event collection. That is the main route: the plain /collections/handle
+     address shows the kiosk with no ?view= parameter and no admin step. The stock collection banner and grid sections
+     step aside for that collection.
+  2. On the alternate template collection.racket-sports, for any collection assigned to it in Shopify admin.
+
+  What it shows
+  - The hero: The Showcase (snippets/ac-showcase.liquid), a continuously moving display of today's real cards that
+    answers a tap or a swipe, with "Browse Available Cards" beside it. A small gold star in its corner opens The Vault
+    (snippets/ac-vault.liquid), an optional extra that reveals one real card. Neither ever opens by itself.
+  - One search field and two tabs, "On Display" and "Behind the Table".
+  - Real inventory only, from two sources that are merged into one grid:
+      a. the products in the event collection (shared product cards, unchanged), and
+      b. scanned-card entries of the metaobject type `ors_card`, saved by the separate Import Cards admin app.
+    A scan linked to an existing listing (its exact product variant) stands in for that listing, so each physical
+    copy appears once. A linked scan takes its price, availability and Add to bag from that variant, live from Shopify.
+    When Shopify reports the variant unavailable, the tile shows Sold and the purchase action is not rendered.
+    A show-only scan (no linked variant) is never a checkout product. With no price it reads "Ask at the table".
+  - Where a card sits: a scan carries its own Placement ("In Case" shows under On Display, "Back Stock" under Behind
+    the Table; the older values display/behind still work). A product is On Display unless it has the tag
+    `behind-the-table`.
+  - Each card's "Ask Albert to pull this card" button opens a large photo with a reference ID. It never reserves a card
+    and never touches the cart. "Check recent sales" lives only inside that view.
+
+  Privacy: this template reads only the shopper-facing fields of `ors_card`. Hidden cards are saved as drafts, which
+  Shopify does not give to the storefront at all, and box locations live in a different, admin-only entry type.
+
+  Search covers every page: albert-kiosk.js loads the remaining pages of this same section in the background and
+  re-checks them every so often, so changes saved in the admin app show up without a theme edit. Without JavaScript the
+  first page and plain page links still work.
+{%- endcomment -%}
+{%- liquid
+  assign is_kiosk = false
+  if template.suffix == 'racket-sports'
+    assign is_kiosk = true
+  elsif settings.ac_event_collection != blank and collection.handle == settings.ac_event_collection.handle
+    assign is_kiosk = true
+  endif
+-%}
+{%- if is_kiosk -%}
+{{ 'albert-racket.css' | asset_url | stylesheet_tag }}
+{{ 'albert-kiosk.css' | asset_url | stylesheet_tag }}
+{{ 'albert-showcase.css' | asset_url | stylesheet_tag }}
+{{ 'albert-vault.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'albert-kiosk.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'albert-showcase.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'albert-vault.js' | asset_url }}" defer="defer"></script>
+{%- liquid
+  assign scan_def = metaobjects.ors_card
+  assign scan_total = scan_def.values_count | default: 0
+  assign linked_ids = ','
+  assign linked_variant_ids = ','
+  assign count_display = 0
+  assign count_behind = 0
+  assign pages_total = 1
+  assign current_page = 1
+  assign eager_left = 4
+-%}
+
+{%- capture scan_cards -%}
+  {%- if scan_total > 0 -%}
+    {%- paginate metaobjects.ors_card.values by 250 -%}
+      {%- for card in metaobjects.ors_card.values -%}
+        {%- liquid
+          assign placement_raw = card.placement.value | downcase
+          assign placement = 'behind'
+          if placement_raw == 'display' or placement_raw contains 'case'
+            assign placement = 'display'
+          endif
+          assign status_raw = card.status.value | downcase
+          assign state = 'available'
+          if status_raw == 'sold'
+            assign state = 'sold'
+          elsif status_raw == 'hidden'
+            assign state = 'hidden'
+          endif
+          comment
+            The linked listing: the exact variant picked in Shopify. Entries saved by the first importer version carry a
+            product instead, so that product's first variant is used for them.
+          endcomment
+          assign linked_variant = card.variant.value
+          assign linked = linked_variant.product
+          if linked_variant == blank and card.product.value != blank
+            assign linked = card.product.value
+            assign linked_variant = linked.selected_or_first_available_variant
+          endif
+          assign linked_id = ''
+          assign linked_variant_id = ''
+          assign linked_url = ''
+          assign can_buy = false
+          assign price_text = ''
+          if linked_variant != blank
+            assign linked_id = linked.id
+            assign linked_variant_id = linked_variant.id
+            assign linked_ids = linked_ids | append: linked.id | append: ','
+            assign linked_variant_ids = linked_variant_ids | append: linked_variant.id | append: ','
+            assign price_text = linked_variant.price | money
+            if linked_variant.available
+              if state == 'available'
+                assign can_buy = true
+                assign linked_url = linked_variant.url | default: linked.url
+              endif
+            elsif state == 'available'
+              assign state = 'sold'
+            endif
+          elsif card.price.value != blank
+            assign price_text = card.price.value | times: 100 | round | money
+          endif
+          assign show_it = true
+          if state == 'hidden'
+            assign show_it = false
+          elsif state == 'sold' and section.settings.show_sold == false
+            assign show_it = false
+          endif
+        -%}
+        {%- if show_it -%}
+          {%- liquid
+            if placement == 'display'
+              assign count_display = count_display | plus: 1
+            else
+              assign count_behind = count_behind | plus: 1
+            endif
+            assign front_media = card.front_image.value
+            assign front = front_media.preview_image | default: front_media
+            assign back_media = card.back_image.value
+            assign back = back_media.preview_image | default: back_media
+            assign ref = card.system.handle | upcase
+            assign hay = card.name.value | append: ' ' | append: card.set_name.value | append: ' ' | append: card.card_number.value | append: ' ' | append: card.language.value | append: ' ' | append: card.condition.value | append: ' ' | append: ref | downcase
+            assign sales_query = card.name.value | append: ' ' | append: card.card_number.value | append: ' ' | append: card.language.value | strip
+          -%}
+          <div class="ac-kiosk-item" data-ac-kiosk-item data-kind="scan" data-ref="{{ ref | escape }}" data-product-id="{{ linked_id }}" data-variant-id="{{ linked_variant_id }}" data-placement="{{ placement }}" data-state="{{ state }}" data-name="{{ card.name.value | escape }}" data-set="{{ card.set_name.value | escape }}" data-number="{{ card.card_number.value | escape }}" data-language="{{ card.language.value | escape }}" data-condition="{{ card.condition.value | escape }}" data-price="{{ price_text | strip_html | escape }}" data-front="{% if front != blank and front.width %}{{ front | image_url: width: 1100 }}{% endif %}" data-back="{% if back != blank and back.width %}{{ back | image_url: width: 1100 }}{% endif %}" data-url="{{ linked_url }}" data-sales="{{ sales_query | escape }}" data-search="{{ hay | escape }}">
+            {% render 'ac-kiosk-card', card: card, state: state, price_text: price_text, eager: false %}
+            {%- if can_buy -%}
+              <form method="post" action="{{ routes.cart_add_url }}" class="ac-quick-add ac-kiosk-add" data-ac-add-form><input type="hidden" name="id" value="{{ linked_variant.id }}"><input type="hidden" name="quantity" value="1"><button type="submit" name="add" class="ac-add-button">Add to bag <span aria-hidden="true">+</span></button><span class="ac-add-status visually-hidden" role="status"></span></form>
+            {%- endif -%}
+            {%- if state != 'sold' -%}
+              <button type="button" class="ac-kiosk-pull" data-ac-kiosk-open>Ask Albert to pull this card</button>
+            {%- else -%}
+              <span class="ac-sold-label">Found a new home</span>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+      {%- liquid
+        if paginate.pages > pages_total
+          assign pages_total = paginate.pages
+        endif
+        assign current_page = paginate.current_page
+      -%}
+    {%- endpaginate -%}
+  {%- endif -%}
+{%- endcapture -%}
+
+{%- capture page_links -%}{%- endcapture -%}
+{%- capture product_cards -%}
+  {%- paginate collection.products by 100 -%}
+    {%- for item in collection.products -%}
+      {%- liquid
+        comment
+          A listing steps aside only when every one of its variants is shown by a linked scan.
+        endcomment
+        assign unlinked = 0
+        for v in item.variants
+          assign v_key = ',' | append: v.id | append: ','
+          unless linked_variant_ids contains v_key
+            assign unlinked = unlinked | plus: 1
+          endunless
+        endfor
+      -%}
+      {%- if unlinked > 0 -%}
+        {%- liquid
+          assign tag_text = item.tags | join: '|' | downcase
+          assign placement = 'display'
+          if tag_text contains 'behind-the-table' or tag_text contains 'behind the table'
+            assign placement = 'behind'
+            assign count_behind = count_behind | plus: 1
+          else
+            assign count_display = count_display | plus: 1
+          endif
+          assign state = 'available'
+          unless item.available
+            assign state = 'sold'
+          endunless
+          assign sku = item.selected_or_first_available_variant.sku
+          if sku != blank
+            assign ref = sku | upcase
+          else
+            assign ref = item.id | modulo: 1000000 | prepend: 'P-'
+          endif
+          assign hay = item.title | append: ' ' | append: item.type | append: ' ' | append: item.vendor | append: ' ' | append: tag_text | append: ' ' | append: ref | downcase
+          assign card_eager = false
+          if eager_left > 0 and paginate.current_page == 1 and placement == 'display'
+            assign card_eager = true
+            assign eager_left = eager_left | minus: 1
+          endif
+        -%}
+        <div class="ac-kiosk-item" data-ac-kiosk-item data-kind="product" data-ref="{{ ref | escape }}" data-product-id="{{ item.id }}" data-variant-ids="{{ item.variants | map: 'id' | join: ',' }}" data-placement="{{ placement }}" data-state="{{ state }}" data-name="{{ item.title | escape }}" data-set="{{ item.type | escape }}" data-number="" data-language="" data-condition="" data-price="{{ item.price | money | strip_html | escape }}" data-front="{% if item.featured_media.preview_image != blank %}{{ item.featured_media.preview_image | image_url: width: 1100 }}{% endif %}" data-back="" data-url="{{ item.url }}" data-sales="{{ item.title | escape }}" data-search="{{ hay | escape }}">
+          {% render 'ac-product-card', product: item, eager: card_eager %}
+          {%- if item.available -%}
+            <button type="button" class="ac-kiosk-pull" data-ac-kiosk-open>Ask Albert to pull this card</button>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- liquid
+      if paginate.pages > pages_total
+        assign pages_total = paginate.pages
+      endif
+      assign current_page = paginate.current_page
+    -%}
+    {%- if paginate.pages > 1 -%}
+      {%- capture page_links -%}<nav class="ac-kiosk-pages" aria-label="More cards" data-ac-kiosk-pages>{{ paginate | default_pagination }}</nav>{%- endcapture -%}
+    {%- endif -%}
+  {%- endpaginate -%}
+{%- endcapture -%}
+
+{%- assign count_all = count_display | plus: count_behind -%}
+<section class="ac-courtside ac-kiosk" data-ac-context="racket" data-ac-kiosk data-section-id="{{ section.id }}" data-url="{{ collection.url }}" data-pages="{{ pages_total }}" data-page="{{ current_page }}"{% if request.design_mode %} data-design-mode{% endif %}>
+  <div class="ac-court acs-hero">
+    {% render 'ac-showcase', mode: 'kiosk' %}
+    <div class="acs-copy">
+      {%- if section.settings.eyebrow != blank -%}<p class="acs-eyebrow">{{ section.settings.eyebrow | escape }}</p>{%- endif -%}
+      <h1>{{ section.settings.heading | default: collection.title | escape }}</h1>
+      {%- assign intro = collection.description | strip_html | strip -%}
+      {%- if intro == blank -%}{%- assign intro = section.settings.text -%}{%- endif -%}
+      {%- if intro != blank -%}<p class="acs-text">{{ intro | escape }}</p>{%- endif -%}
+      <p class="acs-count"{% if count_all == 0 %} hidden{% endif %} data-ac-kiosk-count><span class="ac-live-dot" aria-hidden="true"></span><span data-ac-kiosk-count-text>{{ count_display }} on display · {{ count_behind }} behind the table</span></p>
+      <button type="button" class="acs-cta" data-acs-browse><span>{{ section.settings.cta_label | default: 'Browse Available Cards' | escape }}</span><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M12 5v13M6.500 13l5.500 5.500 5.500-5.500" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      {%- if section.settings.note != blank -%}<p class="acs-note">{{ section.settings.note | escape }}</p>{%- endif -%}
+    </div>
+    {% render 'ac-vault' %}
+  </div>
+
+  <div class="ac-kiosk-bar" data-ac-kiosk-bar>
+    <div class="ac-wrap ac-kiosk-bar-inner">
+      <form class="ac-kiosk-search" role="search" action="{{ collection.url }}" data-ac-kiosk-form>
+        <label class="visually-hidden" for="ac-kiosk-q-{{ section.id }}">Search Pokémon, set, or card number</label>
+        <svg class="ac-kiosk-search-icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false"><circle cx="8.500" cy="8.500" r="5.750" fill="none" stroke="currentColor" stroke-width="1.800"/><path d="M13 13l4.500 4.500" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/></svg>
+        <input class="ac-kiosk-input" id="ac-kiosk-q-{{ section.id }}" type="search" name="q" placeholder="Search Pokémon, set, or card number" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-ac-kiosk-input>
+        <button type="button" class="ac-kiosk-clear" data-ac-kiosk-clear hidden>Clear<span class="visually-hidden"> search</span></button>
+      </form>
+      <div class="ac-kiosk-tabs" role="tablist" aria-label="Where the card is tonight">
+        <button type="button" class="ac-kiosk-tab is-active" role="tab" id="ac-kiosk-tab-display-{{ section.id }}" aria-selected="true" aria-controls="ac-courtside-grid" data-ac-kiosk-tab="display">On Display <span class="ac-kiosk-tab-count" data-ac-kiosk-tab-count>{{ count_display }}</span></button>
+        <button type="button" class="ac-kiosk-tab" role="tab" id="ac-kiosk-tab-behind-{{ section.id }}" aria-selected="false" aria-controls="ac-courtside-grid" tabindex="-1" data-ac-kiosk-tab="behind">Behind the Table <span class="ac-kiosk-tab-count" data-ac-kiosk-tab-count>{{ count_behind }}</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ac-wrap ac-kiosk-stock" id="ac-courtside-grid" data-ac-context="table" role="tabpanel" aria-labelledby="ac-kiosk-tab-display-{{ section.id }}" data-ac-kiosk-panel>
+    <p class="ac-kiosk-status" role="status" aria-live="polite" data-ac-kiosk-status></p>
+    <h2 class="visually-hidden">Cards available today</h2>
+    <div class="ac-product-grid ac-catalog-grid ac-kiosk-grid" data-ac-kiosk-grid>
+      {{ product_cards }}
+      {{ scan_cards }}
+    </div>
+    <div class="ac-kiosk-empty" data-ac-kiosk-empty{% if count_all > 0 %} hidden{% endif %}>
+      <p class="ac-kiosk-empty-title" data-ac-kiosk-empty-title>Today's cards are on their way.</p>
+      <p data-ac-kiosk-empty-text>Nothing is listed here right now. Check back before the next event, or browse the rest of the shop.</p>
+      <button type="button" class="ac-racket-button ac-kiosk-empty-action" data-ac-kiosk-empty-action hidden><span>Clear search</span></button>
+      <a class="ac-racket-button ac-kiosk-empty-link" href="{{ routes.all_products_collection_url }}" data-ac-kiosk-empty-link><span>Browse everything</span></a>
+    </div>
+    {{ page_links }}
+  </div>
+
+  <div class="ac-kiosk-detail" data-ac-kiosk-detail>
+    <div class="ac-kiosk-scrim" data-ac-kiosk-close></div>
+    <div class="ac-kiosk-sheet" role="dialog" aria-modal="true" aria-labelledby="ac-kiosk-detail-name-{{ section.id }}" tabindex="-1" data-ac-kiosk-sheet>
+      <button type="button" class="ac-kiosk-x" data-ac-kiosk-close aria-label="Close and go back to the cards"><span aria-hidden="true">×</span></button>
+      <div class="ac-kiosk-detail-media">
+        <div class="ac-kiosk-detail-frame"><img class="ac-kiosk-detail-photo" alt="" data-ac-kiosk-photo></div>
+        <button type="button" class="ac-kiosk-detail-flip" data-ac-kiosk-detail-flip aria-pressed="false" hidden><span aria-hidden="true" class="ac-flip-icon">↻</span> <span data-ac-kiosk-detail-flip-text>Flip card</span></button>
+      </div>
+      <div class="ac-kiosk-detail-body">
+        <p class="ac-kicker ac-kiosk-detail-kicker">Ask Albert to pull this card</p>
+        <h2 class="ac-kiosk-detail-name" id="ac-kiosk-detail-name-{{ section.id }}" data-ac-kiosk-name></h2>
+        <p class="ac-kiosk-detail-meta" data-ac-kiosk-meta></p>
+        <p class="ac-kiosk-detail-price" data-ac-kiosk-price></p>
+        <div class="ac-kiosk-refbox">
+          <p class="ac-kiosk-reflabel">Reference ID <span class="ac-kiosk-where" data-ac-kiosk-where></span></p>
+          <p class="ac-kiosk-ref" data-ac-kiosk-ref></p>
+          <p class="ac-kiosk-refhelp" data-ac-kiosk-refhelp>Show this screen to Albert and he will pull the card for you. Asking does not reserve the card or start an order.</p>
+        </div>
+        <a class="ac-kiosk-buy" data-ac-kiosk-buy hidden>See this card's online listing <span aria-hidden="true">↗</span></a>
+        {%- comment -%}
+          Price comparison. Two parts:
+          - "Active listings · Asking prices": up to five current eBay listings shown inline, never clickable. It appears
+            only when the section's "eBay listings endpoint" setting points at a server you run that holds the eBay
+            credentials (none are in the theme). albert-kiosk.js asks it for this card and keeps only close matches.
+          - The outbound eBay links. Hidden in kiosk mode: on a device that opened this page once with ?kiosk=1 (the
+            show iPad), or for everyone when "Keep shoppers on this page" is on. Regular visitors keep the links.
+        {%- endcomment -%}
+        <div class="ac-kiosk-sales" data-ac-kiosk-sales data-endpoint="{{ section.settings.ebay_endpoint | strip | escape }}"{% if section.settings.kiosk_lock %} data-kiosk-lock{% endif %}>
+          <div class="ac-kiosk-asking" data-ac-kiosk-asking hidden>
+            <h3>Active listings · Asking prices</h3>
+            <ul class="ac-kiosk-asking-list" data-ac-kiosk-asking-list></ul>
+            <p class="ac-kiosk-sales-note" data-ac-kiosk-asking-note role="status"></p>
+          </div>
+          <div class="ac-kiosk-outbound" data-ac-kiosk-outbound>
+            <h3>Check recent sales</h3>
+            <a class="ac-kiosk-sales-link" target="_blank" rel="noopener noreferrer" data-ac-kiosk-sold><strong>Sold listings on eBay</strong><span>What buyers recently paid.</span></a>
+            <a class="ac-kiosk-sales-link ac-kiosk-sales-link--asking" target="_blank" rel="noopener noreferrer" data-ac-kiosk-active><strong>Active listings on eBay</strong><span>Asking prices only. These are not sales.</span></a>
+            <p class="ac-kiosk-sales-note">Opens eBay in a new tab, searching this card's name, number and language.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Albert event kiosk",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shows only for the collection chosen in Theme settings > Albert extras > Event collection."
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Page heading",
+      "info": "Shown instead of the collection's own title.",
+      "default": "Discover What's on Display"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Small heading",
+      "default": "ALBERT COLLECTS · AT TODAY'S SHOW"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "Intro text",
+      "info": "Used when the collection has no description of its own.",
+      "default": "Explore the cards available at today's show."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Button label",
+      "default": "Browse Available Cards"
+    },
+    {
+      "type": "text",
+      "id": "note",
+      "label": "Availability note",
+      "default": "Availability can change during the show. If you don't see a card here, just ask."
+    },
+    {
+      "type": "text",
+      "id": "greeting",
+      "label": "Aster's greeting",
+      "default": "Welcome in."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sold",
+      "label": "Keep sold cards visible",
+      "info": "Sold cards stay in their tab with a Sold label. Turn off to drop them from the kiosk.",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "eBay price comparison"
+    },
+    {
+      "type": "text",
+      "id": "ebay_endpoint",
+      "label": "eBay listings endpoint (optional)",
+      "info": "Address of a small server you run that looks up active eBay listings with your eBay developer keys. Leave empty if you do not have one: the card view then shows no inline listings. Never paste eBay keys here."
+    },
+    {
+      "type": "checkbox",
+      "id": "kiosk_lock",
+      "label": "Keep shoppers on this page",
+      "info": "Hides the outbound eBay links for everyone. Without this, they are hidden only on a device that opened the page once with ?kiosk=1 (use ?kiosk=0 to undo).",
+      "default": false
+    }
+  ]
+}
+{% endschema %}
