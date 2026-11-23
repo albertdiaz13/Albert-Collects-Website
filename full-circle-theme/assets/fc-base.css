@@ -445,7 +445,7 @@ details > summary::-webkit-details-marker { display: none; }
 
 .fc-subbar {
   display: grid;
-  grid-template-columns: 1fr 1.35fr;
+  grid-template-columns: 1fr 1fr 1.35fr;
   border-top: var(--fc-rule);
 }
 .fc-subbar__link {

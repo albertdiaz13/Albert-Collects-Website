@@ -1,5 +1,0 @@
-{%- comment -%} Splits text on " · " and keeps each part on one line, so times and places never break mid-phrase. - text {%- endcomment -%}
-{%- assign parts = text | split: ' · ' -%}
-{%- for part in parts -%}
-  <span class="fc-nowrap">{{ part | escape }}</span>{% unless forloop.last %}<span aria-hidden="true"> · </span>{% endunless %}
-{%- endfor -%}

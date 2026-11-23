@@ -136,6 +136,26 @@
       document.documentElement.lang = doc.documentElement.lang || 'en';
       doc.head.querySelectorAll('link[rel="stylesheet"], link[rel="preload"], link[rel="icon"], style, meta[name="theme-color"]').forEach((n) => document.head.appendChild(document.importNode(n, true)));
     }
+    // Wait for every stylesheet this page uses (head and section-level) before swapping the
+    // body in, so there is never a flash of unstyled content.
+    const sheets = [];
+    doc.querySelectorAll('link[rel="stylesheet"]').forEach((l) => {
+      const href = l.getAttribute('href');
+      if (!href || document.querySelector(`link[rel="stylesheet"][href="${href}"][data-fc-loaded]`)) return;
+      let el = document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`);
+      if (!el) { el = document.createElement('link'); el.rel = 'stylesheet'; el.href = href; document.head.appendChild(el); }
+      sheets.push(new Promise((resolve) => {
+        const done = () => { el.setAttribute('data-fc-loaded', ''); resolve(); };
+        if (el.sheet) return done();
+        el.addEventListener('load', done, { once: true });
+        el.addEventListener('error', done, { once: true });
+        setTimeout(done, 4000);
+      }));
+    });
+    return Promise.all(sheets).then(() => swapIn(doc, href, standalone));
+  }
+
+  function swapIn(doc, href, standalone) {
     document.title = doc.title || 'Full Circle Collaborations';
 
     const scripts = [];
@@ -173,9 +193,30 @@
     const r = await ask('GET', href);
     if (r.type === 'redirect') return go(r.location);
     await paint(r.body, href, r.standalone);
+    if (pendingAnchor) {
+      const id = pendingAnchor;
+      pendingAnchor = null;
+      requestAnimationFrame(() => scrollToAnchor(id));
+    }
+  }
+
+  let pendingAnchor = null;
+  function scrollToAnchor(id) {
+    const el = id && document.getElementById(id);
+    if (!el) return false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el.tabIndex >= -1) el.focus({ preventScroll: true });
+    return true;
   }
 
   function go(href) {
+    const [pathPart, anchor] = href.split('#');
+    href = pathPart || '/';
+    if (anchor) {
+      const samePage = (current.split('?')[0] || '/') === (href.split('?')[0] || '/');
+      if (samePage && scrollToAnchor(anchor)) return Promise.resolve();
+      pendingAnchor = anchor;
+    }
     const name = nameFor(href);
     if (location.hash.slice(1) === name) return render(hrefFor(name));
     location.hash = name; // hashchange renders

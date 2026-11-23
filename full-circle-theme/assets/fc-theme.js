@@ -445,61 +445,16 @@
     }
   }, true);
 
-  /* ---------- hero logo press ---------- */
+  /* ---------- hero logo press (static fallback) ---------- */
 
-  // A press sends rings out from the point of contact (the centre for keyboard presses), then
-  // a crimson pulse travels once around the mark from that angle and fades back to idle.
-  // Reduced motion or motion off: the ring simply turns crimson for a moment.
-  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var ORBIT = { cx: 845, cy: 777, w: 1671, h: 1700 };
-
-  function pulseLogo(button, e) {
-    var rect = button.getBoundingClientRect();
-    var keyboard = !e || !e.detail || (e.clientX === 0 && e.clientY === 0);
-    var cx = rect.left + rect.width * (ORBIT.cx / ORBIT.w);
-    var cy = rect.top + rect.height * (ORBIT.cy / ORBIT.h);
-    var x = keyboard ? cx : e.clientX;
-    var y = keyboard ? cy : e.clientY;
-
-    if (reduceMotion.matches || FC.motion === false || !button.animate) {
-      button.classList.add('is-acknowledged');
-      clearTimeout(button._fcAck);
-      button._fcAck = setTimeout(function () { button.classList.remove('is-acknowledged'); }, 700);
-      return;
-    }
-
-    var ripples = button.querySelector('[data-fc-ripples]');
-    var reach = Math.max(rect.width, rect.height) * 1.25;
-    [0, 140].forEach(function (delay) {
-      var r = document.createElement('span');
-      r.className = 'fc-hero__ripple';
-      r.style.left = (x - rect.left) + 'px';
-      r.style.top = (y - rect.top) + 'px';
-      ripples.appendChild(r);
-      r.animate(
-        [{ transform: 'scale(0.4)', opacity: 0.9 }, { transform: 'scale(' + (reach / 24) + ')', opacity: 0 }],
-        { duration: 900, delay: delay, easing: 'cubic-bezier(0.22, 0.7, 0.2, 1)', fill: 'forwards' }
-      ).onfinish = function () { r.remove(); };
-    });
-
-    // Angle of contact around the logo's circle, as a position along the ring (0–100).
-    var start = ((Math.atan2(y - cy, x - cx) * 180 / Math.PI + 360) % 360) / 3.6;
-    var pulse = button.querySelector('[data-fc-pulse]');
-    if (pulse) {
-      if (pulse._fcAnim) pulse._fcAnim.cancel();
-      pulse._fcAnim = pulse.animate([
-        { strokeDasharray: '0 100', strokeDashoffset: -start, opacity: 1 },
-        { strokeDasharray: '30 70', strokeDashoffset: -(start + 45), opacity: 1, offset: 0.45 },
-        { strokeDasharray: '0 100', strokeDashoffset: -(start + 100), opacity: 0 }
-      ], { duration: 1300, delay: 120, easing: 'cubic-bezier(0.45, 0, 0.2, 1)' });
-    }
-    var img = button.querySelector('[data-fc-logo-img]');
-    if (img) img.animate([{ transform: 'scale(1)' }, { transform: 'scale(0.975)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
-  }
-
+  // With motion running, fc-motion.js rolls the crimson mark. Without it (reduced motion or
+  // motion turned off), a press still gets a calm, visible acknowledgement.
   document.addEventListener('click', function (e) {
     var logo = e.target.closest('[data-fc-logo]');
-    if (logo) pulseLogo(logo, e);
+    if (!logo || document.documentElement.classList.contains('fc-motion-on')) return;
+    logo.classList.add('is-acknowledged');
+    clearTimeout(logo._fcAck);
+    logo._fcAck = setTimeout(function () { logo.classList.remove('is-acknowledged'); }, 700);
   });
 
   /* ---------- recommendations ---------- */

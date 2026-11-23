@@ -19,7 +19,8 @@
     "powered_by": "Powered by Shopify",
     "404_title": "Page not found",
     "404_body": "That page isn't on the bill. Try the shop or the show schedule.",
-    "loading": "Loading"
+    "loading": "Loading",
+    "about": "About"
   },
   "cart": {
     "title": "Your cart",
@@ -103,7 +104,9 @@
     "venue": "Venue",
     "when": "When",
     "directions": "Map",
-    "next_up": "Next up"
+    "next_up": "Next up",
+    "book_now": "Book now",
+    "price_per_table": "{{ price }} per table"
   },
   "collections": {
     "products_count": {

@@ -107,18 +107,24 @@
     <span class="fc-bill__meta" data-fc-reveal="meta">
       <span class="fc-status fc-status--{{ status_class }}">{{ status_text }}</span>
       {%- unless is_past or event.available == false -%}
-        <span class="fc-bill__price">{{ 'events.from_price' | t: price: price_html }}</span>
+        {%- if event.price_varies -%}
+          <span class="fc-bill__price">{{ 'events.from_price' | t: price: price_html }}</span>
+        {%- else -%}
+          <span class="fc-bill__price">{{ 'events.price_per_table' | t: price: price_html }}</span>
+        {%- endif -%}
       {%- endunless -%}
     </span>
     {%- unless style == 'past' -%}
       <span class="fc-bill__go">
-        {%- if style == 'feature' -%}
-          <span class="fc-bill__cta">{% if is_past or event.available == false %}{{ 'events.view_show' | t }}{% else %}{{ 'events.book_table' | t }}{% endif %}</span>
+        {%- if is_past or event.available == false -%}
+          <span class="fc-bill__cta fc-bill__cta--quiet">{{ 'events.view_show' | t }}</span>
+        {%- else -%}
+          <span class="fc-bill__cta">{{ 'events.book_now' | t }}</span>
+          <span class="fc-ring-arrow">
+            <span class="fc-ring-arrow__ring" aria-hidden="true"></span>
+            {% render 'fc-icon', icon: 'arrow' %}
+          </span>
         {%- endif -%}
-        <span class="fc-ring-arrow">
-          <span class="fc-ring-arrow__ring" aria-hidden="true"></span>
-          {% render 'fc-icon', icon: 'arrow' %}
-        </span>
       </span>
     {%- endunless -%}
   </a>

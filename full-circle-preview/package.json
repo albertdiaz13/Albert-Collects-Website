@@ -9,7 +9,8 @@
     "package": "node package-theme.js",
     "build:storefront": "node browser/build.js",
     "test:storefront": "node browser/test-static.js",
-    "check:homepage": "node browser/check-homepage.js"
+    "check:homepage": "node browser/check-homepage.js",
+    "record:logo": "node browser/record-logo.js"
   },
   "license": "ISC",
   "dependencies": {

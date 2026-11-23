@@ -181,3 +181,82 @@ the live theme stays as it is.
 - Product recommendations data.
 - Dynamic checkout buttons.
 - Currency switching in the country selector.
+
+## Client demo revision (Friday trade nights)
+
+### Homepage
+
+The homepage runs top to bottom as:
+
+- **Hero:** the animated logo.
+- **Upcoming Shows:** one dated row per Friday, each with its own **Book now** link.
+- **About Full Circle:** a short strip.
+- **Shop:** the product grid.
+
+The header's **About** link goes to `/#about`. You can change its label and link in Theme
+settings › Shop & booking.
+
+### The animated logo
+
+The logo animation uses five layers, all cut from the supplied artwork on the same canvas:
+
+| File | Layer |
+|---|---|
+| `fc-logo-ring.webp` | Brush ring |
+| `fc-logo-stroke.webp` | Ink stroke |
+| `fc-logo-crimson.webp` | Crimson mark |
+| `fc-logo-text-black.webp` | Black lettering |
+| `fc-logo-text-red.webp` | Red lettering |
+
+Stacked, the layers rebuild the original. Under the crimson mark, the ink stroke is
+filled with brush texture copied from the line beside it, so the line stays whole when the
+mark rolls away.
+
+Visitors who ask for reduced motion, or anyone with motion turned off, see the original
+`fc-logo-hero.webp` as one image.
+
+If you upload a different logo under **Hero › Logo**, that logo is shown with a simple fade
+instead of the layered animation.
+
+### Each Friday is its own event product
+
+Set up one event product per Friday:
+
+- **Title:** ORS TCG Trade Nights
+- **Theme template:** `product.event`
+- **Product type:** Vending table
+- **Price:** $60 (one default variant)
+- **Inventory:** Track quantity on, Continue selling when out of stock off, quantity = tables
+  for that night
+- **Shipping:** This is a physical product off
+- **Metafields:** `event.starts_at` = that Friday at 5:00 PM, `event.ends_at` = 9:30 PM,
+  `event.venue` = Orlando Racket Sports, `event.city` = Orange Blossom Trail
+
+The calendar sorts the Fridays by date and shows tables left or "Sold out" from each date's
+inventory. A Friday drops off once its end time passes.
+
+### Sample data in the preview
+
+All of this lives only in `full-circle-preview/fixtures.js`. None of it is in the theme
+files or the ZIP.
+
+- **Fridays:** Nov 27 and Dec 4, 11 and 18, 2026. The event name, time, venue and $60 price
+  come from the client brief.
+- **Table counts are invented for the demo:**
+
+  | Friday | Tables in the preview | State shown |
+  |---|---|---|
+  | Nov 27 | 3 left | low |
+  | Dec 4 | 9 left | available |
+  | Dec 11 | 0 | sold out |
+  | Dec 18 | 14 left | available |
+
+- **Past night:** Nov 20, 2026, with 2 leftover tables, exists only to show the ended state
+  on Book Vending Tables.
+- **Merchandise:** still the real public catalog.
+
+### Still needed from the client
+
+- **An approved trade-night photo** for the About strip, added under **About › Event photo**.
+  None was supplied, so the strip shows the brush mark for now.
+- **The real table count** for each Friday.

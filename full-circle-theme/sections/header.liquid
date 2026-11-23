@@ -3,6 +3,9 @@
   assign book_url = settings.vending_collection.url | default: '/collections/vending-tables'
   assign shop_label = settings.shop_label | default: 'Shop'
   assign book_label = settings.booking_label | default: 'Book vending tables'
+  assign book_short = settings.booking_label_short | default: book_label
+  assign about_label = settings.about_label | default: 'About'
+  assign about_url = settings.about_link | default: '/#about'
   assign current_path = request.path
   assign on_shop = false
   assign on_book = false
@@ -35,6 +38,7 @@
     <nav class="fc-nav" aria-label="Primary">
       <ul class="fc-nav__list" role="list">
         <li><a class="fc-nav__link{% if on_shop %} is-current{% endif %}" href="{{ shop_url }}"{% if on_shop %} aria-current="page"{% endif %}>{{ shop_label | escape }}</a></li>
+        <li><a class="fc-nav__link" href="{{ about_url }}">{{ about_label | escape }}</a></li>
         <li><a class="fc-nav__link fc-nav__link--book{% if on_book %} is-current{% endif %}" href="{{ book_url }}"{% if on_book %} aria-current="page"{% endif %}>{{ book_label | escape }}</a></li>
         {%- for link in section.settings.menu.links -%}
           <li class="fc-nav__extra"><a class="fc-nav__link{% if link.current %} is-current{% endif %}" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
@@ -75,6 +79,7 @@
           <nav aria-label="{{ 'general.menu' | t }}">
             <ul class="fc-drawer__list" role="list">
               <li><a class="fc-drawer__link" href="{{ shop_url }}">{{ shop_label | escape }}</a></li>
+              <li><a class="fc-drawer__link" href="{{ about_url }}">{{ about_label | escape }}</a></li>
               <li><a class="fc-drawer__link fc-drawer__link--book" href="{{ book_url }}">{{ book_label | escape }}</a></li>
               {%- for link in section.settings.menu.links -%}
                 <li><a class="fc-drawer__link" href="{{ link.url }}">{{ link.title | escape }}</a></li>
@@ -94,10 +99,11 @@
     </div>
   </div>
 
-  <nav class="fc-subbar" aria-label="Shop and booking">
+  <nav class="fc-subbar" aria-label="Shop, about and booking">
     <a class="fc-subbar__link{% if on_shop %} is-current{% endif %}" href="{{ shop_url }}">{{ shop_label | escape }}</a>
+    <a class="fc-subbar__link" href="{{ about_url }}">{{ about_label | escape }}</a>
     <a class="fc-subbar__link fc-subbar__link--book{% if on_book %} is-current{% endif %}" href="{{ book_url }}">
-      {{- book_label | escape -}}
+      {{- book_short | escape -}}
       {% render 'fc-icon', icon: 'arrow' %}
     </a>
   </nav>

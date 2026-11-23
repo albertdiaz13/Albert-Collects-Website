@@ -166,101 +166,52 @@ function eventMeta(o) {
   return { event: m };
 }
 
-// Sample show dates are relative to today so the preview never goes stale.
-// Times are fixed in UTC (15:00Z ≈ 10 AM Eastern); good enough for a fixture.
-function daysFromNow(days, hourUTC) {
-  const d = new Date();
-  d.setUTCHours(hourUTC, 0, 0, 0);
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().replace('.000Z', 'Z');
+/* ORS TCG Trade Nights — one event product per Friday, as the merchant would set it up.
+ * Event name, time (5:00–9:30 PM), venue and $60 table price come from the client brief.
+ * PREVIEW SAMPLE DATA: the table counts below (and the past Nov 20 night) are invented for the
+ * demo so the tables-left, sold-out and ended states are visible. The real counts come from
+ * Shopify inventory once the products exist. */
+const TRADE_NIGHT_BODY = '<p>Every Friday collectors meet at Orlando Racket Sports on Orange Blossom Trail to buy, sell and trade cards. Book a vending table to sell at this night.</p><p><em>Local preview: table counts are sample data.</em></p>';
+
+function tradeNight(id, date, tablesLeft) {
+  const raw = {
+    id,
+    handle: `ors-tcg-trade-nights-${date}`,
+    title: 'ORS TCG Trade Nights',
+    vendor: 'Full Circle Collaborations',
+    product_type: 'Vending table',
+    tags: ['vending-table', 'trade-night', 'preview-sample'],
+    body_html: TRADE_NIGHT_BODY,
+    images: [],
+    options: [{ name: 'Title', values: ['Default Title'] }],
+    variants: [{ id: id * 10 + 1, title: 'Default Title', option1: 'Default Title', price: '60.00', available: true, requires_shipping: false }],
+  };
+  // Eastern Standard Time in late November and December: UTC−5.
+  return buildProduct(raw, {
+    fixture: true,
+    template_suffix: 'event',
+    requires_shipping: false,
+    inventory: { [id * 10 + 1]: tablesLeft },
+    metafields: eventMeta({
+      starts_at: `${date}T17:00:00-05:00`,
+      ends_at: `${date}T21:30:00-05:00`,
+      venue: 'Orlando Racket Sports',
+      city: 'Orange Blossom Trail',
+    }),
+  });
 }
 
-const FIXTURE_NOTE = '<p><strong>Preview fixture.</strong> This sample show exists only in the local preview to demonstrate the booking page. It is not a real event.</p>';
-
-const showOpen = buildProduct(
-  eventRaw(800000001, 'sample-winter-card-show', 'Sample Show: Card & Collectibles Expo', [
-    { id: 810000011, title: 'Standard table', price: '60.00' },
-    { id: 810000012, title: 'Corner table', price: '85.00' },
-  ], FIXTURE_NOTE),
-  {
-    fixture: true,
-    template_suffix: 'event',
-    requires_shipping: false,
-    inventory: { 810000011: 4, 810000012: 0 },
-    metafields: eventMeta({
-      starts_at: daysFromNow(20, 15),
-      ends_at: daysFromNow(20, 21),
-      venue: 'Fixture Hall (sample venue)',
-      city: 'Sample City',
-      address: '100 Example Avenue',
-      table_size: 'Sample value: 6 ft × 30 in',
-      included: 'Sample value: one table and two chairs.',
-      load_in: 'Sample value: vendor load-in opens 8:30 AM.',
-      cancellation: 'Sample value: the merchant writes their real cancellation terms here.',
-    }),
-  }
-);
-
-const showVendor = buildProduct(
-  eventRaw(800000002, 'sample-spring-convention', 'Sample Show: Collectors Convention & Trade Night at the Riverside Exhibition Pavilion', [
-    { id: 810000021, title: 'Standard table', price: '55.00' },
-    { id: 810000022, title: 'Double table', price: '100.00' },
-  ], FIXTURE_NOTE),
-  {
-    fixture: true,
-    template_suffix: 'event',
-    requires_shipping: false,
-    inventory: { 810000021: 18, 810000022: 6 },
-    metafields: eventMeta({
-      starts_at: daysFromNow(62, 14),
-      ends_at: daysFromNow(62, 20),
-      venue: 'Fixture Pavilion (sample venue)',
-      city: 'Sample City',
-      vendor_fields: ['Business name', 'Instagram or website'],
-    }),
-  }
-);
-
-const showSoldOut = buildProduct(
-  eventRaw(800000003, 'sample-february-swap', 'Sample Show: Card Swap', [
-    { id: 810000031, title: 'Standard table', price: '50.00' },
-    { id: 810000032, title: 'Corner table', price: '70.00' },
-  ], FIXTURE_NOTE),
-  {
-    fixture: true,
-    template_suffix: 'event',
-    requires_shipping: false,
-    inventory: { 810000031: 0, 810000032: 0 },
-    metafields: eventMeta({
-      starts_at: daysFromNow(90, 16),
-      ends_at: daysFromNow(90, 22),
-      venue: 'Fixture Center (sample venue)',
-      city: 'Sample City',
-    }),
-  }
-);
-
-const showPast = buildProduct(
-  eventRaw(800000004, 'sample-october-show', 'Sample Show: Last Season’s Card Show', [
-    { id: 810000041, title: 'Standard table', price: '50.00' },
-  ], FIXTURE_NOTE),
-  {
-    fixture: true,
-    template_suffix: 'event',
-    requires_shipping: false,
-    inventory: { 810000041: 3 },
-    metafields: eventMeta({
-      starts_at: daysFromNow(-36, 14),
-      ends_at: daysFromNow(-36, 20),
-      venue: 'Fixture Hall (sample venue)',
-      city: 'Sample City',
-    }),
-  }
-);
+const fridays = [
+  tradeNight(800001120, '2026-11-20', 2),  // past night with leftover tables: shows the ended state
+  tradeNight(800001127, '2026-11-27', 3),  // low: highlighted "3 tables left"
+  tradeNight(800001204, '2026-12-04', 9),
+  tradeNight(800001211, '2026-12-11', 0),  // sold out
+  tradeNight(800001218, '2026-12-18', 14),
+];
 
 const EVENT_SETS = {
-  full: [showVendor, showOpen, showSoldOut, showPast], // intentionally unsorted
-  one: [showOpen],
+  full: [fridays[3], fridays[0], fridays[1], fridays[4], fridays[2]], // deliberately unsorted
+  one: [fridays[1]],
   none: [],
 };
 

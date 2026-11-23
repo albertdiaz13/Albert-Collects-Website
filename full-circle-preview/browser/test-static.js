@@ -43,8 +43,8 @@ const server = http.createServer((req, res) => {
   ok('homepage renders from theme files in the browser');
 
   await page.mouse.wheel(0, 900); await page.waitForTimeout(1200);
-  assert.ok(await page.locator('.fc-night__title').isVisible());
-  ok('scrolls to the Friday trade night');
+  assert.ok(await page.locator('.fc-bill__title').first().isVisible());
+  ok('scrolls to the Upcoming shows calendar');
 
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.locator('[data-fc-menu] summary').click();
@@ -91,17 +91,17 @@ const server = http.createServer((req, res) => {
   // booking
   await page.locator('.fc-subbar__link--book').click();
   await page.locator('.fc-vending__title').waitFor();
-  await page.locator('.fc-bill__link').first().click();
+  await page.locator('.fc-bill__link').first().getByText('Book now').click();
   await page.locator('.fc-event__title').waitFor();
   await page.waitForTimeout(400);
-  await page.locator('[data-fc-sticky-go]').click();
+  await page.locator('.fc-booking__submit').click();
   await page.locator('[data-fc-toast]:not([hidden])').waitFor();
-  ok('book a table from the sticky bar');
+  ok('Book now on the first Friday adds a table');
 
   await page.locator('[data-fc-toast]').getByRole('button', { name: 'Check out' }).click();
   await page.locator('[data-checkout-stub]').waitFor();
   const stub = await page.locator('table').textContent();
-  assert.ok(stub.includes('Plain / Regular / Circle') && stub.includes('Standard table'));
+  assert.ok(stub.includes('Plain / Regular / Circle') && stub.includes('ORS TCG Trade Nights'));
   await page.screenshot({ path: `${OUT}/s-checkout.png`, fullPage: true });
   ok('simulated checkout shows stickers + table');
   await page.getByRole('link', { name: 'Back to the store' }).click();

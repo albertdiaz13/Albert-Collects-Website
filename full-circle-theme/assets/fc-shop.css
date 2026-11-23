@@ -14,9 +14,12 @@
 
 .fc-shop__head {
   display: grid;
-  gap: 1rem 2rem;
-  margin-bottom: clamp(1.75rem, 4vw, 3rem);
+  gap: 1.25rem 2rem;
+  margin-bottom: clamp(2.25rem, 5vw, 3.75rem);
 }
+/* Breathing room between the kicker and the large heading */
+.fc-shop__headline { display: grid; gap: clamp(0.75rem, 1.6vw, 1.1rem); }
+.fc-shop__headline .fc-kicker { line-height: 1.4; }
 .fc-shop__title { font-size: clamp(4.25rem, 14vw, 9rem); line-height: 0.8; }
 .fc-shop__text { max-width: 42ch; color: var(--fc-ink-soft); }
 

@@ -57,23 +57,32 @@
         "show_empty": false
       }
     },
-    "night": {
-      "type": "fc-event-night",
+    "shows": {
+      "type": "fc-shows",
       "settings": {
-        "kicker": "Weekly trade night",
-        "title": "ORS TCG Trade Nights",
-        "schedule": "Every Friday · 5:00 PM–9:30 PM",
-        "venue": "Orlando Racket Sports · Orange Blossom Trail",
-        "badge_top": "Every",
-        "badge_day": "Fri",
-        "link_label": "",
-        "link": ""
+        "collection": "",
+        "kicker": "Vending tables",
+        "heading": "Upcoming shows",
+        "text": "",
+        "limit": 6,
+        "scheme": "ink"
+      }
+    },
+    "about": {
+      "type": "fc-about",
+      "settings": {
+        "anchor": "about",
+        "heading": "About Full Circle",
+        "text": "<p>Custom stickers, hats and supplies for the trading-card hobby.</p>",
+        "night": "Every Friday, 5:00–9:30 PM, ORS TCG Trade Nights bring collectors to Orlando Racket Sports on Orange Blossom Trail to buy, sell and trade.",
+        "photo_caption": ""
       }
     }
   },
   "order": [
     "hero",
-    "night",
+    "shows",
+    "about",
     "shop"
   ]
 }

@@ -4,29 +4,30 @@
   assign book_url = section.settings.secondary_url | default: settings.vending_collection.url | default: '/collections/vending-tables'
 -%}
 {%- comment -%}
-  The orbit SVG shares the lockup's coordinate space (1671 × 1700). The brush circle in the
-  logo is centred at 845, 777, so every ring below is drawn around that point.
+  The logo is built from five layers cut from the original artwork on one shared canvas
+  (1671 × 1700), so stacked at rest they are the original logo. Without the motion script,
+  or with reduced motion, the single original image is shown instead.
 {%- endcomment -%}
+{%- assign layered = false -%}
+{%- if section.settings.logo == blank -%}{%- assign layered = true -%}{%- endif -%}
 <section class="fc-hero" data-fc-hero data-section-id="{{ section.id }}" aria-labelledby="HeroTitle-{{ section.id }}">
   <div class="fc-hero__inner">
-    <div class="fc-hero__stage" data-fc-hero-stage>
-      <button class="fc-hero__mark" type="button" data-fc-logo aria-describedby="HeroLogoHint-{{ section.id }}">
-        <svg class="fc-hero__orbit" viewBox="0 0 1671 1700" aria-hidden="true" focusable="false" data-fc-orbit>
-          <circle class="fc-hero__track" cx="845" cy="777" r="1000" pathLength="100" data-fc-track />
-          <g class="fc-hero__spin">
-            <circle class="fc-hero__arc" cx="845" cy="777" r="1000" pathLength="100" />
-          </g>
-          <circle class="fc-hero__pulse" cx="845" cy="777" r="1000" pathLength="100" data-fc-pulse />
-        </svg>
+    <div class="fc-hero__stage">
+      <button class="fc-hero__mark" type="button" data-fc-logo{% if layered %} data-fc-layered{% endif %} aria-describedby="HeroLogoHint-{{ section.id }}">
         {%- if section.settings.logo != blank -%}
           {%- assign logo_alt = section.settings.logo.alt | default: shop.name -%}
-          {{ section.settings.logo | image_url: width: 1100 | image_tag: class: 'fc-hero__logo', alt: logo_alt, loading: 'eager', fetchpriority: 'high', widths: '400, 600, 800, 1100', sizes: '(min-width: 990px) 520px, 78vw', data-fc-logo-img: '' }}
+          {{ section.settings.logo | image_url: width: 1100 | image_tag: class: 'fc-hero__logo', alt: logo_alt, loading: 'eager', fetchpriority: 'high', widths: '400, 600, 800, 1100', sizes: '(min-width: 990px) 480px, 70vw' }}
         {%- else -%}
-          <img class="fc-hero__logo" src="{{ 'fc-logo-hero.webp' | asset_url }}" alt="{{ shop.name | escape }}" width="1100" height="1119" loading="eager" fetchpriority="high" data-fc-logo-img>
+          <img class="fc-hero__logo" src="{{ 'fc-logo-hero.webp' | asset_url }}" alt="{{ shop.name | escape }}" width="1100" height="1119" loading="eager" fetchpriority="high">
+          <span class="fc-hero__layers" aria-hidden="true">
+            {%- assign logo_parts = 'ring,stroke,text-black,text-red,crimson' | split: ',' -%}
+            {%- for part in logo_parts -%}
+              <span class="fc-layer fc-layer--{{ part }}" data-layer="{{ part }}"><img src="{{ 'fc-logo-' | append: part | append: '.webp' | asset_url }}" alt="" width="1100" height="1119" loading="eager" decoding="async"></span>
+            {%- endfor -%}
+          </span>
         {%- endif -%}
-        <span class="fc-hero__ripples" aria-hidden="true" data-fc-ripples></span>
       </button>
-      <span class="fc-visually-hidden" id="HeroLogoHint-{{ section.id }}">Press to send a pulse around the logo.</span>
+      <span class="fc-visually-hidden" id="HeroLogoHint-{{ section.id }}">Press to roll the crimson mark along the ink stroke.</span>
     </div>
 
     <div class="fc-hero__copy">

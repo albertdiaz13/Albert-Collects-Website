@@ -131,6 +131,25 @@
         "default": "Book vending tables"
       },
       {
+        "type": "text",
+        "id": "booking_label_short",
+        "label": "Booking link label on phones",
+        "default": "Book tables"
+      },
+      {
+        "type": "text",
+        "id": "about_label",
+        "label": "About link label",
+        "default": "About"
+      },
+      {
+        "type": "text",
+        "id": "about_link",
+        "label": "About link",
+        "info": "Defaults to the About section on the homepage.",
+        "default": "/#about"
+      },
+      {
         "type": "url",
         "id": "booking_contact_url",
         "label": "Show inquiries link",

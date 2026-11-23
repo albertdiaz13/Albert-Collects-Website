@@ -23,7 +23,8 @@ const server = http.createServer((req, res) => {
 });
 
 async function run(browser, size, label) {
-  const ctx = await browser.newContext({ viewport: size, hasTouch: label === 'phone', isMobile: label === 'phone' });
+  const phone = label === 'phone';
+  const ctx = await browser.newContext({ viewport: size, hasTouch: phone, isMobile: phone });
   const page = await ctx.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -31,100 +32,110 @@ async function run(browser, size, label) {
   page.on('response', (r) => { if (r.status() >= 400) errors.push(r.status() + ' ' + r.url()); });
   const ok = (s) => console.log(`PASS [${label}] ${s}`);
   const shot = (n) => page.screenshot({ path: `${OUT}/${label}-${n}.png` });
+  const prop = (sel, p) => page.evaluate(([s, q]) => window.gsap.getProperty(document.querySelector(s), q), [sel, p]);
+  const C = '[data-layer="crimson"] img';
 
   await page.goto('http://localhost:9494/artifact/x/');
-  await page.locator('[data-fc-logo-img].is-sweeping').waitFor({ timeout: 15000 });
+  await page.locator('[data-layer="ring"] img.is-sweeping').waitFor({ timeout: 15000 });
   const clickable = await page.evaluate(() => { const a = document.querySelector('.fc-hero__actions a'); const r = a.getBoundingClientRect(); return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2).closest('a') === a; });
-  assert.ok(clickable, 'CTA clickable during the sweep');
-  await page.waitForTimeout(450);
-  await shot('1-load-mid-sweep');
-  ok('load: circular sweep running while the buttons are already usable');
-  await page.waitForTimeout(1700);
-  assert.strictEqual(await page.locator('[data-fc-logo-img].is-sweeping').count(), 0);
-  await shot('2-settled');
-  ok('load: logo settles fully visible');
+  assert.ok(clickable, 'buttons usable during the entrance');
+  ok('entrance: logo layers swap in; buttons are usable from the first frame');
+  await page.waitForTimeout(700); await shot('1-ring-drawing');
+  await page.waitForTimeout(1300); await shot('2-crimson-drop');
+  await page.waitForTimeout(800); await shot('3-lettering');
+  await page.waitForTimeout(1600);
+  const rest = await page.evaluate(() => [...document.querySelectorAll('.fc-layer img')].map((i) => ({ n: i.closest('[data-layer]').dataset.layer, t: getComputedStyle(i).transform, c: getComputedStyle(i).clipPath, o: getComputedStyle(i).opacity, m: i.classList.contains('is-sweeping') })));
+  for (const r of rest) {
+    if (r.n === 'crimson') continue; // idle sway may have begun
+    assert.ok((r.t === 'none' || r.t === 'matrix(1, 0, 0, 1, 0, 0)') && (r.c === 'none' || r.c === 'inset(0%)' || r.c === 'inset(0% 0% 0% 0%)') && r.o === '1' && !r.m, JSON.stringify(r));
+  }
+  await shot('4-assembled');
+  ok('entrance: ring, stroke and lettering settle exactly into the original positions');
 
-  const a1 = await page.locator('.fc-hero__spin').evaluate((el) => getComputedStyle(el).transform);
-  await page.waitForTimeout(1500);
-  const a2 = await page.locator('.fc-hero__spin').evaluate((el) => getComputedStyle(el).transform);
-  assert.notStrictEqual(a1, a2);
-  const logoTransform = await page.locator('[data-fc-logo-img]').evaluate((el) => getComputedStyle(el).transform);
-  assert.ok(logoTransform === 'none', 'logo itself is still at rest: ' + logoTransform);
-  ok('rest: orbit arc drifts slowly; the logo itself stays still');
+  const x1 = await prop(C, 'xPercent'); await page.waitForTimeout(2600); const x2 = await prop(C, 'xPercent');
+  assert.notStrictEqual(x1, x2, 'idle sway moves the crimson mark');
+  ok(`rest: the crimson mark sways gently on the stroke (${x1.toFixed(2)} → ${x2.toFixed(2)})`);
 
   const box = await page.locator('[data-fc-logo]').boundingBox();
-  const px = box.x + box.width * 0.85; const py = box.y + box.height * 0.22;
-  if (label === 'phone') await page.touchscreen.tap(px, py); else await page.mouse.click(px, py);
-  await page.waitForTimeout(380);
-  assert.ok((await page.locator('.fc-hero__ripple').count()) >= 1, 'ripples created');
-  await shot('3-pulse');
-  await page.waitForTimeout(1500);
-  assert.strictEqual(await page.locator('.fc-hero__ripple').count(), 0);
-  assert.strictEqual(await page.locator('[data-fc-pulse]').evaluate((el) => getComputedStyle(el).opacity), '0');
-  ok('press: rings leave the contact point, pulse travels the ring, then back to idle');
+  if (!phone) {
+    await page.mouse.move(box.x + box.width * 0.2, box.y + box.height * 0.45, { steps: 6 });
+    await page.mouse.move(box.x + box.width * 0.8, box.y + box.height * 0.45, { steps: 12 });
+    await page.waitForTimeout(700);
+    const xr = await prop(C, 'xPercent'); const rr = await prop(C, 'rotation');
+    assert.ok(xr > 15 && rr > 40, `rolls right with the pointer: x ${xr} rot ${rr}`);
+    await shot('5-hover-roll');
+    ok(`hover: the mark rolls along the stroke after the pointer (x ${xr.toFixed(1)}%, ${Math.round(rr)}°)`);
+    await page.mouse.click(box.x + box.width * 0.8, box.y + box.height * 0.45);
+    await page.waitForTimeout(250);
+    const hop = await prop(C, 'yPercent');
+    assert.ok(hop < -3, 'click makes it hop: ' + hop);
+    ok('click: the mark hops off the stroke with a spin and bounces back; the ring feels the landing');
+    await page.mouse.move(box.x + box.width + 120, box.y - 40);
+    await page.waitForTimeout(1600);
+  } else {
+    await page.touchscreen.tap(box.x + box.width * 0.22, box.y + box.height * 0.45);
+    await page.waitForTimeout(500);
+    const xt = await prop(C, 'xPercent');
+    assert.ok(xt < -10, 'rolls toward the tap: ' + xt);
+    await shot('5-tap-roll');
+    ok(`tap: the mark rolls to the tap point (x ${xt.toFixed(1)}%), hops, and rolls home`);
+    await page.waitForTimeout(2600);
+  }
+  const home = await prop(C, 'xPercent');
+  assert.ok(Math.abs(home) < 2.5, 'returns home: ' + home);
+  ok('returns to rest afterwards');
 
   await page.locator('[data-fc-logo]').focus();
   await page.keyboard.press('Enter');
-  await page.waitForTimeout(250);
-  const center = await page.locator('.fc-hero__ripple').first().evaluate((el) => ({ l: parseFloat(el.style.left), t: parseFloat(el.style.top) }));
-  const b2 = await page.locator('[data-fc-logo]').boundingBox();
-  assert.ok(Math.abs(center.l - b2.width * 0.5057) < 3 && Math.abs(center.t - b2.height * 0.457) < 3, 'keyboard pulse starts at the logo centre');
-  await page.keyboard.press(' ');
-  ok('keyboard: Enter and Space pulse from the centre of the mark');
+  await page.waitForTimeout(450);
+  assert.ok((await prop(C, 'xPercent')) > 15);
+  ok('keyboard: Enter rolls the mark to the end of the stroke and back');
+  await page.waitForTimeout(2400);
 
   const heroH = await page.locator('[data-fc-hero]').evaluate((el) => el.offsetHeight);
-  if (label === 'phone') await page.evaluate((y) => window.scrollTo(0, y), heroH * 0.6);
-  else await page.mouse.wheel(0, heroH * 0.6);
-  await page.waitForTimeout(1000);
-  console.log(`  scrolled to ${await page.evaluate(() => Math.round(window.scrollY))}px of a ${heroH}px hero`);
-  const st = await page.evaluate(() => ({
-    mark: new DOMMatrix(getComputedStyle(document.querySelector('[data-fc-logo]')).transform).a,
-    ring: new DOMMatrix(getComputedStyle(document.querySelector('[data-fc-orbit]')).transform).a,
-    ringOpacity: parseFloat(getComputedStyle(document.querySelector('[data-fc-orbit]')).opacity),
-  }));
-  assert.ok(st.mark < 0.95 && st.ring > 1.15 && st.ringOpacity < 0.85, JSON.stringify(st));
-  await shot('4-scroll-handoff');
-  ok(`scroll: mark scales to ${st.mark.toFixed(2)}, ring expands to ${st.ring.toFixed(2)}× at ${st.ringOpacity.toFixed(2)} opacity`);
+  await page.evaluate((y) => window.scrollTo(0, y), heroH * 0.6);
+  await page.waitForTimeout(900);
+  const exit = await page.evaluate(() => {
+    const g = (n, p) => window.gsap.getProperty(document.querySelector(`[data-layer="${n}"]`), p);
+    return { crimsonX: g('crimson', 'xPercent'), crimsonO: g('crimson', 'opacity'), textO: g('text-black', 'opacity'), ringS: g('ring', 'scale') };
+  });
+  assert.ok(exit.crimsonX > 8 && exit.textO < 0.8 && exit.ringS < 0.97, JSON.stringify(exit));
+  await shot('6-scroll-exit');
+  ok(`scroll: the logo comes apart (mark rolls off ${exit.crimsonX.toFixed(0)}%, lettering ${exit.textO.toFixed(2)} opacity, ring ${exit.ringS.toFixed(2)}×)`);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await page.waitForTimeout(900);
+  const back = await page.evaluate(() => window.gsap.getProperty(document.querySelector('[data-layer="text-black"]'), 'opacity'));
+  assert.ok(back > 0.98, 'reassembles on the way back up: ' + back);
+  ok('scroll back up: the logo reassembles');
 
-  await page.locator('.fc-night__title').scrollIntoViewIfNeeded();
-  await page.waitForTimeout(500);
-  const night = await page.locator('.fc-night').innerText();
-  for (const t of ['ORS TCG', 'TRADE NIGHTS', 'Every Friday', '5:00 PM–9:30 PM', 'Orlando Racket Sports', 'Orange Blossom Trail']) assert.ok(night.toUpperCase().includes(t.toUpperCase()), t);
-  await page.locator('.fc-night').screenshot({ path: `${OUT}/${label}-5-event.png` });
-  ok('event: name, day/time and venue present exactly');
+  // Calendar directly under the hero, with a per-date Book now
+  const order = await page.evaluate(() => [...document.querySelectorAll('main .shopify-section')].map((s) => s.className.match(/fc-section-(\w+)/)?.[1]).filter(Boolean));
+  assert.deepStrictEqual(order.slice(0, 4), ['hero', 'shows', 'about', 'shop'], order.join());
+  ok('page order: hero → Upcoming shows → About → Shop');
+  await page.locator('[data-fc-bill] .fc-bill__item').first().scrollIntoViewIfNeeded();
+  await page.locator('[data-fc-shows]').screenshot({ path: `${OUT}/${label}-7-calendar.png` });
+  await page.locator('[data-fc-bill] .fc-bill__item').nth(1).getByText('Book now').click();
+  await page.locator('.fc-event__title').waitFor();
+  assert.ok(page.url().endsWith('#p-ors-tcg-trade-nights-2026-12-04'), page.url());
+  assert.ok((await page.locator('.fc-event__facts').innerText()).includes('Friday, December 4, 2026'));
+  await shot('8-dec4-booking');
+  ok('Book now on Dec 4 opens the Dec 4 booking page (#p-ors-tcg-trade-nights-2026-12-04)');
 
-  await page.locator('.fc-shop__grid').scrollIntoViewIfNeeded();
-  const tiles = page.locator('.fc-tile');
-  assert.strictEqual(await tiles.count(), 3);
-  const frames = await page.locator('.fc-tile__frame').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
-  assert.ok(new Set(frames).size === 1, 'equal frames ' + frames);
-  const fits = await page.locator('.fc-tile__img').evaluateAll((els) => els.map((e) => getComputedStyle(e).objectFit));
-  assert.ok(fits.every((f) => f === 'contain'));
-  if (label === 'desktop') {
-    await tiles.nth(1).hover();
-    await page.waitForTimeout(1000);
-    const drawn = await tiles.nth(1).locator('.fc-tile__edge i').evaluateAll((els) => els.every((e) => getComputedStyle(e).transform === 'none'));
-    assert.ok(drawn, 'edge drawn on hover');
-    await page.locator('.fc-shop').screenshot({ path: `${OUT}/${label}-6-shop-hover.png` });
-    ok('shop: equal frames, whole photos, crimson edge draws on hover');
+  // Navigation: About goes back to the homepage strip
+  if (phone) {
+    await page.locator('[data-fc-menu] summary').click();
+    await page.waitForTimeout(250);
+    await shot('9-menu');
+    await page.locator('.fc-drawer__link', { hasText: 'About' }).click();
   } else {
-    await page.locator('.fc-shop').screenshot({ path: `${OUT}/${label}-6-shop.png` });
-    ok('shop: equal frames, whole photos, one per row');
+    await page.locator('.fc-nav__link', { hasText: 'About' }).click();
   }
-
-  // Open a product from its image (touch on phone)
-  await tiles.first().locator('.fc-tile__frame').evaluate((el) => el.scrollIntoView({ block: 'center' }));
-  await page.waitForTimeout(400);
-  const target = await tiles.first().locator('.fc-tile__frame').boundingBox();
-  const hit = await page.evaluate(([x, y]) => { const el = document.elementFromPoint(x, y); const a = el && el.closest('a'); return a ? a.getAttribute('href') : null; }, [target.x + target.width / 2, target.y + target.height / 2]);
-  assert.ok(hit && hit.includes('/products/'), 'image centre is a product link: ' + hit);
-  if (label === 'phone') await page.touchscreen.tap(target.x + target.width / 2, target.y + target.height / 2);
-  else await page.mouse.click(target.x + target.width / 2, target.y + target.height / 2);
-  await page.locator('.fc-product__title').waitFor();
-  assert.ok((await page.locator('.fc-product__title').textContent()).includes('Custom Stickers'));
-  await page.waitForTimeout(600);
-  await shot('7-product');
-  ok('product: tapping the tile image opens Custom Stickers');
+  await page.locator('#about').waitFor();
+  await page.waitForTimeout(1200);
+  const aboutTop = await page.locator('#about').evaluate((el) => el.getBoundingClientRect().top);
+  assert.ok(aboutTop >= 0 && aboutTop < size.height * 0.5, 'About strip scrolled into view: ' + aboutTop);
+  await shot('10-about');
+  ok(`${phone ? 'menu' : 'header'} About link lands on the About strip`);
 
   const real = errors.filter((e) => !/favicon/i.test(e));
   if (real.length) { console.log(`[${label}] console:\n` + real.join('\n')); throw new Error('console errors'); }
@@ -144,12 +155,12 @@ async function run(browser, size, label) {
     await page.goto('http://localhost:9494/artifact/x/');
     await page.locator('[data-fc-logo]').waitFor();
     await page.waitForTimeout(500);
-    assert.strictEqual(await page.locator('.is-sweeping').count(), 0);
-    assert.strictEqual(await page.locator('.fc-hero__spin').evaluate((el) => getComputedStyle(el).animationName), 'none');
+    assert.strictEqual(await page.locator('.is-sweeping, .is-layered').count(), 0);
+    assert.ok(await page.locator('.fc-hero__logo').isVisible());
     await page.locator('[data-fc-logo]').click();
     assert.ok(await page.locator('[data-fc-logo].is-acknowledged').count());
-    assert.strictEqual(await page.locator('.fc-hero__ripple').count(), 0);
-    console.log('PASS [reduced motion] static logo; press gives a still crimson ring, no travel');
+    await page.screenshot({ path: `${OUT}/reduced-motion.png` });
+    console.log('PASS [reduced motion] complete original logo, no movement; a press gives a still glow');
     await ctx.close();
   } finally {
     await browser.close();

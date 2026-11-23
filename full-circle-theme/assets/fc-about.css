@@ -1,0 +1,29 @@
+/* Compact About strip: paper, one line of brand, one line about Friday trade nights. */
+.fc-about { border-bottom: var(--fc-rule); scroll-margin-top: calc(var(--fc-header-h) + 52px); outline: none; }
+.fc-about__inner {
+  max-width: var(--fc-max);
+  margin: 0 auto;
+  padding: clamp(2rem, 5vw, 3.25rem) var(--fc-gutter);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2.5rem);
+  align-items: center;
+}
+.fc-about__mark { width: clamp(64px, 14vw, 120px); }
+.fc-about__mark img { width: 100%; height: auto; }
+.fc-about__copy { display: grid; gap: 0.5rem; max-width: 68ch; min-width: 0; }
+.fc-about__title {
+  font-family: var(--fc-font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+  line-height: 0.9;
+}
+.fc-about__text { font-size: 1.05rem; }
+.fc-about__night { color: var(--fc-ink-soft); }
+.fc-about__photo { margin: 0; width: min(320px, 100%); }
+.fc-about__img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border: 2px solid var(--fc-ink); }
+.fc-about__photo figcaption { font-size: 0.8rem; color: var(--fc-ink-soft); margin-top: 0.4rem; }
+@media (max-width: 749px) {
+  .fc-about__inner.has-photo { grid-template-columns: minmax(0, 1fr); }
+}
