@@ -2,40 +2,35 @@
 {%- liquid
   assign shop_url = section.settings.primary_url | default: settings.merch_collection.url | default: routes.all_products_collection_url
   assign book_url = section.settings.secondary_url | default: settings.vending_collection.url | default: '/collections/vending-tables'
-  assign use_bundled = false
-  if section.settings.image == blank and section.settings.use_bundled_art
-    assign use_bundled = true
-  endif
-  assign breakout = section.settings.breakout_image
-  assign show_breakout = false
-  if breakout != blank or use_bundled
-    assign show_breakout = true
-  endif
-  assign frame_style = ''
-  if use_bundled
-    assign bx = 71.7
-    assign by = 66
-    assign bd = 41.8
-    assign frame_style = '--z: 1.1; --sx: 5; --sy: 2; --pop: 1.07;'
-  else
-    assign bx = section.settings.breakout_x
-    assign by = section.settings.breakout_y
-    assign bd = section.settings.breakout_size
-  endif
 -%}
+{%- comment -%}
+  The orbit SVG shares the lockup's coordinate space (1671 × 1700). The brush circle in the
+  logo is centred at 845, 777, so every ring below is drawn around that point.
+{%- endcomment -%}
 <section class="fc-hero" data-fc-hero data-section-id="{{ section.id }}" aria-labelledby="HeroTitle-{{ section.id }}">
-  <div class="fc-hero__grid">
+  <div class="fc-hero__inner">
+    <div class="fc-hero__stage" data-fc-hero-stage>
+      <button class="fc-hero__mark" type="button" data-fc-logo aria-describedby="HeroLogoHint-{{ section.id }}">
+        <svg class="fc-hero__orbit" viewBox="0 0 1671 1700" aria-hidden="true" focusable="false" data-fc-orbit>
+          <circle class="fc-hero__track" cx="845" cy="777" r="1000" pathLength="100" data-fc-track />
+          <g class="fc-hero__spin">
+            <circle class="fc-hero__arc" cx="845" cy="777" r="1000" pathLength="100" />
+          </g>
+          <circle class="fc-hero__pulse" cx="845" cy="777" r="1000" pathLength="100" data-fc-pulse />
+        </svg>
+        {%- if section.settings.logo != blank -%}
+          {%- assign logo_alt = section.settings.logo.alt | default: shop.name -%}
+          {{ section.settings.logo | image_url: width: 1100 | image_tag: class: 'fc-hero__logo', alt: logo_alt, loading: 'eager', fetchpriority: 'high', widths: '400, 600, 800, 1100', sizes: '(min-width: 990px) 520px, 78vw', data-fc-logo-img: '' }}
+        {%- else -%}
+          <img class="fc-hero__logo" src="{{ 'fc-logo-hero.webp' | asset_url }}" alt="{{ shop.name | escape }}" width="1100" height="1119" loading="eager" fetchpriority="high" data-fc-logo-img>
+        {%- endif -%}
+        <span class="fc-hero__ripples" aria-hidden="true" data-fc-ripples></span>
+      </button>
+      <span class="fc-visually-hidden" id="HeroLogoHint-{{ section.id }}">Press to send a pulse around the logo.</span>
+    </div>
+
     <div class="fc-hero__copy">
-      {%- if section.settings.kicker != blank -%}
-        <p class="fc-kicker fc-hero__kicker">{{ section.settings.kicker | escape }}</p>
-      {%- endif -%}
-      <h1 class="fc-hero__title" id="HeroTitle-{{ section.id }}">{{ section.settings.headline | escape | newline_to_br }}</h1>
-      {%- if section.settings.show_stroke -%}
-        <div class="fc-hero__stroke" aria-hidden="true" data-fc-hero-stroke>
-          <img class="fc-hero__stroke-img" src="{{ 'fc-brush-stroke.webp' | asset_url }}" alt="" width="1323" height="199" loading="eager">
-          <img class="fc-hero__dot" src="{{ 'fc-crimson-ring.webp' | asset_url }}" alt="" width="90" height="88" loading="eager" data-fc-hero-dot>
-        </div>
-      {%- endif -%}
+      <h1 class="fc-hero__title" id="HeroTitle-{{ section.id }}">{{ section.settings.headline | escape }}</h1>
       {%- if section.settings.subheading != blank -%}
         <div class="fc-hero__sub">{{ section.settings.subheading }}</div>
       {%- endif -%}
@@ -54,37 +49,6 @@
         {%- endif -%}
       </div>
     </div>
-
-    <div class="fc-hero__art">
-      <div class="fc-hero__frame" style="--bx: {{ bx }}; --by: {{ by }}; --bd: {{ bd }}; {{ frame_style }}" data-fc-hero-frame>
-        <div class="fc-hero__reveal" data-fc-hero-reveal>
-          <div class="fc-hero__photo">
-            {%- if section.settings.image != blank -%}
-              {% render 'fc-image', image: section.settings.image, widths: '400, 600, 800, 1000, 1200, 1500', sizes: '(min-width: 990px) 52vw, 92vw', class: 'fc-hero__img', loading: 'eager', priority: true %}
-            {%- elsif use_bundled -%}
-              <img class="fc-hero__img" src="{{ 'fc-hero-stickers.webp' | asset_url }}" alt="{{ section.settings.image_alt | escape }}" width="1400" height="1400" loading="eager" fetchpriority="high">
-            {%- else -%}
-              <span class="fc-hero__empty">
-                <img src="{{ 'fc-mark.webp' | asset_url }}" alt="" width="256" height="236">
-              </span>
-            {%- endif -%}
-          </div>
-          <img class="fc-hero__ring" src="{{ 'fc-brush-ring.webp' | asset_url }}" alt="" width="1300" height="1200" loading="eager">
-        </div>
-        {%- if show_breakout -%}
-          <div class="fc-hero__breakout" data-fc-hero-breakout>
-            {%- if breakout != blank -%}
-              {{ breakout | image_url: width: 900 | image_tag: class: 'fc-hero__breakout-img', alt: '', loading: 'eager', widths: '300, 450, 600, 900', sizes: '(min-width: 990px) 22vw, 40vw' }}
-            {%- else -%}
-              <img class="fc-hero__breakout-img" src="{{ 'fc-hero-sticker.webp' | asset_url }}" alt="" width="900" height="900" loading="eager">
-            {%- endif -%}
-            {%- if section.settings.idle_effect == 'foil' -%}
-              <span class="fc-hero__foil" aria-hidden="true"></span>
-            {%- endif -%}
-          </div>
-        {%- endif -%}
-      </div>
-    </div>
   </div>
 </section>
 
@@ -95,23 +59,21 @@
   "class": "fc-section-hero",
   "settings": [
     {
-      "type": "text",
-      "id": "kicker",
-      "label": "Kicker",
-      "default": "Full Circle Collaborations"
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo",
+      "info": "Defaults to the transparent Full Circle lockup bundled with the theme. Use a transparent PNG or WebP of the full circular logo so the rings line up."
     },
     {
-      "type": "textarea",
+      "type": "text",
       "id": "headline",
       "label": "Headline",
-      "info": "Line breaks are kept. Keep it short — it is set very large.",
-      "default": "Gear for the hobby.\nTables at the show."
+      "default": "Gear for the hobby. Tables at the show."
     },
     {
       "type": "richtext",
       "id": "subheading",
-      "label": "Supporting text",
-      "default": "<p>Custom stickers for your card business, hats and collector supplies — plus vending tables at the shows we host.</p>"
+      "label": "Supporting text"
     },
     {
       "type": "header",
@@ -140,86 +102,8 @@
       "id": "secondary_url",
       "label": "Booking button link",
       "info": "Defaults to the vending tables collection in Theme settings."
-    },
-    {
-      "type": "header",
-      "content": "Artwork"
-    },
-    {
-      "type": "image_picker",
-      "id": "image",
-      "label": "Circle image",
-      "info": "A real product detail or show photo. Shown inside the brush circle. Set the focal point in the image editor."
-    },
-    {
-      "type": "text",
-      "id": "image_alt",
-      "label": "Bundled image description",
-      "default": "A fanned stack of round holographic Full Circle Collaborations stickers"
-    },
-    {
-      "type": "checkbox",
-      "id": "use_bundled_art",
-      "label": "Use bundled sticker photo when no image is chosen",
-      "default": true
-    },
-    {
-      "type": "image_picker",
-      "id": "breakout_image",
-      "label": "Breakout cutout",
-      "info": "Optional transparent PNG of one item from the circle image. It is placed over the photo and allowed to cross the brush edge."
-    },
-    {
-      "type": "range",
-      "id": "breakout_x",
-      "label": "Breakout center, horizontal",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "default": 72
-    },
-    {
-      "type": "range",
-      "id": "breakout_y",
-      "label": "Breakout center, vertical",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "default": 66
-    },
-    {
-      "type": "range",
-      "id": "breakout_size",
-      "label": "Breakout size",
-      "min": 10,
-      "max": 70,
-      "step": 1,
-      "unit": "%",
-      "default": 42
-    },
-    {
-      "type": "select",
-      "id": "idle_effect",
-      "label": "Idle effect",
-      "options": [
-        { "value": "foil", "label": "Light moving across foil" },
-        { "value": "none", "label": "None" }
-      ],
-      "default": "foil"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_stroke",
-      "label": "Show ink stroke and crimson ring",
-      "default": true
     }
   ],
-  "presets": [
-    {
-      "name": "Hero"
-    }
-  ]
+  "presets": [{ "name": "Hero" }]
 }
 {% endschema %}

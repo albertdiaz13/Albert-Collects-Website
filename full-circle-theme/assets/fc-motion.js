@@ -1,6 +1,6 @@
 /* Full Circle — motion signature (GSAP + ScrollTrigger).
- * Three moments: the hero arrival along the brush arc, the event bill drawing its rule,
- * and a quiet foil sheen on the hero sticker. Content is fully visible without this file;
+ * Hero: the logo sweeps in around its brush circle, and its orbit expands away on scroll
+ * (the slow idle orbit is CSS; the press pulse lives in fc-theme.js). Show lists draw their rule. Content is fully visible without this file;
  * hidden states are only set here, immediately before they animate. */
 (function () {
   'use strict';
@@ -20,61 +20,42 @@
     return (wrap && wrap.id) || el.getAttribute('data-section-id') || 'root';
   }
 
-  /* ---------- Hero arrival ---------- */
+  /* ---------- Hero: load sweep and scroll hand-off ---------- */
 
+  // Load: the logo is revealed by a circular sweep around its own brush circle, the orbit
+  // track draws itself, and the mark settles. Headline and buttons are usable throughout.
   function heroArrival(hero) {
-    var reveal = hero.querySelector('[data-fc-hero-reveal]');
-    var breakout = hero.querySelector('[data-fc-hero-breakout]');
-    var stroke = hero.querySelector('[data-fc-hero-stroke] .fc-hero__stroke-img');
-    var dot = hero.querySelector('[data-fc-hero-dot]');
+    var img = hero.querySelector('[data-fc-logo-img]');
+    var track = hero.querySelector('[data-fc-track]');
+    var spin = hero.querySelector('.fc-hero__spin');
     var tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-    if (reveal) {
-      reveal.classList.add('is-sweeping');
-      reveal.style.setProperty('--sweep', '0deg');
-      tl.to(reveal, {
+    if (img) {
+      img.classList.add('is-sweeping');
+      img.style.setProperty('--sweep', '0deg');
+      tl.to(img, {
         '--sweep': '361deg',
-        duration: 1.15,
+        duration: 1.2,
         ease: 'power2.inOut',
-        onComplete: function () {
-          reveal.classList.remove('is-sweeping');
-          reveal.style.removeProperty('--sweep');
-        }
+        onComplete: function () { img.classList.remove('is-sweeping'); img.style.removeProperty('--sweep'); }
       }, 0);
+      tl.fromTo(img, { scale: 0.94 }, { scale: 1, duration: 0.55, ease: 'back.out(2.2)', clearProps: 'transform' }, 0.95);
     }
-    if (stroke) {
-      tl.fromTo(stroke, { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: 1, duration: 0.85, ease: 'power2.out', clearProps: 'transform' }, 0.2);
-    }
-    if (breakout) {
-      tl.fromTo(breakout, { opacity: 0, scale: 0.9, rotation: -10 }, { opacity: 1, scale: 1, rotation: 0, duration: 0.7, clearProps: 'opacity,transform' }, 0.75);
-    }
-    if (dot) {
-      // The crimson ring drifts in and settles onto the ink stroke, like the logo.
-      tl.fromTo(dot,
-        { opacity: 0, yPercent: -50, y: -46, rotation: -140, scale: 0.7 },
-        { opacity: 1, yPercent: -50, y: 0, rotation: 0, scale: 1, duration: 0.9, ease: 'back.out(1.6)' },
-        0.85);
-    }
+    if (track) tl.fromTo(track, { strokeDasharray: '0 100' }, { strokeDasharray: '100 0', duration: 1.2, ease: 'power2.inOut', clearProps: 'strokeDasharray' }, 0.1);
+    if (spin) tl.fromTo(spin, { opacity: 0 }, { opacity: 1, duration: 0.6, clearProps: 'opacity' }, 1.05);
     return tl;
   }
 
-  function heroPointer(hero) {
-    var breakout = hero.querySelector('[data-fc-hero-breakout]');
-    if (!breakout || !finePointer.matches) return null;
-    var setX = gsap.quickTo(breakout, '--fx', { duration: 0.9, ease: 'power3.out' });
-    var setY = gsap.quickTo(breakout, '--fy', { duration: 0.9, ease: 'power3.out' });
-    function onMove(e) {
-      var r = hero.getBoundingClientRect();
-      setX(((e.clientX - r.left) / r.width - 0.5) * 2);
-      setY(((e.clientY - r.top) / r.height - 0.5) * 2);
-    }
-    function onLeave() { setX(0); setY(0); }
-    hero.addEventListener('pointermove', onMove, { passive: true });
-    hero.addEventListener('pointerleave', onLeave);
-    return function () {
-      hero.removeEventListener('pointermove', onMove);
-      hero.removeEventListener('pointerleave', onLeave);
-    };
+  // Scroll: as the hero leaves, the mark eases down in scale and the orbit expands and fades
+  // into the next section. Scrubbed transforms only, so native scrolling stays untouched.
+  function heroScroll(hero) {
+    if (!window.ScrollTrigger) return;
+    var mark = hero.querySelector('[data-fc-logo]');
+    var orbit = hero.querySelector('[data-fc-orbit]');
+    var tl = gsap.timeline({
+      scrollTrigger: { trigger: hero, start: 0, end: 'bottom top', scrub: 0.35 }
+    });
+    if (mark) tl.fromTo(mark, { scale: 1 }, { scale: 0.8, ease: 'none' }, 0);
+    if (orbit) tl.fromTo(orbit, { scale: 1, opacity: 1 }, { scale: 1.9, opacity: 0, ease: 'power1.in' }, 0);
   }
 
   function watchVisibility(hero, key) {
@@ -142,12 +123,10 @@
     if (root.matches && root.matches('[data-fc-hero]')) heroes = [root];
     Array.prototype.forEach.call(heroes, function (hero) {
       var key = sectionKey(hero);
-      var cleanupPointer;
       contexts[key] = gsap.context(function () {
         heroArrival(hero);
-        cleanupPointer = heroPointer(hero);
+        heroScroll(hero);
       }, hero);
-      contexts[key].add(function () { return function () { if (cleanupPointer) cleanupPointer(); }; });
       watchVisibility(hero, key);
     });
 

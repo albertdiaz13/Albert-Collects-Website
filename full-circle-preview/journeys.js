@@ -190,21 +190,21 @@ async function fresh(browser, opts = {}) {
     ok('past show with leftover inventory: booking closed');
     await page.screenshot({ path: `${OUT}/edge-past-1440.png` });
 
-    await page.goto(BASE + '/?fixture=none&bar=0');
+    await page.goto(BASE + '/collections/vending-tables?fixture=none&bar=0');
     assert.ok(await page.getByText('No shows announced').isVisible());
     assert.ok(await page.locator('[data-fc-shows]').getByRole('link', { name: 'Ask about upcoming shows' }).isVisible());
-    ok('no shows: compact empty state with configured contact link');
+    ok('no shows: schedule shows a compact empty state with configured contact link');
     await page.locator('[data-fc-shows]').screenshot({ path: `${OUT}/edge-none-1440.png` });
 
-    await page.goto(BASE + '/?fixture=one&bar=0');
+    await page.goto(BASE + '/collections/vending-tables?fixture=one&bar=0');
     assert.ok(await page.locator('.fc-bill--feature').isVisible());
-    ok('one show: feature layout');
+    ok('one show: schedule uses the feature layout');
     await page.locator('[data-fc-shows]').scrollIntoViewIfNeeded();
     await page.waitForTimeout(1600);
     await page.locator('[data-fc-shows]').screenshot({ path: `${OUT}/edge-one-1440.png` });
 
     // Keyboard: tab to the first event row and check focus ring + crimson ring
-    await page.goto(BASE + '/?fixture=full&bar=0');
+    await page.goto(BASE + '/collections/vending-tables?fixture=full&bar=0');
     await page.locator('[data-fc-shows]').scrollIntoViewIfNeeded();
     await page.waitForTimeout(1500);
     const link = page.locator('.fc-bill__link').first();
@@ -235,7 +235,7 @@ async function fresh(browser, opts = {}) {
     const { ctx, page } = await fresh(browser, { viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
     await page.goto(BASE + '/?bar=0');
     await page.waitForTimeout(300);
-    const sweeping = await page.locator('.fc-hero__reveal.is-sweeping').count();
+    const sweeping = await page.locator('.fc-hero__logo.is-sweeping').count();
     const motionOn = await page.evaluate(() => document.documentElement.classList.contains('fc-motion-on'));
     assert.strictEqual(sweeping, 0); assert.strictEqual(motionOn, false);
     const dates = await page.locator('[data-fc-reveal="date"]').evaluateAll((els) => els.map((e) => getComputedStyle(e).opacity));
@@ -254,8 +254,8 @@ async function fresh(browser, opts = {}) {
       wrap.innerHTML = html;
       wrap.dispatchEvent(new CustomEvent('shopify:section:load', { bubbles: true }));
       await new Promise((r) => setTimeout(r, 1800));
-      const reveal = wrap.querySelector('[data-fc-hero-reveal]');
-      return { sweeping: reveal.classList.contains('is-sweeping'), mask: getComputedStyle(reveal).maskImage || getComputedStyle(reveal).webkitMaskImage, dot: getComputedStyle(wrap.querySelector('[data-fc-hero-dot]')).opacity };
+      const logo = wrap.querySelector('[data-fc-logo-img]');
+      return { sweeping: logo.classList.contains('is-sweeping'), dot: getComputedStyle(wrap.querySelector('.fc-hero__spin')).opacity };
     });
     assert.strictEqual(result.sweeping, false); assert.strictEqual(result.dot, '1');
     assert.deepStrictEqual(page.errors, []);

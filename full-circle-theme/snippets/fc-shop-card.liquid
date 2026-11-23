@@ -1,0 +1,44 @@
+{%- comment -%}
+  Featured product tile for the homepage shop.
+  The photo sits whole inside a matted frame (contain, never cropped), so artwork stays intact.
+  A crimson edge draws around the frame on hover or keyboard focus.
+  - product (required), eager (boolean)
+{%- endcomment -%}
+{%- liquid
+  assign img_loading = 'lazy'
+  if eager
+    assign img_loading = 'eager'
+  endif
+  assign media = product.featured_media
+  assign unit = product.metafields.custom.price_unit.value
+  assign tile_id = 'Tile-' | append: product.id
+-%}
+<article class="fc-tile{% unless product.available %} is-sold-out{% endunless %}" aria-labelledby="{{ tile_id }}">
+  <a class="fc-tile__frame" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if media -%}
+      {% render 'fc-image', image: media.preview_image, widths: '400, 600, 800, 1100', sizes: '(min-width: 990px) 30vw, (min-width: 750px) 46vw, 92vw', class: 'fc-tile__img', loading: img_loading %}
+    {%- else -%}
+      <span class="fc-tile__placeholder"><img src="{{ 'fc-mark.webp' | asset_url }}" alt="" width="120" height="111" loading="lazy">{{ 'products.no_image' | t }}</span>
+    {%- endif -%}
+    <span class="fc-tile__edge" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+    {%- unless product.available -%}
+      <span class="fc-badge">{{ 'products.sold_out' | t }}</span>
+    {%- endunless -%}
+  </a>
+  <div class="fc-tile__meta">
+    <h3 class="fc-tile__title" id="{{ tile_id }}">
+      <a class="fc-tile__link" href="{{ product.url }}">{{ product.title | escape }}</a>
+    </h3>
+    <p class="fc-tile__price">{% render 'fc-price', product: product, show_from: true, unit: unit %}</p>
+    <p class="fc-tile__status">
+      {%- if product.available == false -%}
+        {{ 'products.sold_out' | t }}
+      {%- elsif product.has_only_default_variant -%}
+        {{ 'products.add_to_cart' | t }}
+      {%- else -%}
+        {{ 'products.choose_options' | t }}
+      {%- endif -%}
+      {% render 'fc-icon', icon: 'arrow' %}
+    </p>
+  </div>
+</article>

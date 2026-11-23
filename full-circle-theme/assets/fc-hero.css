@@ -1,302 +1,156 @@
 /* ==========================================================================
-   Hero — a show poster: tight headline, brush circle, ink stroke, crimson ring.
-   Frame geometry follows the brush ring artwork (1300 × 1200, circle centered
-   at 50.5% / 50.5%, inner edge at ~43% of the photo box).
+   Hero — the Full Circle logo, centred, with a living orbit around its brush circle.
+   States: load (sweep), rest (slow orbit), press (pulse), scroll (ring expands out).
+   The ring geometry follows the lockup: circle centre at 50.57% / 45.71%.
    ========================================================================== */
+
+.fc-section-hero { position: relative; z-index: 2; }
 
 .fc-hero {
   position: relative;
-  overflow: hidden;
-  border-bottom: var(--fc-rule);
+  overflow-x: clip;
+  overflow-y: visible;
+  --fc-orbit-cx: 50.57%;
+  --fc-orbit-cy: 45.71%;
 }
 
-.fc-hero__grid {
-  position: relative;
+.fc-hero__inner {
   max-width: var(--fc-max);
   margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) var(--fc-gutter) clamp(2.5rem, 6vw, 4.5rem);
   display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: clamp(1rem, 2.4vw, 1.6rem);
 }
 
-.fc-hero__copy {
+/* ---------- The mark ---------- */
+
+.fc-hero__stage {
+  --stage: min(66vw, 38svh, 460px);
   position: relative;
-  z-index: 3;
-  padding: 0 var(--fc-gutter);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  width: var(--stage);
+  aspect-ratio: 1671 / 1700;
+  /* the orbit (r = 1000 of 1671) reaches above and below the logo box */
+  margin-block: calc(var(--stage) * 0.15) calc(var(--stage) * 0.06);
 }
 
-.fc-hero__kicker { margin-bottom: 0.9rem; }
+.fc-hero__mark {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  border-radius: 50%;
+  -webkit-tap-highlight-color: transparent;
+  transform-origin: var(--fc-orbit-cx) var(--fc-orbit-cy);
+}
+.fc-hero__mark:focus-visible { outline: none; }
+.fc-hero__mark:focus-visible .fc-hero__track { stroke: var(--fc-crimson); stroke-width: 7; }
 
+.fc-hero__logo {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.fc-hero__orbit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  transform-origin: var(--fc-orbit-cx) var(--fc-orbit-cy);
+}
+.fc-hero__track,
+.fc-hero__arc,
+.fc-hero__pulse {
+  fill: none;
+  vector-effect: non-scaling-stroke;
+}
+.fc-hero__track { stroke: rgba(var(--fc-ink-rgb), 0.28); stroke-width: 1.5; transition: stroke 0.25s ease, stroke-width 0.25s ease; }
+.fc-hero__arc {
+  stroke: var(--fc-crimson);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 9 91;
+}
+.fc-hero__pulse {
+  stroke: var(--fc-crimson);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 0 100;
+  opacity: 0;
+}
+
+/* Rest: the crimson arc drifts slowly around the logo. The logo itself never moves. */
+.fc-hero__spin {
+  transform-box: view-box;
+  transform-origin: 845px 777px;
+  animation: fc-orbit 26s linear infinite;
+}
+@keyframes fc-orbit { to { transform: rotate(360deg); } }
+.fc-hero.is-offscreen .fc-hero__spin { animation-play-state: paused; }
+/* Idle motion runs only when the motion script is active (Theme settings › Motion). */
+html:not(.fc-motion-on) .fc-hero__spin { animation: none; }
+
+/* Load: circular sweep around the logo's own circle, applied only while the script animates */
+.fc-hero__logo.is-sweeping {
+  -webkit-mask-image: conic-gradient(from 210deg at var(--fc-orbit-cx) var(--fc-orbit-cy), #000 var(--sweep, 360deg), transparent calc(var(--sweep, 360deg) + 1deg));
+  mask-image: conic-gradient(from 210deg at var(--fc-orbit-cx) var(--fc-orbit-cy), #000 var(--sweep, 360deg), transparent calc(var(--sweep, 360deg) + 1deg));
+}
+
+/* Press: rings travel out from the point of contact */
+.fc-hero__ripples { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.fc-hero__ripple {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border: 2px solid var(--fc-crimson);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Reduced motion or motion off: a calm, visible acknowledgement instead of travel */
+.fc-hero__mark.is-acknowledged .fc-hero__track { stroke: var(--fc-crimson); stroke-width: 6; }
+
+/* ---------- Copy ---------- */
+
+.fc-hero__copy { display: grid; justify-items: center; gap: 1rem; }
 .fc-hero__title {
-  font-size: clamp(2.9rem, 14.2vw, 4.6rem);
-  max-width: 11ch;
+  font-size: clamp(2.2rem, 9.5vw, 4.4rem);
+  max-width: 16ch;
 }
-
-.fc-hero__sub {
-  max-width: 40ch;
-  font-size: 1.02rem;
-  color: var(--fc-ink-soft);
-}
-
+.fc-hero__sub { max-width: 46ch; color: var(--fc-ink-soft); }
 .fc-hero__actions {
   display: grid;
   gap: 0.6rem;
-  width: 100%;
-  margin-top: 1.25rem;
+  width: min(100%, 360px);
 }
 .fc-hero__actions .fc-button { justify-content: space-between; }
 
-/* Ink stroke (from the logo) with the crimson ring settled on it */
-.fc-hero__stroke {
-  position: relative;
-  width: calc(100% + var(--fc-gutter));
-  height: clamp(34px, 9vw, 52px);
-  margin: 0.9rem 0 0.8rem calc(var(--fc-gutter) * -1);
-  pointer-events: none;
-}
-.fc-hero__stroke-img {
-  width: 100%;
-  height: 100%;
-  object-fit: fill;
-  object-position: right center;
-}
-.fc-hero__dot {
-  position: absolute;
-  top: 50%;
-  right: 22%;
-  width: auto;
-  height: 168%;
-  aspect-ratio: 359 / 353;
-  transform: translateY(-50%);
+@media (min-width: 750px) {
+  .fc-hero__actions { display: flex; flex-wrap: wrap; justify-content: center; width: auto; gap: 0.75rem; }
+  .fc-hero__actions .fc-button { justify-content: center; }
 }
 
-/* ---------- Artwork ---------- */
-
-.fc-hero__art {
-  position: relative;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.fc-hero__frame {
-  position: absolute;
-  aspect-ratio: 1300 / 1200;
-}
-
-.fc-hero__reveal {
-  position: absolute;
-  inset: 0;
-}
-
-.fc-hero__photo {
-  position: absolute;
-  left: 2.25%;
-  top: -1.79%;
-  width: 96.5%;
-  aspect-ratio: 1;
-  overflow: hidden;
-  clip-path: circle(46% at 50% 50%);
-  background: var(--fc-surface);
-}
-.fc-hero__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: translate(calc(var(--sx) * -1%), calc(var(--sy) * -1%)) scale(var(--z));
-}
-.fc-hero__empty {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: var(--fc-paper-deep);
-}
-.fc-hero__empty img { width: 30%; opacity: 0.25; }
-
-.fc-hero__ring {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.fc-hero__frame {
-  --z: 1;
-  --sx: 0;
-  --sy: 0;
-  --pop: 1;
-  /* breakout center and radius in photo-window units (0–100), following the photo's zoom and shift */
-  --bcx: calc(50 + (var(--bx) - 50) * var(--z) - var(--sx));
-  --bcy: calc(50 + (var(--by) - 50) * var(--z) - var(--sy));
-  --br: calc(var(--bd) / 2 * var(--z) * var(--pop));
-}
-.fc-hero__breakout {
-  position: absolute;
-  left: calc((2.25 + (var(--bcx) - var(--br)) * 0.965) * 1%);
-  top: calc((-1.65 + (var(--bcy) - var(--br)) * 0.965) / 0.9227 * 1%);
-  width: calc(var(--br) * 2 * 0.965 * 1%);
-  aspect-ratio: 1;
-  filter: drop-shadow(0 16px 20px rgba(20, 12, 6, 0.3)) drop-shadow(0 2px 3px rgba(20, 12, 6, 0.28));
-  --fx: 0;
-  --fy: 0;
-}
-.fc-hero__breakout-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-}
-
-/* Idle: light drifting across the holographic laminate, kept inside the printed circle */
-.fc-hero__foil {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  mix-blend-mode: color-dodge;
-  opacity: 0.55;
-  pointer-events: none;
-}
-.fc-hero__foil::before {
-  content: '';
-  position: absolute;
-  inset: -60%;
-  background:
-    linear-gradient(
-      115deg,
-      transparent 36%,
-      rgba(120, 255, 214, 0.55) 44%,
-      rgba(255, 150, 232, 0.6) 49%,
-      rgba(255, 238, 150, 0.55) 54%,
-      rgba(130, 180, 255, 0.45) 58%,
-      transparent 66%
-    );
-  transform: translate3d(-22%, -12%, 0);
-  translate: calc(var(--fx) * 7%) calc(var(--fy) * 5%);
-  animation: fc-foil 11s ease-in-out infinite alternate;
-  will-change: transform;
-}
-.fc-hero.is-offscreen .fc-hero__foil::before { animation-play-state: paused; }
-/* The idle sheen only runs when the motion script is active (it pauses it offscreen). */
-html:not(.fc-motion-on) .fc-hero__foil::before { animation: none; }
-
-/* Arrival: the artwork is revealed along the brush arc. Applied only while the script animates. */
-.fc-hero__reveal.is-sweeping {
-  -webkit-mask-image: conic-gradient(from 205deg at 50.5% 50.5%, #000 var(--sweep, 360deg), transparent calc(var(--sweep, 360deg) + 1deg));
-  mask-image: conic-gradient(from 205deg at 50.5% 50.5%, #000 var(--sweep, 360deg), transparent calc(var(--sweep, 360deg) + 1deg));
-}
-
-@keyframes fc-foil {
-  from { transform: translate3d(-24%, -14%, 0); }
-  to { transform: translate3d(22%, 12%, 0); }
-}
-
-/* ---------- Phone: vertical poster. Art on top, cropped on the left so the sticker stays whole. ---------- */
-
-@media (max-width: 749px) {
-  .fc-hero__grid { grid-template-columns: minmax(0, 1fr); }
-  .fc-hero__art {
-    order: -1;
-    height: min(78vw, 34svh, 360px);
-  }
-  .fc-hero__frame {
-    height: 112%;
-    right: 2vw;
-    top: -8%;
-  }
-  .fc-hero__copy { padding-top: 0.25rem; padding-bottom: 2rem; }
-  .fc-hero__kicker { display: none; }
-  .fc-hero__title { order: 1; max-width: 9.2ch; }
-  .fc-hero__stroke { order: 2; margin-top: 0.4rem; margin-bottom: 0.5rem; }
-  .fc-hero__actions { order: 3; margin-top: 0.25rem; }
-  .fc-hero__sub { order: 4; font-size: 0.98rem; margin-top: 1.1rem; }
+@media (min-width: 990px) {
+  .fc-hero__inner { padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+  .fc-hero__stage { --stage: min(34vw, 46svh, 480px); }
+  .fc-hero__title { font-size: clamp(3rem, 4.2vw, 4.6rem); max-width: 22ch; }
 }
 
 @media (max-width: 749px) and (max-height: 640px) {
-  .fc-hero__art { height: min(70vw, 30svh); }
-  .fc-hero__title { font-size: clamp(2.6rem, 13vw, 3.4rem); }
-  .fc-hero__sub { display: none; }
+  .fc-hero__stage { --stage: min(52vw, 32svh); }
 }
 
-/* ---------- Tablet: headline across the top, actions and art side by side ---------- */
-
-@media (min-width: 750px) and (max-width: 989px) {
-  .fc-hero__grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    min-height: 640px;
-  }
-  .fc-hero__copy {
-    grid-column: 1 / -1;
-    grid-row: 1;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    column-gap: 2rem;
-    align-items: start;
-  }
-  .fc-hero__kicker,
-  .fc-hero__title,
-  .fc-hero__stroke { grid-column: 1 / -1; }
-  .fc-hero__title { font-size: clamp(5rem, 12.4vw, 7.25rem); max-width: 9.6ch; }
-  .fc-hero__sub,
-  .fc-hero__actions { grid-column: 1; }
-  .fc-hero__actions { max-width: 340px; }
-  .fc-hero__stroke { width: 70%; height: 56px; margin-left: calc(var(--fc-gutter) * -1); }
-  .fc-hero__art {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: end;
-    height: 100%;
-  }
-  .fc-hero__frame {
-    width: 62vw;
-    right: -16vw;
-    bottom: -7vw;
-  }
-}
-
-/* ---------- Desktop: headline left, cropped circle right ---------- */
-
-@media (min-width: 990px) {
-  .fc-hero__grid {
-    grid-template-columns: minmax(0, 5.2fr) minmax(0, 6.8fr);
-    min-height: clamp(600px, calc(100svh - var(--fc-header-h) - 56px), 800px);
-  }
-  .fc-hero__copy {
-    justify-content: center;
-    padding-top: clamp(2.5rem, 5vw, 4.5rem);
-    padding-bottom: clamp(2.5rem, 5vw, 4.5rem);
-    padding-right: 0;
-  }
-  .fc-hero__title {
-    font-size: clamp(5.4rem, 7.9vw, 8.25rem);
-    max-width: 10.5ch;
-  }
-  .fc-hero__stroke {
-    width: calc(100% + 13vw);
-    height: clamp(52px, 5.4vw, 74px);
-    margin: 1.1rem 0 1rem calc(var(--fc-gutter) * -1);
-  }
-  .fc-hero__dot { right: 13%; }
-  .fc-hero__sub { font-size: 1.08rem; }
-  .fc-hero__actions {
-    display: flex;
-    flex-wrap: wrap;
-    width: auto;
-    gap: 0.75rem;
-    margin-top: 1.6rem;
-  }
-  .fc-hero__actions .fc-button { justify-content: center; }
-  .fc-hero__frame {
-    width: min(58vw, 900px);
-    right: calc(min(58vw, 900px) * -0.05);
-    top: 50%;
-    transform: translateY(-50%);
-    margin-top: calc(min(58vw, 900px) * -0.02);
-  }
-}
-
-@media (min-width: 1440px) {
-  .fc-hero__frame { right: calc(((100vw - var(--fc-max)) / -2) - 60px); }
+@media (prefers-reduced-motion: reduce) {
+  .fc-hero__spin { animation: none; }
 }

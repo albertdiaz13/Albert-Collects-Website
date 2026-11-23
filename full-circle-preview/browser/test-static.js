@@ -43,8 +43,8 @@ const server = http.createServer((req, res) => {
   ok('homepage renders from theme files in the browser');
 
   await page.mouse.wheel(0, 900); await page.waitForTimeout(1200);
-  assert.ok(await page.locator('.fc-bill__title').first().isVisible());
-  ok('scrolls to the show bill');
+  assert.ok(await page.locator('.fc-night__title').isVisible());
+  ok('scrolls to the Friday trade night');
 
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.locator('[data-fc-menu] summary').click();

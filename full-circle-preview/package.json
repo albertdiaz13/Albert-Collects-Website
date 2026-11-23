@@ -8,7 +8,8 @@
     "test": "node journeys.js",
     "package": "node package-theme.js",
     "build:storefront": "node browser/build.js",
-    "test:storefront": "node browser/test-static.js"
+    "test:storefront": "node browser/test-static.js",
+    "check:homepage": "node browser/check-homepage.js"
   },
   "license": "ISC",
   "dependencies": {
