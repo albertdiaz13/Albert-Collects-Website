@@ -669,16 +669,9 @@ details > summary::-webkit-details-marker { display: none; }
 
 .fc-callout {
   position: relative;
-  padding: 1rem 1.1rem 1.05rem 1.25rem;
+  padding: 1rem 1.1rem 1.05rem;
   border: 2px solid var(--fc-ink);
   background: var(--fc-surface);
-}
-.fc-callout::before {
-  content: '';
-  position: absolute;
-  left: -2px; top: -2px; bottom: -2px;
-  width: 6px;
-  background: var(--fc-crimson);
 }
 .fc-callout__title { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.35rem; color: var(--fc-crimson); }
 
