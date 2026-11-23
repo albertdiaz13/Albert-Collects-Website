@@ -1,0 +1,84 @@
+{%- comment -%}
+  Sorts event products by their event.starts_at metafield and renders them as a bill.
+  - events: array of products (required)
+  - limit: max upcoming to render
+  - show_past (boolean)
+  - context: 'home' | 'collection'
+  - heading_level
+  Upcoming shows are sorted soonest first; shows without a date are listed last;
+  past shows (ended) are excluded unless show_past is true.
+{%- endcomment -%}
+{%- liquid
+  assign limit = limit | default: 50
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign upcoming_keys = ''
+  assign tba_keys = ''
+  assign past_keys = ''
+  for p in events
+    assign start = p.metafields.event.starts_at.value
+    assign finish = p.metafields.event.ends_at.value
+    if start == blank
+      assign tba_keys = tba_keys | append: forloop.index0 | append: ','
+      continue
+    endif
+    assign start_ts = start | date: '%s' | plus: 0
+    if finish != blank
+      assign end_ts = finish | date: '%s' | plus: 0
+    else
+      assign end_ts = start_ts | plus: 43200
+    endif
+    if end_ts < now_ts
+      assign past_keys = past_keys | append: start_ts | append: ':' | append: forloop.index0 | append: ','
+    else
+      assign upcoming_keys = upcoming_keys | append: start_ts | append: ':' | append: forloop.index0 | append: ','
+    endif
+  endfor
+  assign upcoming = upcoming_keys | split: ',' | sort
+  assign tba = tba_keys | split: ','
+  assign past = past_keys | split: ',' | sort | reverse
+  assign upcoming_count = upcoming.size | plus: tba.size
+  assign style = 'row'
+  if upcoming_count == 1
+    assign style = 'feature'
+  endif
+-%}
+{%- if upcoming_count > 0 -%}
+  <ol class="fc-bill fc-bill--{{ style }}" data-fc-bill data-count="{{ upcoming_count }}">
+    {%- for key in upcoming limit: limit -%}
+      {%- assign idx = key | split: ':' | last | plus: 0 -%}
+      {% render 'fc-event-row', event: events[idx], style: style, heading_level: heading_level %}
+    {%- endfor -%}
+    {%- assign remaining = limit | minus: upcoming.size -%}
+    {%- if remaining > 0 -%}
+      {%- for key in tba limit: remaining -%}
+        {%- assign idx = key | plus: 0 -%}
+        {% render 'fc-event-row', event: events[idx], style: style, heading_level: heading_level %}
+      {%- endfor -%}
+    {%- endif -%}
+  </ol>
+{%- else -%}
+  <div class="fc-bill-empty" data-fc-bill-empty>
+    <p class="fc-bill-empty__title">{{ 'events.none_title' | t }}</p>
+    <p class="fc-bill-empty__body">{{ 'events.none_body' | t }}</p>
+    {%- if settings.booking_contact_url != blank -%}
+      <a class="fc-link-button" href="{{ settings.booking_contact_url }}">
+        {{- settings.booking_contact_label | default: 'Ask about upcoming shows' | escape -}}
+        {% render 'fc-icon', icon: 'arrow' %}
+      </a>
+    {%- endif -%}
+    {%- if settings.social_instagram_link != blank -%}
+      <a class="fc-link-button fc-link-button--quiet" href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">Instagram {% render 'fc-icon', icon: 'arrow' %}</a>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+{%- if show_past and past.size > 0 -%}
+  <div class="fc-bill-past">
+    <h2 class="fc-bill-past__title">{{ 'events.past' | t }}</h2>
+    <ol class="fc-bill fc-bill--past">
+      {%- for key in past limit: 12 -%}
+        {%- assign idx = key | split: ':' | last | plus: 0 -%}
+        {% render 'fc-event-row', event: events[idx], style: 'past', heading_level: 3 %}
+      {%- endfor -%}
+    </ol>
+  </div>
+{%- endif -%}

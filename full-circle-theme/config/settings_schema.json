@@ -1,0 +1,229 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Full Circle",
+    "theme_version": "1.0.0",
+    "theme_author": "Full Circle Collaborations",
+    "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
+    "theme_support_url": "https://help.shopify.com/"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The theme ships with transparent versions of the Full Circle mark and lockup. Upload replacements here only if the artwork changes. Use transparent PNG or WebP files."
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_mark",
+        "label": "Header mark",
+        "info": "Small symbol shown beside the typeset name in the header. Square-ish, transparent background."
+      },
+      {
+        "type": "image_picker",
+        "id": "logo_lockup",
+        "label": "Full logo lockup",
+        "info": "Circular logo with hand lettering. Shown in the footer at a size where the lettering stays readable."
+      },
+      {
+        "type": "text",
+        "id": "wordmark_line_1",
+        "label": "Header name, line 1",
+        "default": "Full Circle"
+      },
+      {
+        "type": "text",
+        "id": "wordmark_line_2",
+        "label": "Header name, line 2",
+        "default": "Collaborations"
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "32 × 32px. Defaults to the brush mark."
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_paper",
+        "label": "Paper",
+        "default": "#EAE4D8"
+      },
+      {
+        "type": "color",
+        "id": "color_paper_deep",
+        "label": "Paper, deep",
+        "default": "#E1D9CA"
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Ink",
+        "default": "#0F0E0C"
+      },
+      {
+        "type": "color",
+        "id": "color_crimson",
+        "label": "Crimson",
+        "default": "#9C0612"
+      },
+      {
+        "type": "color",
+        "id": "color_surface",
+        "label": "Merchandise surface",
+        "info": "Clean background behind product photos so colors stay accurate.",
+        "default": "#FBFAF7"
+      },
+      {
+        "type": "checkbox",
+        "id": "paper_texture",
+        "label": "Show paper fiber texture",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Headlines use the bundled condensed display face (Big Shoulders Display). Choose the body face for prices, dates, buttons and copy."
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "label": "Body font",
+        "default": "inter_n4"
+      }
+    ]
+  },
+  {
+    "name": "Shop & booking",
+    "settings": [
+      {
+        "type": "collection",
+        "id": "merch_collection",
+        "label": "Merchandise collection",
+        "info": "Curated collection of physical products. Exclude vending tables from it so counts and pagination stay accurate."
+      },
+      {
+        "type": "collection",
+        "id": "vending_collection",
+        "label": "Vending tables collection",
+        "info": "Holds one event product per show. Used by the header and booking links."
+      },
+      {
+        "type": "text",
+        "id": "shop_label",
+        "label": "Shop link label",
+        "default": "Shop"
+      },
+      {
+        "type": "text",
+        "id": "booking_label",
+        "label": "Booking link label",
+        "default": "Book vending tables"
+      },
+      {
+        "type": "url",
+        "id": "booking_contact_url",
+        "label": "Show inquiries link",
+        "info": "Shown when no shows are announced or a show sells out, e.g. your contact page."
+      },
+      {
+        "type": "text",
+        "id": "booking_contact_label",
+        "label": "Show inquiries label",
+        "default": "Ask about upcoming shows"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_table_counts",
+        "label": "Show number of tables left",
+        "info": "Requires inventory tracking on each table option.",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "low_table_threshold",
+        "label": "Highlight when tables left is at or below",
+        "min": 1,
+        "max": 20,
+        "step": 1,
+        "default": 5
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "cart_note",
+        "label": "Enable order note",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled",
+        "label": "Show currency codes",
+        "default": false
+      },
+      {
+        "type": "richtext",
+        "id": "table_cart_notice",
+        "label": "Vending table notice in cart",
+        "default": "<p>A table is not held while it sits in your cart. Your table is confirmed when checkout is complete.</p>"
+      }
+    ]
+  },
+  {
+    "name": "Social media",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram_link",
+        "label": "Instagram",
+        "info": "https://instagram.com/…"
+      },
+      {
+        "type": "text",
+        "id": "social_tiktok_link",
+        "label": "TikTok"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook_link",
+        "label": "Facebook"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube_link",
+        "label": "YouTube"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter_link",
+        "label": "X (Twitter)"
+      }
+    ]
+  },
+  {
+    "name": "Motion",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "motion_enabled",
+        "label": "Enable motion",
+        "info": "Visitors who ask their device for reduced motion always get a static site.",
+        "default": true
+      }
+    ]
+  }
+]

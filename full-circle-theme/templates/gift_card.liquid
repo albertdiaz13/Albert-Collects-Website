@@ -1,0 +1,31 @@
+{%- layout none -%}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>{{ 'gift_cards.title' | t }} — {{ shop.name }}</title>
+    <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+    {{ content_for_header }}
+    {{ 'fc-base.css' | asset_url | stylesheet_tag }}
+  </head>
+  <body class="fc-body">
+    <main class="fc-page" id="MainContent">
+      <div class="fc-page__inner">
+        <img src="{{ 'fc-lockup.webp' | asset_url }}" alt="{{ shop.name | escape }}" width="200" height="203">
+        <h1 class="fc-page__title">{{ 'gift_cards.title' | t }}</h1>
+        <p class="fc-summary__total">{{ gift_card.balance | money }}</p>
+        <p><span class="fc-label">{{ 'gift_cards.code' | t }}</span> <strong>{{ gift_card.code | format_code }}</strong></p>
+        <div id="QrCode" data-identifier="{{ gift_card.qr_identifier }}"></div>
+        {%- if gift_card.pass_url -%}<p><a href="{{ gift_card.pass_url }}">Apple Wallet</a></p>{%- endif -%}
+        <p><a class="fc-button" href="{{ shop.url }}">{{ 'cart.continue' | t }}</a></p>
+      </div>
+    </main>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('QrCode');
+        if (window.QRCode && el) new QRCode(el, { text: el.dataset.identifier, width: 120, height: 120 });
+      });
+    </script>
+  </body>
+</html>

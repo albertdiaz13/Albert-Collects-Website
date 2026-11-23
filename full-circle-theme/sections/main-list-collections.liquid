@@ -1,0 +1,23 @@
+{{ 'fc-collection.css' | asset_url | stylesheet_tag }}
+<section class="fc-collection">
+  <div class="fc-collection__inner">
+    <header class="fc-collection__head">
+      <h1 class="fc-collection__title">{{ section.settings.title | escape }}</h1>
+    </header>
+    <ul class="fc-collist" role="list">
+      {%- for c in collections -%}
+        {%- if c.products_count == 0 -%}{%- continue -%}{%- endif -%}
+        <li>
+          <a class="fc-collist__link" href="{{ c.url }}">
+            <span class="fc-collist__title">{{ c.title | escape }}</span>
+            <span class="fc-collist__count">{{ 'collections.products_count' | t: count: c.products_count }}</span>
+            <span class="fc-ring-arrow"><span class="fc-ring-arrow__ring" aria-hidden="true"></span>{% render 'fc-icon', icon: 'arrow' %}</span>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+{% schema %}
+{ "name": "Collections list", "tag": "div", "settings": [{ "type": "text", "id": "title", "label": "Heading", "default": "Collections" }] }
+{% endschema %}

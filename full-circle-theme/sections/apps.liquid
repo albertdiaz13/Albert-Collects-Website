@@ -1,0 +1,8 @@
+<div class="fc-apps">
+  {%- for block in section.blocks -%}
+    {% render block %}
+  {%- endfor -%}
+</div>
+{% schema %}
+{ "name": "Apps", "tag": "div", "settings": [], "blocks": [{ "type": "@app" }], "presets": [{ "name": "Apps" }] }
+{% endschema %}

@@ -1,0 +1,9 @@
+<section class="fc-page" data-section-id="{{ section.id }}">
+  <div class="fc-page__inner">
+    <h1 class="fc-page__title">{{ page.title | escape }}</h1>
+    <div class="fc-rte fc-page__content">{{ page.content }}</div>
+  </div>
+</section>
+{% schema %}
+{ "name": "Page", "tag": "div", "class": "fc-section-page", "settings": [] }
+{% endschema %}

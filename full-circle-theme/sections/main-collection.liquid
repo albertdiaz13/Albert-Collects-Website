@@ -1,0 +1,85 @@
+{{ 'fc-collection.css' | asset_url | stylesheet_tag }}
+<section class="fc-collection" data-section-id="{{ section.id }}">
+  <div class="fc-collection__inner">
+    <header class="fc-collection__head">
+      <p class="fc-kicker">{{ settings.shop_label | default: 'Shop' | escape }}</p>
+      <h1 class="fc-collection__title">{{ collection.title | escape }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="fc-collection__desc fc-rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </header>
+
+    {%- paginate collection.products by section.settings.per_page -%}
+      <div class="fc-toolbar">
+        <p class="fc-toolbar__count">{{ 'collections.products_count' | t: count: collection.products_count }}</p>
+        {%- if section.settings.enable_filtering or section.settings.enable_sorting -%}
+          <form class="fc-toolbar__form" method="get" action="{{ collection.url }}" data-fc-autosubmit>
+            {%- if section.settings.enable_filtering -%}
+              {%- for filter in collection.filters -%}
+                {%- if filter.type == 'list' or filter.type == 'boolean' -%}
+                  <details class="fc-filter">
+                    <summary>{{ filter.label | escape }}{% if filter.active_values.size > 0 %} ({{ filter.active_values.size }}){% endif %}</summary>
+                    <div class="fc-filter__panel">
+                      {%- for value in filter.values -%}
+                        <label class="fc-check{% if value.count == 0 and value.active == false %} is-disabled{% endif %}">
+                          <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %}>
+                          <span>{{ value.label | escape }} <span class="fc-check__count">({{ value.count }})</span></span>
+                        </label>
+                      {%- endfor -%}
+                    </div>
+                  </details>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endif -%}
+            {%- if section.settings.enable_sorting -%}
+              <label class="fc-visually-hidden" for="SortBy-{{ section.id }}">{{ 'collections.sort_by' | t }}</label>
+              {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+              <select class="fc-select fc-select--small" id="SortBy-{{ section.id }}" name="sort_by">
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+                {%- endfor -%}
+              </select>
+            {%- endif -%}
+            <noscript><button class="fc-button fc-button--small" type="submit">OK</button></noscript>
+          </form>
+        {%- endif -%}
+      </div>
+
+      {%- if collection.products.size > 0 -%}
+        <ul class="fc-grid" role="list">
+          {%- for product in collection.products -%}
+            <li class="fc-grid__item">
+              {%- if forloop.index <= 4 -%}
+                {% render 'fc-product-card', product: product, eager: true %}
+              {%- else -%}
+                {% render 'fc-product-card', product: product %}
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <div class="fc-empty">
+          <p>{{ 'collections.empty' | t }}</p>
+          <a class="fc-link-button" href="{{ settings.merch_collection.url | default: routes.all_products_collection_url }}">{{ 'collections.all' | t }} {% render 'fc-icon', icon: 'arrow' %}</a>
+        </div>
+      {%- endif -%}
+
+      {%- if paginate.pages > 1 -%}
+        {% render 'fc-pagination', paginate: paginate %}
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "div",
+  "class": "fc-section-collection",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 6, "max": 36, "step": 3, "default": 18 },
+    { "type": "checkbox", "id": "enable_filtering", "label": "Enable filtering", "default": true },
+    { "type": "checkbox", "id": "enable_sorting", "label": "Enable sorting", "default": true }
+  ]
+}
+{% endschema %}

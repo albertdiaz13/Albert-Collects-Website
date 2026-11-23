@@ -1,0 +1,31 @@
+{%- comment -%}
+  Responsive image with focal point support.
+  - image: image object (required)
+  - widths: comma list
+  - sizes: sizes attribute
+  - class, loading ('eager' | 'lazy'), alt, priority (boolean)
+{%- endcomment -%}
+{%- liquid
+  assign img_widths = widths | default: '360, 540, 720, 900, 1100, 1400'
+  assign img_sizes = sizes | default: '100vw'
+  assign img_loading = loading | default: 'lazy'
+  assign img_alt = alt | default: image.alt | default: ''
+  assign focal = image.presentation.focal_point | default: '50% 50%'
+  assign style = 'object-position: ' | append: focal
+  assign fetch = 'auto'
+  if priority
+    assign fetch = 'high'
+  endif
+-%}
+{{-
+  image
+  | image_url: width: 1800
+  | image_tag:
+    widths: img_widths,
+    sizes: img_sizes,
+    loading: img_loading,
+    class: class,
+    alt: img_alt,
+    style: style,
+    fetchpriority: fetch
+-}}

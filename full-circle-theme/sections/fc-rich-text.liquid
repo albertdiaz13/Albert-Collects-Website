@@ -1,0 +1,23 @@
+<section class="fc-richtext fc-richtext--{{ section.settings.scheme }}">
+  <div class="fc-richtext__inner">
+    {%- if section.settings.heading != blank -%}<h2 class="fc-richtext__title">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    {%- if section.settings.text != blank -%}<div class="fc-rte">{{ section.settings.text }}</div>{%- endif -%}
+    {%- if section.settings.link_label != blank and section.settings.link != blank -%}
+      <a class="fc-link-button" href="{{ section.settings.link }}">{{ section.settings.link_label | escape }} {% render 'fc-icon', icon: 'arrow' %}</a>
+    {%- endif -%}
+  </div>
+</section>
+{% schema %}
+{
+  "name": "Statement",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "richtext", "id": "text", "label": "Text" },
+    { "type": "text", "id": "link_label", "label": "Link label" },
+    { "type": "url", "id": "link", "label": "Link" },
+    { "type": "select", "id": "scheme", "label": "Color", "options": [{ "value": "paper", "label": "Paper" }, { "value": "ink", "label": "Ink" }], "default": "paper" }
+  ],
+  "presets": [{ "name": "Statement" }]
+}
+{% endschema %}

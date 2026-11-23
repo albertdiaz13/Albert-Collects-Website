@@ -1,0 +1,164 @@
+{{ 'fc-product.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign selected = product.selected_or_first_available_variant
+  assign form_id = 'ProductForm-' | append: section.id
+  assign unit = product.metafields.custom.price_unit.value
+  assign back = collection
+  if back == blank
+    assign back = settings.merch_collection
+  endif
+-%}
+<section class="fc-product" data-fc-product data-section-id="{{ section.id }}" data-url="{{ product.url }}">
+  <div class="fc-product__inner">
+    <div class="fc-product__media">
+      {% render 'fc-media-gallery', product: product, selected: selected %}
+    </div>
+
+    <div class="fc-product__info">
+      {%- if back != blank -%}
+        <a class="fc-backlink" href="{{ back.url }}">{% render 'fc-icon', icon: 'arrow-left' %}{{ back.title | escape }}</a>
+      {%- endif -%}
+
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when '@app' -%}
+            {% render block %}
+
+          {%- when 'title' -%}
+            <h1 class="fc-product__title" {{ block.shopify_attributes }}>{{ product.title | escape }}</h1>
+
+          {%- when 'price' -%}
+            <div class="fc-product__price" {{ block.shopify_attributes }} data-fc-price-wrap>
+              {% render 'fc-price', product: product, variant: selected, unit: unit %}
+              <p class="fc-product__stock" data-fc-stock>
+                {%- unless selected.available -%}{{ 'products.sold_out' | t }}{%- endunless -%}
+              </p>
+            </div>
+
+          {%- when 'variant_picker' -%}
+            <div {{ block.shopify_attributes }}>
+              {% render 'fc-variant-picker', product: product, form_id: form_id, selected: selected %}
+            </div>
+
+          {%- when 'instructions' -%}
+            {%- assign instructions = product.metafields.custom.order_instructions -%}
+            {%- if instructions != blank or block.settings.text != blank -%}
+              <aside class="fc-callout" {{ block.shopify_attributes }} aria-labelledby="Instr-{{ block.id }}">
+                <h2 class="fc-callout__title" id="Instr-{{ block.id }}">{%- if block.settings.heading != blank -%}{{ block.settings.heading | escape }}{%- else -%}{{ 'products.before_you_order' | t }}{%- endif -%}</h2>
+                <div class="fc-rte">
+                  {%- if instructions != blank -%}
+                    {{ instructions | metafield_tag }}
+                  {%- else -%}
+                    {{ block.settings.text }}
+                  {%- endif -%}
+                </div>
+              </aside>
+            {%- endif -%}
+
+          {%- when 'description' -%}
+            {%- if product.description != blank -%}
+              <div class="fc-product__description fc-rte" {{ block.shopify_attributes }}>
+                {{ product.description }}
+              </div>
+            {%- endif -%}
+
+          {%- when 'text' -%}
+            {%- if block.settings.text != blank -%}
+              <div class="fc-rte fc-product__text" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+            {%- endif -%}
+
+          {%- when 'collapsible' -%}
+            {%- if block.settings.content != blank or block.settings.page != blank -%}
+              <details class="fc-disclosure" {{ block.shopify_attributes }}>
+                <summary>{{ block.settings.heading | escape }}</summary>
+                <div class="fc-rte">{{ block.settings.content }}{{ block.settings.page.content }}</div>
+              </details>
+            {%- endif -%}
+
+          {%- when 'buy_buttons' -%}
+            <div class="fc-buy" {{ block.shopify_attributes }}>
+              {%- form 'product', product, id: form_id, class: 'fc-product-form', novalidate: 'novalidate', data-fc-product-form: '' -%}
+                <input type="hidden" name="id" value="{{ selected.id }}" disabled data-fc-variant-id>
+                <div class="fc-buy__row">
+                  {%- if block.settings.show_quantity -%}
+                    <div class="fc-buy__qty">
+                      <label class="fc-label" for="Quantity-{{ section.id }}">{{ 'products.quantity' | t }}</label>
+                      {%- assign qty_id = 'Quantity-' | append: section.id -%}
+                      {% render 'fc-quantity', id: qty_id, title: product.title %}
+                    </div>
+                  {%- endif -%}
+                  <button type="submit" name="add" class="fc-button fc-button--large fc-buy__submit" data-fc-submit{% unless selected.available %} disabled{% endunless %}>
+                    <span data-fc-submit-label>
+                      {%- if selected.available -%}{{ 'products.add_to_cart' | t }}{%- else -%}{{ 'products.sold_out' | t }}{%- endif -%}
+                    </span>
+                  </button>
+                </div>
+                <p class="fc-form-error" role="alert" data-fc-error hidden></p>
+                {%- if block.settings.show_dynamic_checkout -%}
+                  <div class="fc-buy__dynamic">{{ form | payment_button }}</div>
+                {%- endif -%}
+              {%- endform -%}
+            </div>
+        {%- endcase -%}
+      {%- endfor -%}
+      {% render 'fc-variant-data', product: product %}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json">
+  {{ product | structured_data }}
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "div",
+  "class": "fc-section-product",
+  "blocks": [
+    { "type": "@app" },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { "type": "price", "name": "Price", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant picker", "limit": 1 },
+    {
+      "type": "instructions",
+      "name": "Ordering instructions",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "Shows the product's custom.order_instructions metafield. If it is empty, the fallback text below is shown, or nothing."
+        },
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Before you order" },
+        { "type": "richtext", "id": "text", "label": "Fallback text" }
+      ]
+    },
+    { "type": "description", "name": "Description", "limit": 1 },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text" }
+      ]
+    },
+    {
+      "type": "collapsible",
+      "name": "Collapsible row",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Shipping" },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "page", "id": "page", "label": "Content from page" }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_quantity", "label": "Show quantity", "default": true },
+        { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": false }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,147 @@
+{%- liquid
+  assign shop_url = settings.merch_collection.url | default: routes.all_products_collection_url
+  assign book_url = settings.vending_collection.url | default: '/collections/vending-tables'
+  assign shop_label = settings.shop_label | default: 'Shop'
+  assign book_label = settings.booking_label | default: 'Book vending tables'
+  assign current_path = request.path
+  assign on_shop = false
+  assign on_book = false
+  if current_path == shop_url or template.name == 'collection' and template.suffix != 'vending'
+    assign on_shop = true
+  endif
+  if current_path == book_url or template.suffix == 'vending' or template.suffix == 'event'
+    assign on_book = true
+  endif
+  if template.name == 'product' and template.suffix != 'event'
+    assign on_shop = true
+  endif
+-%}
+<header class="fc-header{% if section.settings.sticky %} fc-header--sticky{% endif %}" data-fc-header>
+  <div class="fc-header__bar">
+    <a class="fc-brand" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }} — {{ 'general.home' | t }}">
+      {%- if settings.logo_mark != blank -%}
+        {{ settings.logo_mark | image_url: width: 160 | image_tag: class: 'fc-brand__mark', alt: '', width: 80, height: 74, loading: 'eager' }}
+      {%- else -%}
+        <img class="fc-brand__mark" src="{{ 'fc-mark.webp' | asset_url }}" alt="" width="80" height="74" loading="eager">
+      {%- endif -%}
+      <span class="fc-brand__name" aria-hidden="true">
+        <span class="fc-brand__line1">{{ settings.wordmark_line_1 | escape }}</span>
+        {%- if settings.wordmark_line_2 != blank -%}
+          <span class="fc-brand__line2">{{ settings.wordmark_line_2 | escape }}</span>
+        {%- endif -%}
+      </span>
+    </a>
+
+    <nav class="fc-nav" aria-label="Primary">
+      <ul class="fc-nav__list" role="list">
+        <li><a class="fc-nav__link{% if on_shop %} is-current{% endif %}" href="{{ shop_url }}"{% if on_shop %} aria-current="page"{% endif %}>{{ shop_label | escape }}</a></li>
+        <li><a class="fc-nav__link fc-nav__link--book{% if on_book %} is-current{% endif %}" href="{{ book_url }}"{% if on_book %} aria-current="page"{% endif %}>{{ book_label | escape }}</a></li>
+        {%- for link in section.settings.menu.links -%}
+          <li class="fc-nav__extra"><a class="fc-nav__link{% if link.current %} is-current{% endif %}" href="{{ link.url }}"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="fc-header__tools">
+      <details class="fc-search-toggle" data-fc-search>
+        <summary class="fc-icon-button" aria-label="{{ 'general.search' | t }}">
+          {% render 'fc-icon', icon: 'search' %}
+        </summary>
+        <div class="fc-search-panel">
+          <form action="{{ routes.search_url }}" method="get" role="search" class="fc-search-form">
+            <label class="fc-visually-hidden" for="HeaderSearch-{{ section.id }}">{{ 'search.placeholder' | t }}</label>
+            <input id="HeaderSearch-{{ section.id }}" class="fc-input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'search.placeholder' | t }}" autocomplete="off">
+            <input type="hidden" name="options[prefix]" value="last">
+            <button class="fc-button fc-button--small" type="submit">{{ 'search.submit' | t }}</button>
+          </form>
+        </div>
+      </details>
+
+      <a class="fc-icon-button fc-cart-link" href="{{ routes.cart_url }}" data-fc-cart-link>
+        {% render 'fc-icon', icon: 'cart' %}
+        <span class="fc-visually-hidden">{{ 'general.cart' | t }}</span>
+        <span class="fc-cart-count" data-fc-cart-count{% if cart.item_count == 0 %} hidden{% endif %}>
+          <span aria-hidden="true">{{ cart.item_count }}</span>
+          <span class="fc-visually-hidden">{{ 'cart.count' | t: count: cart.item_count }}</span>
+        </span>
+      </a>
+
+      <details class="fc-menu-toggle" data-fc-menu>
+        <summary class="fc-icon-button" aria-label="{{ 'general.menu' | t }}">
+          <span class="fc-menu-toggle__open">{% render 'fc-icon', icon: 'menu' %}</span>
+          <span class="fc-menu-toggle__close">{% render 'fc-icon', icon: 'close' %}</span>
+        </summary>
+        <div class="fc-drawer">
+          <nav aria-label="{{ 'general.menu' | t }}">
+            <ul class="fc-drawer__list" role="list">
+              <li><a class="fc-drawer__link" href="{{ shop_url }}">{{ shop_label | escape }}</a></li>
+              <li><a class="fc-drawer__link fc-drawer__link--book" href="{{ book_url }}">{{ book_label | escape }}</a></li>
+              {%- for link in section.settings.menu.links -%}
+                <li><a class="fc-drawer__link" href="{{ link.url }}">{{ link.title | escape }}</a></li>
+              {%- endfor -%}
+              {%- for link in section.settings.drawer_menu.links -%}
+                <li><a class="fc-drawer__link fc-drawer__link--small" href="{{ link.url }}">{{ link.title | escape }}</a></li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+          <form action="{{ routes.search_url }}" method="get" role="search" class="fc-search-form fc-drawer__search">
+            <label class="fc-visually-hidden" for="DrawerSearch-{{ section.id }}">{{ 'search.placeholder' | t }}</label>
+            <input id="DrawerSearch-{{ section.id }}" class="fc-input" type="search" name="q" placeholder="{{ 'search.placeholder' | t }}">
+            <button class="fc-button fc-button--small" type="submit">{{ 'search.submit' | t }}</button>
+          </form>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <nav class="fc-subbar" aria-label="Shop and booking">
+    <a class="fc-subbar__link{% if on_shop %} is-current{% endif %}" href="{{ shop_url }}">{{ shop_label | escape }}</a>
+    <a class="fc-subbar__link fc-subbar__link--book{% if on_book %} is-current{% endif %}" href="{{ book_url }}">
+      {{- book_label | escape -}}
+      {% render 'fc-icon', icon: 'arrow' %}
+    </a>
+  </nav>
+</header>
+
+{%- if request.page_type == 'index' -%}
+  <script type="application/ld+json">
+    {
+      "@context": "http://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      "url": {{ request.origin | append: routes.root_url | json }}
+    }
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "fc-section-header",
+  "enabled_on": { "groups": ["header"] },
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Shop and booking links, labels and logos are set in Theme settings › Shop & booking and Brand."
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Keep header visible while scrolling",
+      "default": true
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Extra header links",
+      "info": "Optional. Keep it short; Shop and Book are always shown."
+    },
+    {
+      "type": "link_list",
+      "id": "drawer_menu",
+      "label": "Extra mobile menu links",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,31 @@
+{{ 'fc-shop.css' | asset_url | stylesheet_tag }}
+{%- comment -%}
+  Loaded through the Section Rendering API. Vending-table (event) products are filtered out
+  so tables never appear as merchandise recommendations.
+{%- endcomment -%}
+<section class="fc-recs" data-fc-recs data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.limit | plus: 2 }}&intent=related">
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    {%- assign shown = 0 -%}
+    <div class="fc-recs__inner">
+      <h2 class="fc-recs__title">{{ section.settings.heading | escape }}</h2>
+      <ul class="fc-grid fc-grid--recs" role="list">
+        {%- for rec in recommendations.products -%}
+          {%- if rec.template_suffix contains 'event' or shown >= section.settings.limit -%}{%- continue -%}{%- endif -%}
+          {%- assign shown = shown | plus: 1 -%}
+          <li class="fc-grid__item">{% render 'fc-product-card', product: rec %}</li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+</section>
+{% schema %}
+{
+  "name": "Product recommendations",
+  "tag": "div",
+  "class": "fc-section-recs",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "More from the shop" },
+    { "type": "range", "id": "limit", "label": "Products", "min": 2, "max": 8, "step": 1, "default": 4 }
+  ]
+}
+{% endschema %}

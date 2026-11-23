@@ -1,0 +1,92 @@
+{{ 'fc-cart.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign table_count = 0
+  assign merch_count = 0
+  for item in cart.items
+    if item.product.template_suffix contains 'event'
+      assign table_count = table_count | plus: 1
+    else
+      assign merch_count = merch_count | plus: 1
+    endif
+  endfor
+-%}
+<section class="fc-cart" data-fc-cart data-section-id="{{ section.id }}">
+  <div class="fc-cart__inner">
+    <header class="fc-cart__head">
+      <h1 class="fc-cart__title">{{ 'cart.title' | t }}</h1>
+      {%- if cart.item_count > 0 -%}
+        <p class="fc-cart__count">{{ 'cart.count' | t: count: cart.item_count }}</p>
+      {%- endif -%}
+    </header>
+
+    {%- if cart.item_count == 0 -%}
+      <div class="fc-cart__empty">
+        <p>{{ 'cart.empty' | t }}</p>
+        <div class="fc-cart__empty-actions">
+          <a class="fc-button" href="{{ settings.merch_collection.url | default: routes.all_products_collection_url }}">{{ settings.shop_label | default: 'Shop' | escape }} {% render 'fc-icon', icon: 'arrow' %}</a>
+          <a class="fc-button fc-button--crimson" href="{{ settings.vending_collection.url | default: '/collections/vending-tables' }}">{{ settings.booking_label | escape }} {% render 'fc-icon', icon: 'arrow' %}</a>
+        </div>
+      </div>
+    {%- else -%}
+      <form action="{{ routes.cart_url }}" method="post" id="CartForm" class="fc-cart__form" novalidate>
+        <div class="fc-cart__lines">
+          {%- if table_count > 0 -%}
+            <h2 class="fc-cart__group">{{ 'cart.group_tables' | t }}</h2>
+            {%- if settings.table_cart_notice != blank -%}
+              <div class="fc-cart__notice fc-rte">{{ settings.table_cart_notice }}</div>
+            {%- endif -%}
+            <ul class="fc-lines" role="list">
+              {%- for item in cart.items -%}
+                {%- if item.product.template_suffix contains 'event' -%}
+                  {% render 'fc-cart-line', item: item, is_table: true %}
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+          {%- if merch_count > 0 -%}
+            {%- if table_count > 0 -%}<h2 class="fc-cart__group">{{ 'cart.group_merch' | t }}</h2>{%- endif -%}
+            <ul class="fc-lines" role="list">
+              {%- for item in cart.items -%}
+                {%- unless item.product.template_suffix contains 'event' -%}
+                  {% render 'fc-cart-line', item: item, is_table: false %}
+                {%- endunless -%}
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+
+        <aside class="fc-summary" aria-label="{{ 'cart.subtotal' | t }}">
+          {%- if settings.cart_note -%}
+            <div class="fc-field">
+              <label class="fc-label" for="CartNote">{{ 'cart.note' | t }}</label>
+              <textarea class="fc-input fc-textarea" id="CartNote" name="note" rows="3" data-fc-cart-note>{{ cart.note }}</textarea>
+            </div>
+          {%- endif -%}
+          {%- for discount in cart.cart_level_discount_applications -%}
+            <p class="fc-summary__row"><span>{{ discount.title | escape }}</span><span>−{{ discount.total_allocated_amount | money }}</span></p>
+          {%- endfor -%}
+          <p class="fc-summary__row fc-summary__total">
+            <span>{{ 'cart.subtotal' | t }}</span>
+            <span>{% if settings.currency_code_enabled %}{{ cart.total_price | money_with_currency }}{% else %}{{ cart.total_price | money }}{% endif %}</span>
+          </p>
+          <p class="fc-summary__note">{{ 'cart.taxes' | t }}</p>
+          <noscript><button type="submit" class="fc-button fc-button--ghost" name="update">{{ 'cart.update' | t }}</button></noscript>
+          <button type="submit" class="fc-button fc-button--large fc-summary__checkout" name="checkout">{{ 'cart.checkout' | t }} {% render 'fc-icon', icon: 'arrow' %}</button>
+          {%- if additional_checkout_buttons -%}
+            <div class="fc-summary__dynamic">{{ content_for_additional_checkout_buttons }}</div>
+          {%- endif -%}
+          <p class="fc-form-error" role="alert" data-fc-error hidden></p>
+        </aside>
+      </form>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Cart",
+  "tag": "div",
+  "class": "fc-section-cart",
+  "settings": []
+}
+{% endschema %}

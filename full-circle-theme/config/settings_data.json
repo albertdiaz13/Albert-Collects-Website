@@ -1,0 +1,23 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_paper": "#EAE4D8",
+      "color_paper_deep": "#E1D9CA",
+      "color_ink": "#0F0E0C",
+      "color_crimson": "#9C0612",
+      "color_surface": "#FBFAF7",
+      "paper_texture": true,
+      "type_body_font": "inter_n4",
+      "shop_label": "Shop",
+      "booking_label": "Book vending tables",
+      "booking_contact_url": "/pages/contact",
+      "booking_contact_label": "Ask about upcoming shows",
+      "show_table_counts": true,
+      "low_table_threshold": 5,
+      "cart_note": true,
+      "currency_code_enabled": false,
+      "motion_enabled": true
+    }
+  }
+}

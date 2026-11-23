@@ -1,0 +1,20 @@
+<section class="fc-page fc-contact">
+  <div class="fc-page__inner">
+    {%- if section.settings.heading != blank -%}<h2 class="fc-contact__title">{{ section.settings.heading | escape }}</h2>{%- endif -%}
+    {%- form 'contact', id: 'ContactForm', class: 'fc-contact__form' -%}
+      {%- if form.posted_successfully? -%}
+        <p class="fc-callout" role="status">{{ 'contact.success' | t }}</p>
+      {%- elsif form.errors -%}
+        <div class="fc-form-error" role="alert">{{ 'contact.error' | t }} {{ form.errors | default_errors }}</div>
+      {%- endif -%}
+      <div class="fc-field"><label class="fc-label" for="ContactName">{{ 'contact.name' | t }}</label><input class="fc-input" id="ContactName" name="contact[name]" autocomplete="name" value="{{ form.name }}"></div>
+      <div class="fc-field"><label class="fc-label" for="ContactEmail">{{ 'contact.email' | t }} *</label><input class="fc-input" id="ContactEmail" type="email" name="contact[email]" autocomplete="email" required value="{{ form.email }}"></div>
+      <div class="fc-field"><label class="fc-label" for="ContactPhone">{{ 'contact.phone' | t }}</label><input class="fc-input" id="ContactPhone" type="tel" name="contact[phone]" autocomplete="tel" value="{{ form.phone }}"></div>
+      <div class="fc-field"><label class="fc-label" for="ContactBody">{{ 'contact.message' | t }}</label><textarea class="fc-input fc-textarea" id="ContactBody" name="contact[body]" rows="6">{{ form.body }}</textarea></div>
+      <button class="fc-button fc-button--large" type="submit">{{ 'contact.send' | t }}</button>
+    {%- endform -%}
+  </div>
+</section>
+{% schema %}
+{ "name": "Contact form", "tag": "div", "settings": [{ "type": "text", "id": "heading", "label": "Heading", "default": "Get in touch" }], "presets": [{ "name": "Contact form" }] }
+{% endschema %}

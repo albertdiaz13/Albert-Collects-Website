@@ -1,0 +1,20 @@
+<section class="fc-page">
+  <div class="fc-page__inner">
+    <h1 class="fc-page__title">{{ blog.title | escape }}</h1>
+    {%- paginate blog.articles by 12 -%}
+      <ul class="fc-articles" role="list">
+        {%- for article in blog.articles -%}
+          <li class="fc-article-item">
+            <p class="fc-kicker">{{ article.published_at | date: '%b %-d, %Y' }}</p>
+            <h2><a class="fc-card__link" href="{{ article.url }}">{{ article.title | escape }}</a></h2>
+            <p>{{ article.excerpt_or_content | strip_html | truncatewords: 30 }}</p>
+          </li>
+        {%- endfor -%}
+      </ul>
+      {%- if paginate.pages > 1 -%}{% render 'fc-pagination', paginate: paginate %}{%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</section>
+{% schema %}
+{ "name": "Blog", "tag": "div", "settings": [] }
+{% endschema %}

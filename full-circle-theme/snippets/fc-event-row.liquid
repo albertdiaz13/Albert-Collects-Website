@@ -1,0 +1,125 @@
+{%- comment -%}
+  One show on the bill.
+  - event: event product (required)
+  - style: 'row' | 'feature' | 'past'
+  - heading_level: number, default 3
+  Reads metafields in the "event" namespace:
+  starts_at (date_time), ends_at (date_time), venue (single line), city (single line)
+{%- endcomment -%}
+{%- liquid
+  assign style = style | default: 'row'
+  assign h = heading_level | default: 3
+  assign start = event.metafields.event.starts_at.value
+  assign finish = event.metafields.event.ends_at.value
+  assign venue = event.metafields.event.venue.value
+  assign city = event.metafields.event.city.value
+
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign is_past = false
+  assign end_ts = 0
+  if start != blank
+    assign start_ts = start | date: '%s' | plus: 0
+    if finish != blank
+      assign end_ts = finish | date: '%s' | plus: 0
+    else
+      assign end_ts = start_ts | plus: 43200
+    endif
+    if end_ts < now_ts
+      assign is_past = true
+    endif
+  endif
+
+  assign tracked_left = 0
+  assign untracked = false
+  assign min_price = nil
+  for v in event.variants
+    if v.available
+      if min_price == nil or v.price < min_price
+        assign min_price = v.price
+      endif
+    endif
+    if v.inventory_management == 'shopify' and v.inventory_policy == 'deny'
+      if v.inventory_quantity > 0
+        assign tracked_left = tracked_left | plus: v.inventory_quantity
+      endif
+    elsif v.available
+      assign untracked = true
+    endif
+  endfor
+  if min_price == nil
+    assign min_price = event.price_min
+  endif
+  if settings.currency_code_enabled
+    assign price_html = min_price | money_with_currency
+  else
+    assign price_html = min_price | money
+  endif
+
+  assign status_class = 'open'
+  if is_past
+    assign status_class = 'past'
+    assign status_text = 'events.ended_short' | t
+  elsif event.available == false
+    assign status_class = 'sold-out'
+    assign status_text = 'events.sold_out' | t
+  elsif settings.show_table_counts and untracked == false and tracked_left > 0
+    assign status_text = 'events.tables_left' | t: count: tracked_left
+    if tracked_left <= settings.low_table_threshold
+      assign status_class = 'low'
+    endif
+  else
+    assign status_text = 'events.available' | t
+  endif
+-%}
+<li class="fc-bill__item fc-bill__item--{{ style }} is-{{ status_class }}" data-fc-event{% if end_ts > 0 %} data-ends="{{ end_ts }}"{% endif %}>
+  <a class="fc-bill__link" href="{{ event.url }}">
+    {%- if start != blank -%}
+      <time class="fc-bill__date" datetime="{{ start | date: '%Y-%m-%dT%H:%M' }}" data-fc-reveal="date">
+        <span class="fc-bill__month">{{ start | date: '%b' }}</span>
+        <span class="fc-bill__day">{{ start | date: '%-d' }}</span>
+        {%- assign start_year = start | date: '%Y' -%}
+        {%- assign this_year = 'now' | date: '%Y' -%}
+        <span class="fc-bill__weekday">{{ start | date: '%a' }}{% if style != 'row' or start_year != this_year %} {{ start_year }}{% endif %}</span>
+      </time>
+    {%- else -%}
+      <span class="fc-bill__date fc-bill__date--tba" data-fc-reveal="date">
+        <span class="fc-bill__month">TBA</span>
+      </span>
+    {%- endif -%}
+    <span class="fc-bill__main" data-fc-reveal="venue">
+      <span class="fc-bill__title" role="heading" aria-level="{{ h }}">{{ event.title | escape }}</span>
+      {%- if venue != blank or city != blank -%}
+        <span class="fc-bill__venue">
+          {%- if venue != blank %}{{ venue | escape }}{% endif -%}
+          {%- if venue != blank and city != blank %}<span aria-hidden="true"> · </span>{% endif -%}
+          {%- if city != blank %}{{ city | escape }}{% endif -%}
+        </span>
+      {%- endif -%}
+      {%- if start != blank -%}
+        <span class="fc-bill__time">
+          {{ start | date: '%-l:%M %p' }}
+          {%- if finish != blank %}–{{ finish | date: '%-l:%M %p' }}{% endif %} {{ start | date: '%Z' }}
+        </span>
+      {%- else -%}
+        <span class="fc-bill__time">{{ 'events.date_tba' | t }}</span>
+      {%- endif -%}
+    </span>
+    <span class="fc-bill__meta" data-fc-reveal="meta">
+      <span class="fc-status fc-status--{{ status_class }}">{{ status_text }}</span>
+      {%- unless is_past or event.available == false -%}
+        <span class="fc-bill__price">{{ 'events.from_price' | t: price: price_html }}</span>
+      {%- endunless -%}
+    </span>
+    {%- unless style == 'past' -%}
+      <span class="fc-bill__go">
+        {%- if style == 'feature' -%}
+          <span class="fc-bill__cta">{% if is_past or event.available == false %}{{ 'events.view_show' | t }}{% else %}{{ 'events.book_table' | t }}{% endif %}</span>
+        {%- endif -%}
+        <span class="fc-ring-arrow">
+          <span class="fc-ring-arrow__ring" aria-hidden="true"></span>
+          {% render 'fc-icon', icon: 'arrow' %}
+        </span>
+      </span>
+    {%- endunless -%}
+  </a>
+</li>

@@ -1,0 +1,145 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_paper }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- else -%}
+      <link rel="icon" type="image/png" href="{{ 'fc-favicon.png' | asset_url }}">
+    {%- endif -%}
+
+    {{ 'fc-display-900.woff2' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous' }}
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.page' | t: page: current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {% render 'fc-meta-tags' %}
+
+    <script src="{{ 'fc-theme.js' | asset_url }}" defer="defer"></script>
+
+    {{ content_for_header }}
+
+    {%- liquid
+      assign body_font = settings.type_body_font
+      assign body_font_bold = body_font | font_modify: 'weight', '600'
+      assign body_font_heavy = body_font | font_modify: 'weight', '700'
+    -%}
+
+    {% style %}
+      @font-face {
+        font-family: 'FC Display';
+        src: url('{{ 'fc-display-900.woff2' | asset_url }}') format('woff2');
+        font-weight: 900;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'FC Display';
+        src: url('{{ 'fc-display-800.woff2' | asset_url }}') format('woff2');
+        font-weight: 800;
+        font-style: normal;
+        font-display: swap;
+      }
+      {{ body_font | font_face: font_display: 'swap' }}
+      {{ body_font_bold | font_face: font_display: 'swap' }}
+      {{ body_font_heavy | font_face: font_display: 'swap' }}
+
+      :root {
+        --fc-paper: {{ settings.color_paper }};
+        --fc-paper-deep: {{ settings.color_paper_deep }};
+        --fc-ink: {{ settings.color_ink }};
+        --fc-crimson: {{ settings.color_crimson }};
+        --fc-surface: {{ settings.color_surface }};
+        --fc-ink-rgb: {{ settings.color_ink.red }}, {{ settings.color_ink.green }}, {{ settings.color_ink.blue }};
+        --fc-paper-rgb: {{ settings.color_paper.red }}, {{ settings.color_paper.green }}, {{ settings.color_paper.blue }};
+        --fc-font-body: {{ body_font.family }}, {{ body_font.fallback_families }};
+        --fc-font-body-weight: {{ body_font.weight }};
+        --fc-font-display: 'FC Display', 'Arial Narrow', 'Helvetica Neue Condensed', Impact, sans-serif;
+        {%- if settings.paper_texture %}
+        --fc-paper-texture: url('{{ 'fc-paper.jpg' | asset_url }}');
+        {%- else %}
+        --fc-paper-texture: none;
+        {%- endif %}
+        --fc-asset-ring: url('{{ 'fc-crimson-ring.webp' | asset_url }}');
+      }
+    {% endstyle %}
+
+    {{ 'fc-base.css' | asset_url | stylesheet_tag }}
+
+    <script>
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+      window.FC = {
+        routes: {
+          root: {{ routes.root_url | json }},
+          cart: {{ routes.cart_url | json }},
+          cartAdd: {{ routes.cart_add_url | json }},
+          cartChange: {{ routes.cart_change_url | json }},
+          cartUpdate: {{ routes.cart_update_url | json }}
+        },
+        moneyFormat: {{ shop.money_format | json }},
+        strings: {
+          added: {{ 'cart.added' | t | json }},
+          addedTable: {{ 'cart.added_table' | t | json }},
+          viewCart: {{ 'cart.view_cart' | t | json }},
+          checkout: {{ 'cart.checkout' | t | json }},
+          error: {{ 'cart.error' | t | json }},
+          soldOut: {{ 'products.sold_out' | t | json }},
+          unavailable: {{ 'products.unavailable' | t | json }},
+          addToCart: {{ 'products.add_to_cart' | t | json }},
+          addTable: {{ 'events.add_table' | t | json }},
+          holdNotice: {{ 'events.hold_notice' | t | json }},
+          close: {{ 'general.close' | t | json }}
+        },
+        motion: {{ settings.motion_enabled | json }},
+        designMode: {{ request.design_mode | json }}
+      };
+    </script>
+  </head>
+
+  <body class="fc-body template-{{ template.name | handle }}{% if template.suffix %} template-{{ template.name | handle }}--{{ template.suffix | handle }}{% endif %}">
+    <a class="fc-skip-link" href="#MainContent">{{ 'general.skip_to_content' | t }}</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="fc-main" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    <div class="fc-toast" data-fc-toast hidden>
+      <div class="fc-toast__inner" role="status" aria-live="polite">
+        <p class="fc-toast__title" data-fc-toast-title></p>
+        <p class="fc-toast__note" data-fc-toast-note hidden></p>
+        <div class="fc-toast__actions">
+          <a class="fc-button fc-button--ghost fc-button--small" href="{{ routes.cart_url }}">{{ 'cart.view_cart' | t }}</a>
+          <form action="{{ routes.cart_url }}" method="post">
+            <button class="fc-button fc-button--small" type="submit" name="checkout">{{ 'cart.checkout' | t }}</button>
+          </form>
+        </div>
+        <button class="fc-toast__close" type="button" data-fc-toast-close aria-label="{{ 'general.close' | t }}">
+          {% render 'fc-icon', icon: 'close' %}
+        </button>
+      </div>
+    </div>
+
+    {%- if settings.motion_enabled -%}
+      <script src="{{ 'gsap.min.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'gsap-scrolltrigger.min.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'fc-motion.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+  </body>
+</html>

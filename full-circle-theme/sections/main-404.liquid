@@ -1,0 +1,14 @@
+<section class="fc-page fc-page--404">
+  <div class="fc-page__inner">
+    <p class="fc-kicker">404</p>
+    <h1 class="fc-page__title">{{ 'general.404_title' | t }}</h1>
+    <p>{{ 'general.404_body' | t }}</p>
+    <div class="fc-hero__actions">
+      <a class="fc-button" href="{{ settings.merch_collection.url | default: routes.all_products_collection_url }}">{{ settings.shop_label | escape }} {% render 'fc-icon', icon: 'arrow' %}</a>
+      <a class="fc-button fc-button--crimson" href="{{ settings.vending_collection.url | default: '/collections/vending-tables' }}">{{ settings.booking_label | escape }} {% render 'fc-icon', icon: 'arrow' %}</a>
+    </div>
+  </div>
+</section>
+{% schema %}
+{ "name": "404", "tag": "div", "class": "fc-section-404", "settings": [] }
+{% endschema %}

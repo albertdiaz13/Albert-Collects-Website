@@ -1,0 +1,237 @@
+{{ 'fc-event.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign ev = product.metafields.event
+  assign start = ev.starts_at.value
+  assign finish = ev.ends_at.value
+  assign venue = ev.venue.value
+  assign city = ev.city.value
+  assign address = ev.address.value
+  assign vendor_fields = ev.vendor_fields.value
+  assign form_id = 'EventForm-' | append: section.id
+  assign selected = product.selected_or_first_available_variant
+  assign book_url = settings.vending_collection.url | default: '/collections/vending-tables'
+
+  assign now_ts = 'now' | date: '%s' | plus: 0
+  assign is_past = false
+  assign end_ts = 0
+  if start != blank
+    assign start_ts = start | date: '%s' | plus: 0
+    if finish != blank
+      assign end_ts = finish | date: '%s' | plus: 0
+    else
+      assign end_ts = start_ts | plus: 43200
+    endif
+    if end_ts < now_ts
+      assign is_past = true
+    endif
+  endif
+
+  assign map_url = ev.map_url.value
+  if map_url == blank and address != blank
+    assign map_query = venue | append: ' ' | append: address | url_encode
+    assign map_url = 'https://www.google.com/maps/search/?api=1&query=' | append: map_query
+  endif
+
+  assign state = 'open'
+  if is_past
+    assign state = 'past'
+  elsif product.available == false
+    assign state = 'sold-out'
+  endif
+-%}
+<section class="fc-event is-{{ state }}" data-fc-event-page data-section-id="{{ section.id }}" data-ended-label="{{ 'events.ended' | t | escape }}"{% if end_ts > 0 %} data-ends="{{ end_ts }}"{% endif %}>
+  <div class="fc-event__inner">
+    <a class="fc-backlink" href="{{ book_url }}">{% render 'fc-icon', icon: 'arrow-left' %}{{ 'events.all_shows' | t }}</a>
+
+    <div class="fc-event__head">
+      <p class="fc-kicker">{{ 'events.kicker' | t }}</p>
+      <h1 class="fc-event__title{% if product.title.size > 48 %} fc-event__title--long{% endif %}">{{ product.title | escape }}</h1>
+
+      <dl class="fc-event__facts">
+        <div class="fc-event__fact">
+          <dt>{% render 'fc-icon', icon: 'clock' %}<span class="fc-visually-hidden">{{ 'events.when' | t }}</span></dt>
+          <dd>
+            {%- if start != blank -%}
+              <time datetime="{{ start | date: '%Y-%m-%dT%H:%M' }}"><strong>{{ start | date: '%A, %B %-d, %Y' }}</strong></time>
+              <span>{{ start | date: '%-l:%M %p' }}{% if finish != blank %}–{{ finish | date: '%-l:%M %p' }}{% endif %} {{ start | date: '%Z' }}</span>
+            {%- else -%}
+              <strong>{{ 'events.date_tba' | t }}</strong>
+            {%- endif -%}
+          </dd>
+        </div>
+        {%- if venue != blank or city != blank or address != blank -%}
+          <div class="fc-event__fact">
+            <dt>{% render 'fc-icon', icon: 'pin' %}<span class="fc-visually-hidden">{{ 'events.venue' | t }}</span></dt>
+            <dd>
+              {%- if venue != blank -%}<strong>{{ venue | escape }}</strong>{%- endif -%}
+              {%- if address != blank -%}<span>{{ address | escape | newline_to_br }}</span>{%- endif -%}
+              {%- if city != blank -%}<span>{{ city | escape }}</span>{%- endif -%}
+              {%- if map_url != blank -%}<a class="fc-inline-link" href="{{ map_url }}" target="_blank" rel="noopener">{{ 'events.directions' | t }}</a>{%- endif -%}
+            </dd>
+          </div>
+        {%- endif -%}
+      </dl>
+    </div>
+
+    <div class="fc-event__poster" aria-hidden="true">
+      {%- if product.featured_image -%}
+        <div class="fc-event__photo">
+          {% render 'fc-image', image: product.featured_image, widths: '400, 600, 800, 1000', sizes: '(min-width: 990px) 30vw, 70vw', class: 'fc-event__img', loading: 'eager', alt: '' %}
+        </div>
+      {%- elsif start != blank -%}
+        <div class="fc-event__datemark">
+          <span class="fc-event__dm-month">{{ start | date: '%b' }}</span>
+          <span class="fc-event__dm-day">{{ start | date: '%-d' }}</span>
+          <span class="fc-event__dm-year">{{ start | date: '%a · %Y' }}</span>
+        </div>
+      {%- else -%}
+        <div class="fc-event__datemark"><span class="fc-event__dm-month">TBA</span></div>
+      {%- endif -%}
+      <img class="fc-event__ring" src="{{ 'fc-brush-ring.webp' | asset_url }}" alt="" width="1300" height="1200" loading="eager">
+    </div>
+
+    <div class="fc-event__booking" id="Booking-{{ section.id }}">
+      {%- case state -%}
+        {%- when 'past' -%}
+          <div class="fc-booking fc-booking--closed">
+            <p class="fc-booking__state">{{ 'events.ended' | t }}</p>
+            <a class="fc-button" href="{{ book_url }}">{{ 'events.upcoming' | t }} {% render 'fc-icon', icon: 'arrow' %}</a>
+          </div>
+        {%- when 'sold-out' -%}
+          <div class="fc-booking fc-booking--closed">
+            <p class="fc-booking__state">{{ 'events.sold_out' | t }}</p>
+            <p>{{ 'events.sold_out_event' | t }}</p>
+            <ul class="fc-tiers fc-tiers--static" role="list">
+              {%- for v in product.variants -%}
+                <li class="fc-tier is-sold-out"><span class="fc-tier__name">{{ v.title | escape }}</span><span class="fc-tier__price">{{ v.price | money }}</span><span class="fc-status fc-status--sold-out">{{ 'events.sold_out' | t }}</span></li>
+              {%- endfor -%}
+            </ul>
+            {%- if settings.booking_contact_url != blank -%}
+              <a class="fc-link-button" href="{{ settings.booking_contact_url }}">{{ settings.booking_contact_label | escape }} {% render 'fc-icon', icon: 'arrow' %}</a>
+            {%- endif -%}
+          </div>
+        {%- else -%}
+          {%- form 'product', product, id: form_id, class: 'fc-booking', novalidate: 'novalidate', data-fc-product-form: '', data-fc-event-form: '' -%}
+            {%- if product.has_only_default_variant -%}
+              <input type="hidden" name="id" value="{{ selected.id }}">
+              <div class="fc-booking__single">
+                <span class="fc-booking__price">{{ selected.price | money }}</span>
+                <span class="fc-booking__unit">{{ 'events.per_table' | t }}</span>
+                {% render 'fc-event-stock', variant: selected %}
+              </div>
+            {%- elsif product.options.size == 1 -%}
+              <fieldset class="fc-tiers-wrap">
+                <legend class="fc-booking__legend">{{ 'events.choose_table' | t }}</legend>
+                <ul class="fc-tiers" role="list">
+                  {%- for v in product.variants -%}
+                    <li class="fc-tier{% unless v.available %} is-sold-out{% endunless %}">
+                      <input class="fc-tier__input" type="radio" name="id" id="{{ form_id }}-v{{ v.id }}" value="{{ v.id }}"{% if v.id == selected.id %} checked{% endif %}{% unless v.available %} disabled{% endunless %} data-price="{{ v.price }}"{% if v.inventory_management == 'shopify' and v.inventory_policy == 'deny' %} data-left="{{ v.inventory_quantity | at_least: 0 }}"{% endif %}>
+                      <label class="fc-tier__label" for="{{ form_id }}-v{{ v.id }}">
+                        <span class="fc-tier__name">{{ v.title | escape }}</span>
+                        <span class="fc-tier__price">{{ v.price | money }}</span>
+                        {% render 'fc-event-stock', variant: v %}
+                      </label>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </fieldset>
+            {%- else -%}
+              <input type="hidden" name="id" value="{{ selected.id }}" disabled data-fc-variant-id>
+              {% render 'fc-variant-picker', product: product, form_id: form_id, selected: selected %}
+              <p class="fc-booking__price-line" data-fc-price-wrap>{% render 'fc-price', product: product, variant: selected %} <span class="fc-booking__unit">{{ 'events.per_table' | t }}</span></p>
+            {%- endif -%}
+
+            <div class="fc-booking__qty">
+              {%- assign qty_id = 'Tables-' | append: section.id -%}
+              <label class="fc-label" for="{{ qty_id }}">{{ 'events.tables_needed' | t }}</label>
+              {%- liquid
+                assign qty_max = nil
+                if selected.inventory_management == 'shopify' and selected.inventory_policy == 'deny'
+                  assign qty_max = selected.inventory_quantity | at_least: 1
+                endif
+              -%}
+              {% render 'fc-quantity', id: qty_id, title: product.title, max: qty_max %}
+            </div>
+
+            {%- if vendor_fields != blank and vendor_fields.size > 0 -%}
+              <fieldset class="fc-vendor">
+                <legend class="fc-booking__legend">{{ 'events.vendor_details' | t }}</legend>
+                <p class="fc-vendor__info">{{ 'events.vendor_details_info' | t }}</p>
+                {%- for field in vendor_fields -%}
+                  {%- assign fid = form_id | append: '-f' | append: forloop.index -%}
+                  <div class="fc-field">
+                    <label class="fc-label" for="{{ fid }}">{{ field | escape }}</label>
+                    <input class="fc-input" id="{{ fid }}" type="text" name="properties[{{ field | escape }}]" required autocomplete="off">
+                  </div>
+                {%- endfor -%}
+              </fieldset>
+            {%- endif -%}
+
+            <button type="submit" name="add" class="fc-button fc-button--large fc-button--crimson fc-booking__submit" data-fc-submit>
+              <span data-fc-submit-label>{{ 'events.add_table' | t }}</span>
+            </button>
+            <p class="fc-form-error" role="alert" data-fc-error hidden></p>
+            <p class="fc-booking__notice">{{ 'events.hold_notice' | t }}</p>
+            {% render 'fc-variant-data', product: product %}
+          {%- endform -%}
+        {%- endcase -%}
+    </div>
+
+    {%- liquid
+      assign has_details = false
+      if ev.table_size != blank or ev.included != blank or ev.load_in != blank or ev.cancellation != blank or product.description != blank
+        assign has_details = true
+      endif
+    -%}
+    {%- if has_details -%}
+      <div class="fc-event__details">
+        <dl class="fc-details">
+          {%- if ev.table_size != blank -%}
+            <div class="fc-details__row"><dt>{{ 'events.dimensions' | t }}</dt><dd>{{ ev.table_size.value | escape }}</dd></div>
+          {%- endif -%}
+          {%- if ev.included != blank -%}
+            <div class="fc-details__row"><dt>{{ 'events.included' | t }}</dt><dd class="fc-rte">{{ ev.included | metafield_tag }}</dd></div>
+          {%- endif -%}
+          {%- if ev.load_in != blank -%}
+            <div class="fc-details__row"><dt>{{ 'events.load_in' | t }}</dt><dd class="fc-rte">{{ ev.load_in | metafield_tag }}</dd></div>
+          {%- endif -%}
+          {%- if ev.cancellation != blank -%}
+            <div class="fc-details__row"><dt>{{ 'events.cancellation' | t }}</dt><dd class="fc-rte">{{ ev.cancellation | metafield_tag }}</dd></div>
+          {%- endif -%}
+          {%- if product.description != blank -%}
+            <div class="fc-details__row"><dt>{{ 'events.about' | t }}</dt><dd class="fc-rte">{{ product.description }}</dd></div>
+          {%- endif -%}
+        </dl>
+      </div>
+    {%- endif -%}
+
+    {%- for block in section.blocks -%}
+      <div class="fc-event__app" {{ block.shopify_attributes }}>{% render block %}</div>
+    {%- endfor -%}
+  </div>
+
+  {%- if state == 'open' -%}
+    <div class="fc-sticky-buy" data-fc-sticky hidden>
+      <span class="fc-sticky-buy__text">
+        <span class="fc-sticky-buy__name" data-fc-sticky-name>{{ selected.title | escape }}</span>
+        <span class="fc-sticky-buy__price" data-fc-sticky-price>{{ selected.price | money }}</span>
+      </span>
+      <a class="fc-button fc-button--crimson" href="#Booking-{{ section.id }}" data-fc-sticky-go>{{ 'events.book_table' | t }}</a>
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Show booking",
+  "tag": "div",
+  "class": "fc-section-event",
+  "blocks": [{ "type": "@app" }],
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Show details come from the product's event metafields: starts_at, ends_at, venue, address, city, table_size, included, load_in, cancellation, vendor_fields and map_url. Empty fields are hidden."
+    }
+  ]
+}
+{% endschema %}

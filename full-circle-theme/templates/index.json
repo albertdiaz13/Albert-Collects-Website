@@ -1,0 +1,53 @@
+{
+  "sections": {
+    "hero": {
+      "type": "fc-hero",
+      "settings": {
+        "kicker": "Full Circle Collaborations",
+        "headline": "Gear for the hobby.\nTables at the show.",
+        "subheading": "<p>Custom stickers for your card business, hats and collector supplies — plus vending tables at the shows we host.</p>",
+        "primary_label": "Shop products",
+        "primary_url": "",
+        "secondary_label": "Book vending tables",
+        "secondary_url": "",
+        "image_alt": "A fanned stack of round holographic Full Circle Collaborations stickers",
+        "use_bundled_art": true,
+        "breakout_x": 72,
+        "breakout_y": 66,
+        "breakout_size": 42,
+        "idle_effect": "foil",
+        "show_stroke": true
+      }
+    },
+    "shows": {
+      "type": "fc-shows",
+      "settings": {
+        "collection": "",
+        "kicker": "Vending tables",
+        "heading": "Upcoming shows",
+        "text": "",
+        "limit": 6,
+        "scheme": "ink"
+      }
+    },
+    "shop": {
+      "type": "fc-shop",
+      "blocks": {
+        "hats": { "type": "collection_link", "settings": { "collection": "frontpage", "label": "Hats" } },
+        "mini": { "type": "collection_link", "settings": { "collection": "mini-binders", "label": "Mini binders" } },
+        "sleeve": { "type": "collection_link", "settings": { "collection": "sleeved-binders", "label": "Sleeved binders" } },
+        "toploader": { "type": "collection_link", "settings": { "collection": "top-loaders", "label": "Top loader binders" } }
+      },
+      "block_order": ["hats", "mini", "sleeve", "toploader"],
+      "settings": {
+        "collection": "",
+        "limit": 6,
+        "kicker": "Merch & supplies",
+        "heading": "Shop",
+        "text": "",
+        "show_empty": false
+      }
+    }
+  },
+  "order": ["hero", "shows", "shop"]
+}

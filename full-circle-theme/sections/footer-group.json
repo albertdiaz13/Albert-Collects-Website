@@ -1,0 +1,16 @@
+{
+  "type": "footer",
+  "name": "Footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "shop_menu": "footer",
+        "show_email": false,
+        "show_country": true,
+        "show_payment_icons": true
+      }
+    }
+  },
+  "order": ["footer"]
+}

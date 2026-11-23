@@ -1,0 +1,201 @@
+/* ==========================================================================
+   Show booking page — the buying decision in one place.
+   ========================================================================== */
+
+.fc-event__inner {
+  max-width: var(--fc-max);
+  margin: 0 auto;
+  padding: 0.75rem var(--fc-gutter) clamp(3rem, 8vw, 6rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: 'back' 'head' 'booking' 'poster' 'details' 'apps';
+  gap: 1.25rem;
+}
+.fc-event__inner > .fc-backlink { grid-area: back; justify-self: start; }
+.fc-event__head { grid-area: head; display: grid; gap: 0.75rem; }
+.fc-event__booking { grid-area: booking; }
+.fc-event__poster { grid-area: poster; }
+.fc-event__details { grid-area: details; }
+.fc-event__app { grid-area: apps; }
+
+.fc-event__title { font-size: clamp(2.6rem, 12vw, 6rem); max-width: 16ch; }
+.fc-event__title--long { font-size: clamp(2rem, 8.4vw, 4.6rem); max-width: 22ch; }
+
+.fc-event__facts { display: grid; gap: 0.9rem; margin-top: 0.5rem; }
+.fc-event__fact { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 0.75rem; align-items: start; }
+.fc-event__fact dt { padding-top: 2px; color: var(--fc-crimson); }
+.fc-event__fact dd { display: grid; gap: 0.1rem; font-variant-numeric: tabular-nums; }
+.fc-event__fact strong { font-size: 1.12rem; font-weight: 700; }
+
+/* ---------- Booking card ---------- */
+
+.fc-booking {
+  display: grid;
+  gap: 1.15rem;
+  padding: 1.25rem;
+  border: 2px solid var(--fc-ink);
+  background: var(--fc-surface);
+  margin: 0;
+}
+.fc-booking__legend { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.6rem; padding: 0; }
+.fc-booking__single { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem 0.75rem; }
+.fc-booking__price { font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.fc-booking__unit { color: var(--fc-ink-soft); }
+.fc-booking__price-line { font-size: 1.3rem; }
+.fc-booking__qty { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.fc-booking__qty .fc-label { margin: 0; }
+.fc-booking__submit { width: 100%; justify-content: center; }
+.fc-booking__notice {
+  font-size: 0.85rem;
+  color: var(--fc-ink-soft);
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--fc-crimson);
+}
+.fc-booking--closed { gap: 0.75rem; justify-items: start; }
+.fc-booking__state { font-family: var(--fc-font-display); font-weight: 900; text-transform: uppercase; font-size: 2.4rem; line-height: 0.9; }
+
+.fc-tiers { display: grid; gap: 0.5rem; }
+.fc-tier { position: relative; }
+.fc-tier__input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.fc-tier__label,
+.fc-tiers--static .fc-tier {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
+  grid-template-areas: 'mark name price' 'mark status status';
+  gap: 0.2rem 0.75rem;
+  align-items: center;
+  min-height: 64px;
+  padding: 0.75rem 0.9rem 0.75rem 0.75rem;
+  border: 2px solid rgba(var(--fc-ink-rgb), 0.3);
+  background: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s ease;
+}
+.fc-tiers--static .fc-tier { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'name price' 'status status'; cursor: default; }
+.fc-tier__label::before {
+  content: '';
+  grid-area: mark;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--fc-ink-rgb), 0.5);
+  background: center / 118% no-repeat;
+  transition: border-color 0.2s ease, transform 0.35s var(--fc-ease);
+}
+.fc-tier__name { grid-area: name; font-weight: 700; line-height: 1.25; }
+.fc-tier__price { grid-area: price; font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.fc-tier .fc-status { grid-area: status; }
+.fc-tier__label:hover { border-color: var(--fc-ink); }
+.fc-tier__input:checked + .fc-tier__label { border-color: var(--fc-ink); box-shadow: inset 0 0 0 1px var(--fc-ink); }
+.fc-tier__input:checked + .fc-tier__label::before {
+  border-color: transparent;
+  background-image: var(--fc-asset-ring);
+  transform: rotate(-20deg);
+}
+.fc-tier__input:focus-visible + .fc-tier__label { outline: 3px solid var(--fc-crimson); outline-offset: 2px; }
+.fc-tier.is-sold-out .fc-tier__label,
+.fc-tiers--static .fc-tier { cursor: not-allowed; background: transparent; border-style: dashed; color: var(--fc-ink-soft); }
+.fc-tier.is-sold-out .fc-tier__price { text-decoration: line-through; }
+
+.fc-vendor { display: grid; gap: 0.75rem; padding-top: 1rem; border-top: var(--fc-hair); }
+.fc-vendor__info { font-size: 0.85rem; color: var(--fc-ink-soft); margin-top: -0.3rem; }
+.fc-vendor .fc-field + .fc-field { margin-top: 0; }
+
+/* ---------- Typographic poster ---------- */
+
+.fc-event__poster {
+  position: relative;
+  aspect-ratio: 1300 / 1200;
+  max-width: min(520px, 84vw);
+  width: 100%;
+  justify-self: center;
+}
+.fc-event__ring { position: absolute; inset: 0; width: 100%; height: 100%; }
+.fc-event__datemark,
+.fc-event__photo {
+  position: absolute;
+  left: 2.25%;
+  top: -1.79%;
+  width: 96.5%;
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+}
+.fc-event__photo { clip-path: circle(42.6% at 50% 50%); }
+.fc-event__img { width: 100%; height: 100%; object-fit: cover; }
+.fc-event__datemark { font-family: var(--fc-font-display); font-weight: 900; text-transform: uppercase; line-height: 0.8; }
+.fc-event__dm-month { font-size: clamp(2rem, 7vw, 3.4rem); letter-spacing: 0.08em; color: var(--fc-crimson); margin-bottom: 0.12em; }
+.fc-event__dm-day { font-size: clamp(8rem, 30vw, 15rem); letter-spacing: -0.03em; }
+.fc-event__dm-year { font-family: var(--fc-font-body); font-size: 0.9rem; font-weight: 700; letter-spacing: 0.16em; margin-top: 0.5rem; }
+
+/* ---------- Details ---------- */
+
+.fc-details { border-top: var(--fc-rule); }
+.fc-details__row {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.1rem 0;
+  border-bottom: var(--fc-hair);
+}
+.fc-details__row dt { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fc-crimson); }
+.fc-details__row dd { max-width: 62ch; }
+@media (min-width: 750px) {
+  .fc-details__row { grid-template-columns: 12rem minmax(0, 1fr); gap: 2rem; }
+}
+
+/* Ended or sold out: the page stays informative but quiet */
+.fc-event.is-past .fc-event__title { opacity: 0.75; }
+
+/* ---------- Sticky booking bar (phones) ---------- */
+
+.fc-sticky-buy {
+  position: fixed;
+  z-index: 50;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem var(--fc-gutter) calc(0.6rem + env(safe-area-inset-bottom));
+  background: var(--fc-ink);
+  color: var(--fc-paper);
+  transform: translateY(0);
+  transition: transform 0.3s var(--fc-ease);
+}
+.fc-sticky-buy.is-hidden { transform: translateY(110%); }
+.fc-sticky-buy__text { display: grid; min-width: 0; line-height: 1.25; }
+.fc-sticky-buy__name { font-size: 0.8rem; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fc-sticky-buy__price { font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.fc-sticky-buy .fc-button { flex: none; min-height: 50px; }
+
+@media (min-width: 750px) {
+  .fc-sticky-buy { display: none !important; }
+}
+
+/* ---------- Desktop ---------- */
+
+@media (min-width: 990px) {
+  .fc-event__inner {
+    grid-template-columns: minmax(0, 7fr) minmax(340px, 4.4fr);
+    grid-template-areas:
+      'back back'
+      'head booking'
+      'poster booking'
+      'details booking'
+      'apps apps';
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+    row-gap: 2rem;
+    align-items: start;
+  }
+  .fc-event__booking { position: sticky; top: calc(var(--fc-header-h) + 1.25rem); }
+  .fc-booking { padding: 1.6rem; }
+  .fc-event__title { font-size: clamp(4rem, 6.4vw, 7rem); }
+  .fc-event__title--long { font-size: clamp(3rem, 4.4vw, 4.8rem); }
+  .fc-event__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; margin-top: 1rem; }
+  .fc-event__poster { justify-self: start; max-width: 460px; }
+}

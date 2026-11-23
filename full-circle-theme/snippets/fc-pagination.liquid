@@ -1,0 +1,21 @@
+<nav class="fc-pagination" aria-label="{{ 'general.pagination_label' | t }}">
+  {%- if paginate.previous -%}
+    <a class="fc-pagination__step" href="{{ paginate.previous.url }}">{% render 'fc-icon', icon: 'arrow-left' %}<span>{{ 'general.previous' | t }}</span></a>
+  {%- endif -%}
+  <ol class="fc-pagination__pages" role="list">
+    {%- for part in paginate.parts -%}
+      <li>
+        {%- if part.is_link -%}
+          <a href="{{ part.url }}" aria-label="{{ 'general.page' | t: page: part.title }}">{{ part.title }}</a>
+        {%- elsif part.title == paginate.current_page -%}
+          <span aria-current="page">{{ part.title }}</span>
+        {%- else -%}
+          <span>{{ part.title }}</span>
+        {%- endif -%}
+      </li>
+    {%- endfor -%}
+  </ol>
+  {%- if paginate.next -%}
+    <a class="fc-pagination__step" href="{{ paginate.next.url }}"><span>{{ 'general.next' | t }}</span>{% render 'fc-icon', icon: 'arrow' %}</a>
+  {%- endif -%}
+</nav>

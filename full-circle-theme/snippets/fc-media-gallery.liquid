@@ -1,0 +1,36 @@
+{%- comment -%}
+  Product media. - product, selected (variant)
+{%- endcomment -%}
+{%- liquid
+  assign media_count = product.media.size
+  assign first_id = product.featured_media.id
+  if selected.featured_media
+    assign first_id = selected.featured_media.id
+  endif
+-%}
+<div class="fc-gallery{% if media_count < 2 %} fc-gallery--single{% endif %}" data-fc-gallery>
+  {%- if media_count > 0 -%}
+    <ul class="fc-gallery__list" role="list" data-fc-gallery-list>
+      {%- for media in product.media -%}
+        {%- if media.id == first_id -%}
+          {% render 'fc-media-item', media: media, product: product, index: 1, count: media_count, eager: true %}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- assign n = 1 -%}
+      {%- for media in product.media -%}
+        {%- if media.id != first_id -%}
+          {%- assign n = n | plus: 1 -%}
+          {% render 'fc-media-item', media: media, product: product, index: n, count: media_count %}
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+    {%- if media_count > 1 -%}
+      <p class="fc-gallery__counter" aria-hidden="true"><span data-fc-gallery-index>1</span> / {{ media_count }}</p>
+    {%- endif -%}
+  {%- else -%}
+    <div class="fc-gallery__empty">
+      <img src="{{ 'fc-mark.webp' | asset_url }}" alt="" width="160" height="148">
+      <span>{{ 'products.no_image' | t }}</span>
+    </div>
+  {%- endif -%}
+</div>

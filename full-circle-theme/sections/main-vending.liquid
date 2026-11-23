@@ -1,0 +1,49 @@
+{{ 'fc-shows.css' | asset_url | stylesheet_tag }}
+{{ 'fc-collection.css' | asset_url | stylesheet_tag }}
+<section class="fc-vending" data-fc-shows data-section-id="{{ section.id }}">
+  <div class="fc-vending__inner">
+    <header class="fc-vending__head">
+      <p class="fc-kicker">{{ 'events.kicker' | t }}</p>
+      <h1 class="fc-vending__title">{{ section.settings.heading | default: collection.title | escape }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="fc-vending__desc fc-rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </header>
+    <h2 class="fc-vending__sub">{{ 'events.upcoming' | t }}</h2>
+    <div class="fc-shows__rule" aria-hidden="true" data-fc-rule></div>
+    {% render 'fc-event-list', events: collection.products, limit: 50, show_past: section.settings.show_past, context: 'collection', heading_level: 3 %}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="fc-vending__info">
+        {%- for block in section.blocks -%}
+          <div class="fc-vending__block" {{ block.shopify_attributes }}>
+            {%- if block.settings.heading != blank -%}<h2 class="fc-vending__block-title">{{ block.settings.heading | escape }}</h2>{%- endif -%}
+            <div class="fc-rte">{{ block.settings.text }}</div>
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Show schedule",
+  "tag": "div",
+  "class": "fc-section-vending",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Book vending tables" },
+    { "type": "checkbox", "id": "show_past", "label": "List past shows", "default": true }
+  ],
+  "blocks": [
+    {
+      "type": "info",
+      "name": "Vendor info",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading" },
+        { "type": "richtext", "id": "text", "label": "Text" }
+      ]
+    }
+  ]
+}
+{% endschema %}

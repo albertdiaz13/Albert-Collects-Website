@@ -1,0 +1,37 @@
+{%- comment -%}
+  Radio-pill variant picker with a no-JS select fallback.
+  - product, form_id, selected (variant)
+{%- endcomment -%}
+{%- unless product.has_only_default_variant -%}
+  <div class="fc-variant-picker" data-fc-picker>
+    {%- for option in product.options_with_values -%}
+      <fieldset class="fc-option">
+        <legend class="fc-option__legend">
+          <span class="fc-option__name">{{ option.name | escape }}</span>
+          <span class="fc-option__selected" data-fc-selected-value="{{ forloop.index0 }}">{{ option.selected_value | escape }}</span>
+        </legend>
+        <div class="fc-option__values">
+          {%- assign option_index = forloop.index0 -%}
+          {%- for value in option.values -%}
+            {%- assign input_id = form_id | append: '-' | append: option.position | append: '-' | append: forloop.index0 -%}
+            <input class="fc-option__input" type="radio" id="{{ input_id }}" name="{{ form_id }}-option-{{ option.position }}" value="{{ value | escape }}" data-option-index="{{ option_index }}"{% if option.selected_value == value %} checked{% endif %}>
+            <label class="fc-option__pill" for="{{ input_id }}">
+              <span>{{ value | escape }}</span>
+              <span class="fc-option__flag" data-fc-flag></span>
+            </label>
+          {%- endfor -%}
+        </div>
+      </fieldset>
+    {%- endfor -%}
+  </div>
+  <noscript>
+    <label class="fc-option__legend" for="{{ form_id }}-select">{{ product.options | join: ' / ' | escape }}</label>
+    <select class="fc-select" id="{{ form_id }}-select" name="id" form="{{ form_id }}">
+      {%- for v in product.variants -%}
+        <option value="{{ v.id }}"{% if v.id == selected.id %} selected{% endif %}{% unless v.available %} disabled{% endunless %}>
+          {{ v.title | escape }} — {{ v.price | money }}{% unless v.available %} ({{ 'products.sold_out' | t }}){% endunless %}
+        </option>
+      {%- endfor -%}
+    </select>
+  </noscript>
+{%- endunless -%}

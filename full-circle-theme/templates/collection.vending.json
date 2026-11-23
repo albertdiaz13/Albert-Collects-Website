@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-vending",
+      "settings": { "heading": "Book vending tables", "show_past": true }
+    }
+  },
+  "order": ["main"]
+}

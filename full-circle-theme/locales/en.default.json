@@ -1,0 +1,148 @@
+{
+  "general": {
+    "skip_to_content": "Skip to content",
+    "home": "Home",
+    "menu": "Menu",
+    "close": "Close",
+    "search": "Search",
+    "cart": "Cart",
+    "view_all": "View all",
+    "back": "Back",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{ page }}",
+    "pagination_label": "Pagination",
+    "social_label": "{{ network }} (opens in a new window)",
+    "password_title": "Opening soon",
+    "password_label": "Store password",
+    "password_submit": "Enter",
+    "powered_by": "Powered by Shopify",
+    "404_title": "Page not found",
+    "404_body": "That page isn't on the bill. Try the shop or the show schedule.",
+    "loading": "Loading"
+  },
+  "cart": {
+    "title": "Your cart",
+    "count": {
+      "one": "{{ count }} item",
+      "other": "{{ count }} items"
+    },
+    "empty": "Your cart is empty.",
+    "continue": "Continue shopping",
+    "remove": "Remove {{ title }}",
+    "quantity_for": "Quantity for {{ title }}",
+    "subtotal": "Subtotal",
+    "taxes": "Taxes and shipping are calculated at checkout.",
+    "checkout": "Check out",
+    "note": "Order note",
+    "update": "Update cart",
+    "error": "Something went wrong. Refresh the page and try again.",
+    "added": "Added to cart",
+    "added_table": "Table added to cart",
+    "view_cart": "View cart",
+    "group_tables": "Vending tables",
+    "group_merch": "Merchandise",
+    "no_shipping": "No shipping required",
+    "line_total": "Line total",
+    "unavailable_quantity": "Only {{ count }} available. Quantity updated."
+  },
+  "products": {
+    "add_to_cart": "Add to cart",
+    "choose_options": "Choose options",
+    "sold_out": "Sold out",
+    "unavailable": "Unavailable",
+    "from_price": "From {{ price }}",
+    "regular_price": "Regular price",
+    "sale_price": "Sale price",
+    "sale": "Sale",
+    "quantity": "Quantity",
+    "decrease": "Decrease quantity for {{ title }}",
+    "increase": "Increase quantity for {{ title }}",
+    "before_you_order": "Before you order",
+    "details": "Details",
+    "media_label": "Media {{ index }} of {{ count }}",
+    "view_media": "Show image {{ index }}",
+    "option_sold_out": "{{ value }}, sold out",
+    "related": "More from the shop",
+    "share": "Share",
+    "no_image": "No photo yet",
+    "variant_sold_out_note": "This combination is sold out. Try another option."
+  },
+  "events": {
+    "kicker": "Vending tables",
+    "upcoming": "Upcoming shows",
+    "past": "Past shows",
+    "all_shows": "All shows",
+    "book_table": "Book a table",
+    "add_table": "Add table to cart",
+    "view_show": "View show",
+    "date_tba": "Date to be announced",
+    "ended": "This show has ended",
+    "ended_short": "Ended",
+    "sold_out": "Sold out",
+    "sold_out_event": "Every table for this show is booked.",
+    "available": "Tables available",
+    "tables_left": {
+      "one": "{{ count }} table left",
+      "other": "{{ count }} tables left"
+    },
+    "from_price": "Tables from {{ price }}",
+    "per_table": "per table",
+    "choose_table": "Choose a table",
+    "tables_needed": "Number of tables",
+    "vendor_details": "Vendor details",
+    "vendor_details_info": "Attached to your table so we know who is vending.",
+    "hold_notice": "Adding a table to your cart doesn't hold it. Your table is confirmed when checkout is complete.",
+    "none_title": "No shows announced",
+    "none_body": "There's nothing on the bill right now.",
+    "dimensions": "Table size",
+    "included": "What's included",
+    "load_in": "Load-in",
+    "cancellation": "Cancellations",
+    "about": "About the show",
+    "venue": "Venue",
+    "when": "When",
+    "directions": "Map",
+    "next_up": "Next up"
+  },
+  "collections": {
+    "products_count": {
+      "one": "{{ count }} product",
+      "other": "{{ count }} products"
+    },
+    "empty": "No products here yet.",
+    "sort_by": "Sort by",
+    "all": "All products"
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search products and shows",
+    "submit": "Search",
+    "results_for": {
+      "one": "{{ count }} result for “{{ terms }}”",
+      "other": "{{ count }} results for “{{ terms }}”"
+    },
+    "no_results": "Nothing matched “{{ terms }}”.",
+    "table_label": "Vending table"
+  },
+  "contact": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "message": "Message",
+    "send": "Send",
+    "success": "Thanks — we'll get back to you soon.",
+    "error": "Please check the highlighted fields."
+  },
+  "footer": {
+    "shop": "Shop",
+    "booking": "Shows",
+    "policies": "Policies",
+    "follow": "Follow"
+  },
+  "gift_cards": {
+    "title": "Your gift card",
+    "code": "Gift card code",
+    "balance": "Balance"
+  }
+}

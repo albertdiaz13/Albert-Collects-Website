@@ -1,0 +1,18 @@
+{%- comment -%}
+  Quantity stepper. - id, name, value, min, max, form, title, label
+{%- endcomment -%}
+{%- liquid
+  assign qty_label = label
+  if qty_label == blank
+    assign qty_label = 'products.quantity' | t
+  endif
+  assign qty_min = min | default: 1
+  if min == 0
+    assign qty_min = 0
+  endif
+-%}
+<div class="fc-qty" data-fc-qty>
+  <button type="button" class="fc-qty__btn" data-fc-qty-step="-1" aria-label="{{ 'products.decrease' | t: title: title | escape }}">{% render 'fc-icon', icon: 'minus' %}</button>
+  <input class="fc-qty__input" type="number" id="{{ id }}" name="{{ name | default: 'quantity' }}" value="{{ value | default: 1 }}" min="{{ qty_min }}"{% if max %} max="{{ max }}"{% endif %} inputmode="numeric"{% if form %} form="{{ form }}"{% endif %} aria-label="{{ qty_label | escape }}">
+  <button type="button" class="fc-qty__btn" data-fc-qty-step="1" aria-label="{{ 'products.increase' | t: title: title | escape }}">{% render 'fc-icon', icon: 'plus' %}</button>
+</div>

@@ -1,0 +1,48 @@
+{{ 'fc-collection.css' | asset_url | stylesheet_tag }}
+<section class="fc-collection fc-search" data-section-id="{{ section.id }}">
+  <div class="fc-collection__inner">
+    <header class="fc-collection__head">
+      <p class="fc-kicker">{{ 'search.title' | t }}</p>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="fc-search-form fc-search-form--page">
+        <label class="fc-visually-hidden" for="SearchPage">{{ 'search.placeholder' | t }}</label>
+        <input class="fc-input fc-input--large" id="SearchPage" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'search.placeholder' | t }}">
+        <input type="hidden" name="options[prefix]" value="last">
+        <button class="fc-button fc-button--large" type="submit">{{ 'search.submit' | t }}</button>
+      </form>
+    </header>
+    {%- if search.performed -%}
+      {%- paginate search.results by 24 -%}
+        <p class="fc-toolbar__count">
+          {%- if search.results_count > 0 -%}
+            {{ 'search.results_for' | t: count: search.results_count, terms: search.terms }}
+          {%- else -%}
+            {{ 'search.no_results' | t: terms: search.terms }}
+          {%- endif -%}
+        </p>
+        {%- if search.results_count > 0 -%}
+          <ul class="fc-grid" role="list">
+            {%- for item in search.results -%}
+              <li class="fc-grid__item">
+                {%- case item.object_type -%}
+                  {%- when 'product' -%}
+                    {% render 'fc-product-card', product: item %}
+                  {%- else -%}
+                    <article class="fc-result">
+                      <p class="fc-card__kicker">{{ item.object_type | capitalize }}</p>
+                      <h3 class="fc-card__title"><a class="fc-card__link" href="{{ item.url }}">{{ item.title | escape }}</a></h3>
+                      <p>{{ item.content | strip_html | truncatewords: 24 }}</p>
+                    </article>
+                {%- endcase -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+          {%- if paginate.pages > 1 -%}{% render 'fc-pagination', paginate: paginate %}{%- endif -%}
+        {%- endif -%}
+      {%- endpaginate -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Search results", "tag": "div", "class": "fc-section-search", "settings": [] }
+{% endschema %}

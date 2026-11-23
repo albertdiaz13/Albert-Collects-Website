@@ -1,0 +1,13 @@
+<article class="fc-page">
+  <div class="fc-page__inner">
+    <p class="fc-kicker">{{ article.published_at | date: '%B %-d, %Y' }}</p>
+    <h1 class="fc-page__title">{{ article.title | escape }}</h1>
+    {%- if article.image -%}
+      <div class="fc-page__image">{% render 'fc-image', image: article.image, sizes: '(min-width: 990px) 760px, 100vw', loading: 'eager' %}</div>
+    {%- endif -%}
+    <div class="fc-rte fc-page__content">{{ article.content }}</div>
+  </div>
+</article>
+{% schema %}
+{ "name": "Article", "tag": "div", "settings": [] }
+{% endschema %}

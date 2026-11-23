@@ -1,0 +1,74 @@
+{%- comment -%}
+  Merchandise card.
+  - product (required)
+  - sizes: sizes attribute for the image
+  - eager (boolean): load image eagerly
+  - show_action (boolean, default true)
+{%- endcomment -%}
+{%- liquid
+  assign card_sizes = sizes | default: '(min-width: 990px) 25vw, (min-width: 750px) 33vw, 50vw'
+  assign img_loading = 'lazy'
+  if eager
+    assign img_loading = 'eager'
+  endif
+  assign first_media = product.featured_media
+  assign second_media = nil
+  if product.media.size > 1
+    assign second_media = product.media[1]
+  endif
+  assign unit = product.metafields.custom.price_unit.value
+  assign is_event = false
+  if product.template_suffix contains 'event'
+    assign is_event = true
+  endif
+  assign card_id = 'Card-' | append: product.id | append: '-' | append: section.id
+-%}
+<article class="fc-card{% unless product.available %} fc-card--sold-out{% endunless %}{% if second_media %} fc-card--has-alt{% endif %}" aria-labelledby="{{ card_id }}">
+  <a class="fc-card__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if first_media -%}
+      {% render 'fc-image', image: first_media.preview_image, sizes: card_sizes, class: 'fc-card__img', loading: img_loading %}
+      {%- if second_media -%}
+        {% render 'fc-image', image: second_media.preview_image, sizes: card_sizes, class: 'fc-card__img fc-card__img--alt', alt: '' %}
+      {%- endif -%}
+    {%- else -%}
+      <span class="fc-card__placeholder">
+        <img src="{{ 'fc-mark.webp' | asset_url }}" alt="" width="120" height="111" loading="lazy">
+        <span>{{ 'products.no_image' | t }}</span>
+      </span>
+    {%- endif -%}
+    {%- unless product.available -%}
+      <span class="fc-badge fc-badge--sold-out">{{ 'products.sold_out' | t }}</span>
+    {%- endunless -%}
+  </a>
+  <div class="fc-card__body">
+    {%- if is_event -%}
+      <p class="fc-card__kicker">{{ 'search.table_label' | t }}</p>
+    {%- endif -%}
+    <h3 class="fc-card__title" id="{{ card_id }}">
+      <a href="{{ product.url }}" class="fc-card__link">{{ product.title | escape }}</a>
+    </h3>
+    <p class="fc-card__price">
+      {% render 'fc-price', product: product, show_from: true, unit: unit %}
+    </p>
+    {%- unless show_action == false or is_event -%}
+      <div class="fc-card__action">
+        {%- if product.available and product.has_only_default_variant -%}
+          {%- form 'product', product, class: 'fc-card__form', data-fc-product-form: '' -%}
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <button type="submit" class="fc-link-button">
+              {{- 'products.add_to_cart' | t -}}
+              {% render 'fc-icon', icon: 'plus' %}
+            </button>
+          {%- endform -%}
+        {%- elsif product.available -%}
+          <a class="fc-link-button" href="{{ product.url }}" aria-label="{{ 'products.choose_options' | t }}: {{ product.title | escape }}">
+            {{- 'products.choose_options' | t -}}
+            {% render 'fc-icon', icon: 'arrow' %}
+          </a>
+        {%- else -%}
+          <span class="fc-card__status">{{ 'products.sold_out' | t }}</span>
+        {%- endif -%}
+      </div>
+    {%- endunless -%}
+  </div>
+</article>

@@ -1,0 +1,138 @@
+{%- liquid
+  assign shop_url = settings.merch_collection.url | default: routes.all_products_collection_url
+  assign book_url = settings.vending_collection.url | default: '/collections/vending-tables'
+  assign has_social = false
+  if settings.social_instagram_link != blank or settings.social_tiktok_link != blank or settings.social_facebook_link != blank or settings.social_youtube_link != blank or settings.social_twitter_link != blank
+    assign has_social = true
+  endif
+-%}
+<footer class="fc-footer">
+  <div class="fc-footer__inner">
+    <div class="fc-footer__brand">
+      <a href="{{ routes.root_url }}" class="fc-footer__logo">
+        {%- if settings.logo_lockup != blank -%}
+          {{ settings.logo_lockup | image_url: width: 560 | image_tag: alt: shop.name, width: 280, loading: 'lazy' }}
+        {%- else -%}
+          <img src="{{ 'fc-lockup.webp' | asset_url }}" alt="{{ shop.name | escape }}" width="280" height="285" loading="lazy">
+        {%- endif -%}
+      </a>
+      {%- if section.settings.statement != blank -%}
+        <div class="fc-footer__statement">{{ section.settings.statement }}</div>
+      {%- endif -%}
+    </div>
+
+    <div class="fc-footer__cols">
+      <div class="fc-footer__col">
+        <h2 class="fc-footer__heading">{{ 'footer.shop' | t }}</h2>
+        <ul role="list">
+          <li><a href="{{ shop_url }}">{{ settings.shop_label | default: 'Shop' | escape }}</a></li>
+          {%- for link in section.settings.shop_menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+          {%- endfor -%}
+          <li><a href="{{ routes.search_url }}">{{ 'general.search' | t }}</a></li>
+        </ul>
+      </div>
+      <div class="fc-footer__col">
+        <h2 class="fc-footer__heading">{{ 'footer.booking' | t }}</h2>
+        <ul role="list">
+          <li><a href="{{ book_url }}">{{ settings.booking_label | default: 'Book vending tables' | escape }}</a></li>
+          {%- if settings.booking_contact_url != blank -%}
+            <li><a href="{{ settings.booking_contact_url }}">{{ settings.booking_contact_label | escape }}</a></li>
+          {%- endif -%}
+          {%- if section.settings.show_email and shop.email != blank -%}
+            <li><a href="mailto:{{ shop.email }}">{{ shop.email }}</a></li>
+          {%- endif -%}
+        </ul>
+      </div>
+      {%- assign policy_count = 0 -%}
+      {%- for policy in shop.policies -%}{%- if policy != blank -%}{%- assign policy_count = policy_count | plus: 1 -%}{%- endif -%}{%- endfor -%}
+      {%- if policy_count > 0 -%}
+        <div class="fc-footer__col">
+          <h2 class="fc-footer__heading">{{ 'footer.policies' | t }}</h2>
+          <ul role="list">
+            {%- for policy in shop.policies -%}
+              {%- if policy != blank -%}
+                <li><a href="{{ policy.url }}">{{ policy.title | escape }}</a></li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+      {%- if has_social -%}
+        <div class="fc-footer__col">
+          <h2 class="fc-footer__heading">{{ 'footer.follow' | t }}</h2>
+          <ul role="list" class="fc-social">
+            {%- if settings.social_instagram_link != blank -%}<li><a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">{% render 'fc-icon', icon: 'instagram' %}<span>Instagram</span></a></li>{%- endif -%}
+            {%- if settings.social_tiktok_link != blank -%}<li><a href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener">{% render 'fc-icon', icon: 'tiktok' %}<span>TikTok</span></a></li>{%- endif -%}
+            {%- if settings.social_facebook_link != blank -%}<li><a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener">{% render 'fc-icon', icon: 'facebook' %}<span>Facebook</span></a></li>{%- endif -%}
+            {%- if settings.social_youtube_link != blank -%}<li><a href="{{ settings.social_youtube_link }}" target="_blank" rel="noopener">{% render 'fc-icon', icon: 'youtube' %}<span>YouTube</span></a></li>{%- endif -%}
+            {%- if settings.social_twitter_link != blank -%}<li><a href="{{ settings.social_twitter_link }}" target="_blank" rel="noopener">{% render 'fc-icon', icon: 'twitter' %}<span>X</span></a></li>{%- endif -%}
+          </ul>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <div class="fc-footer__base">
+    {%- if localization.available_countries.size > 1 and section.settings.show_country -%}
+      {%- form 'localization', class: 'fc-localization', data-fc-localization: '' -%}
+        <label class="fc-visually-hidden" for="FooterCountry">Country/region</label>
+        <select id="FooterCountry" name="country_code" class="fc-select fc-select--small">
+          {%- for country in localization.available_countries -%}
+            <option value="{{ country.iso_code }}"{% if country.iso_code == localization.country.iso_code %} selected{% endif %}>{{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})</option>
+          {%- endfor -%}
+        </select>
+        <noscript><button type="submit" class="fc-button fc-button--small">OK</button></noscript>
+      {%- endform -%}
+    {%- endif -%}
+    <p class="fc-footer__copy">&copy; {{ 'now' | date: '%Y' }} {{ shop.name | link_to: routes.root_url }}</p>
+    {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+      <ul class="fc-payment" role="list">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'fc-payment__icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "fc-section-footer",
+  "enabled_on": { "groups": ["footer"] },
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "statement",
+      "label": "Short statement",
+      "info": "Optional. Leave blank to show only the logo."
+    },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Shop links",
+      "info": "Collections such as Hats, Stickers and Binders.",
+      "default": "footer"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_email",
+      "label": "Show store email",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_country",
+      "label": "Show country / currency selector",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,14 @@
+{%- comment -%} Availability label for one table option. - variant {%- endcomment -%}
+{%- liquid
+  assign tracked = false
+  if variant.inventory_management == 'shopify' and variant.inventory_policy == 'deny'
+    assign tracked = true
+  endif
+-%}
+{%- if variant.available == false -%}
+  <span class="fc-status fc-status--sold-out">{{ 'events.sold_out' | t }}</span>
+{%- elsif tracked and settings.show_table_counts -%}
+  <span class="fc-status{% if variant.inventory_quantity <= settings.low_table_threshold %} fc-status--low{% else %} fc-status--open{% endif %}">{{ 'events.tables_left' | t: count: variant.inventory_quantity }}</span>
+{%- else -%}
+  <span class="fc-status fc-status--open">{{ 'events.available' | t }}</span>
+{%- endif -%}

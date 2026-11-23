@@ -1,0 +1,62 @@
+{%- comment -%} One cart line. - item, is_table {%- endcomment -%}
+<li class="fc-line{% if is_table %} fc-line--table{% endif %}" data-fc-line data-key="{{ item.key }}">
+  <a class="fc-line__media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+    {%- assign line_start = item.product.metafields.event.starts_at.value -%}
+    {%- if item.image -%}
+      {%- liquid
+        assign img_loading = 'lazy'
+        if item.index <= 4
+          assign img_loading = 'eager'
+        endif
+      -%}
+      {{ item.image | image_url: width: 300 | image_tag: loading: img_loading, alt: '', widths: '150, 300', sizes: '120px' }}
+    {%- elsif is_table and line_start != blank -%}
+      <span class="fc-line__datetile">
+        <span>{{ line_start | date: '%b' }}</span>
+        <span>{{ line_start | date: '%-d' }}</span>
+      </span>
+    {%- else -%}
+      <img src="{{ 'fc-mark.webp' | asset_url }}" alt="" width="80" height="74" loading="lazy" class="fc-line__mark">
+    {%- endif -%}
+  </a>
+  <div class="fc-line__body">
+    <a class="fc-line__title" href="{{ item.url }}">{{ item.product.title | escape }}</a>
+    {%- unless item.product.has_only_default_variant -%}
+      <p class="fc-line__variant">{{ item.variant.title | escape }}</p>
+    {%- endunless -%}
+    {%- if is_table -%}
+      {%- assign start = item.product.metafields.event.starts_at.value -%}
+      {%- if start != blank -%}<p class="fc-line__meta">{{ start | date: '%a, %b %-d, %Y · %-l:%M %p' }}</p>{%- endif -%}
+    {%- endif -%}
+    {%- for property in item.properties -%}
+      {%- assign first_char = property.first | slice: 0 -%}
+      {%- if property.last != blank and first_char != '_' -%}
+        <p class="fc-line__prop"><span>{{ property.first | escape }}:</span> {{ property.last | escape }}</p>
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if item.selling_plan_allocation -%}<p class="fc-line__meta">{{ item.selling_plan_allocation.selling_plan.name | escape }}</p>{%- endif -%}
+    {%- unless item.requires_shipping -%}<p class="fc-line__meta">{{ 'cart.no_shipping' | t }}</p>{%- endunless -%}
+    <p class="fc-line__unit">
+      {%- if item.original_price > item.final_price -%}<s>{{ item.original_price | money }}</s> {% endif -%}
+      {{ item.final_price | money }}
+      {%- assign unit = item.product.metafields.custom.price_unit.value -%}
+      {%- if unit != blank %} <span class="fc-price__unit">{{ unit | escape }}</span>{% endif -%}
+    </p>
+    {%- for discount in item.line_level_discount_allocations -%}
+      <p class="fc-line__meta">{{ discount.discount_application.title | escape }} (−{{ discount.amount | money }})</p>
+    {%- endfor -%}
+  </div>
+  <div class="fc-line__controls">
+    {%- assign qty_id = 'Qty-' | append: item.index -%}
+    {%- liquid
+      assign line_max = nil
+      if item.variant.inventory_management == 'shopify' and item.variant.inventory_policy == 'deny'
+        assign line_max = item.variant.inventory_quantity | at_least: item.quantity
+      endif
+    -%}
+    <label class="fc-visually-hidden" for="{{ qty_id }}">{{ 'cart.quantity_for' | t: title: item.product.title | escape }}</label>
+    {% render 'fc-quantity', id: qty_id, name: 'updates[]', value: item.quantity, min: 0, max: line_max, title: item.product.title %}
+    <a class="fc-line__remove" href="{{ item.url_to_remove }}" data-fc-remove aria-label="{{ 'cart.remove' | t: title: item.product.title | escape }}">{% render 'fc-icon', icon: 'close' %}</a>
+  </div>
+  <p class="fc-line__total"><span class="fc-visually-hidden">{{ 'cart.line_total' | t }}</span>{{ item.final_line_price | money }}</p>
+</li>

@@ -1,0 +1,15 @@
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "sticky": true,
+        "menu": "",
+        "drawer_menu": "main-menu"
+      }
+    }
+  },
+  "order": ["header"]
+}
