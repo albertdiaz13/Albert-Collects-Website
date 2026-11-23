@@ -5,7 +5,10 @@
   "scripts": {
     "start": "node server.js",
     "check": "node theme-check.js",
-    "test": "node journeys.js"
+    "test": "node journeys.js",
+    "package": "node package-theme.js",
+    "build:storefront": "node browser/build.js",
+    "test:storefront": "node browser/test-static.js"
   },
   "license": "ISC",
   "dependencies": {

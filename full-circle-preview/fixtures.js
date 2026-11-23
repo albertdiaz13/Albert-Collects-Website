@@ -9,10 +9,11 @@
  * "Sample" and venues say "sample venue" so they can never be mistaken for real events.
  * None of this is in the theme's settings_data.json or templates.
  */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory;
+  else root.FCFixtures = factory;
+})(typeof self !== 'undefined' ? self : this, function createFixtures(live) {
 'use strict';
-
-const path = require('path');
-const live = require(path.join(__dirname, 'fixtures', 'live-products.json')).products;
 
 const CDN = 'https://cdn.shopify.com';
 let mediaSeq = 900000;
@@ -165,10 +166,19 @@ function eventMeta(o) {
   return { event: m };
 }
 
+// Sample show dates are relative to today so the preview never goes stale.
+// Times are fixed in UTC (15:00Z ≈ 10 AM Eastern); good enough for a fixture.
+function daysFromNow(days, hourUTC) {
+  const d = new Date();
+  d.setUTCHours(hourUTC, 0, 0, 0);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().replace('.000Z', 'Z');
+}
+
 const FIXTURE_NOTE = '<p><strong>Preview fixture.</strong> This sample show exists only in the local preview to demonstrate the booking page. It is not a real event.</p>';
 
 const showOpen = buildProduct(
-  eventRaw(800000001, 'sample-winter-card-show', 'Sample Show: Winter Card & Collectibles Expo', [
+  eventRaw(800000001, 'sample-winter-card-show', 'Sample Show: Card & Collectibles Expo', [
     { id: 810000011, title: 'Standard table', price: '60.00' },
     { id: 810000012, title: 'Corner table', price: '85.00' },
   ], FIXTURE_NOTE),
@@ -178,8 +188,8 @@ const showOpen = buildProduct(
     requires_shipping: false,
     inventory: { 810000011: 4, 810000012: 0 },
     metafields: eventMeta({
-      starts_at: '2026-12-13T10:00:00-05:00',
-      ends_at: '2026-12-13T16:00:00-05:00',
+      starts_at: daysFromNow(20, 15),
+      ends_at: daysFromNow(20, 21),
       venue: 'Fixture Hall (sample venue)',
       city: 'Sample City',
       address: '100 Example Avenue',
@@ -192,7 +202,7 @@ const showOpen = buildProduct(
 );
 
 const showVendor = buildProduct(
-  eventRaw(800000002, 'sample-spring-convention', 'Sample Show: Spring Collectors Convention & Trade Night at the Riverside Exhibition Pavilion', [
+  eventRaw(800000002, 'sample-spring-convention', 'Sample Show: Collectors Convention & Trade Night at the Riverside Exhibition Pavilion', [
     { id: 810000021, title: 'Standard table', price: '55.00' },
     { id: 810000022, title: 'Double table', price: '100.00' },
   ], FIXTURE_NOTE),
@@ -202,8 +212,8 @@ const showVendor = buildProduct(
     requires_shipping: false,
     inventory: { 810000021: 18, 810000022: 6 },
     metafields: eventMeta({
-      starts_at: '2027-01-24T09:00:00-05:00',
-      ends_at: '2027-01-24T15:00:00-05:00',
+      starts_at: daysFromNow(62, 14),
+      ends_at: daysFromNow(62, 20),
       venue: 'Fixture Pavilion (sample venue)',
       city: 'Sample City',
       vendor_fields: ['Business name', 'Instagram or website'],
@@ -212,7 +222,7 @@ const showVendor = buildProduct(
 );
 
 const showSoldOut = buildProduct(
-  eventRaw(800000003, 'sample-february-swap', 'Sample Show: February Card Swap', [
+  eventRaw(800000003, 'sample-february-swap', 'Sample Show: Card Swap', [
     { id: 810000031, title: 'Standard table', price: '50.00' },
     { id: 810000032, title: 'Corner table', price: '70.00' },
   ], FIXTURE_NOTE),
@@ -222,8 +232,8 @@ const showSoldOut = buildProduct(
     requires_shipping: false,
     inventory: { 810000031: 0, 810000032: 0 },
     metafields: eventMeta({
-      starts_at: '2027-02-21T11:00:00-05:00',
-      ends_at: '2027-02-21T17:00:00-05:00',
+      starts_at: daysFromNow(90, 16),
+      ends_at: daysFromNow(90, 22),
       venue: 'Fixture Center (sample venue)',
       city: 'Sample City',
     }),
@@ -231,7 +241,7 @@ const showSoldOut = buildProduct(
 );
 
 const showPast = buildProduct(
-  eventRaw(800000004, 'sample-october-show', 'Sample Show: October Card Show', [
+  eventRaw(800000004, 'sample-october-show', 'Sample Show: Last Season’s Card Show', [
     { id: 810000041, title: 'Standard table', price: '50.00' },
   ], FIXTURE_NOTE),
   {
@@ -240,8 +250,8 @@ const showPast = buildProduct(
     requires_shipping: false,
     inventory: { 810000041: 3 },
     metafields: eventMeta({
-      starts_at: '2026-10-18T10:00:00-04:00',
-      ends_at: '2026-10-18T16:00:00-04:00',
+      starts_at: daysFromNow(-36, 14),
+      ends_at: daysFromNow(-36, 20),
       venue: 'Fixture Hall (sample venue)',
       city: 'Sample City',
     }),
@@ -346,4 +356,5 @@ const localization = {
   ],
 };
 
-module.exports = { catalog, linklists, pages, shop, localization, CDN };
+return { catalog, linklists, pages, shop, localization, CDN };
+});

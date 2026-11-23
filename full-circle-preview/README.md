@@ -35,3 +35,27 @@ to any URL. The choice is remembered in a cookie.
 
 - `?bar=0` hides the preview banner.
 - `/__reset` empties the cart.
+
+## Interactive storefront without a server
+
+`core.js` holds the renderer, the cart and the routing. The Node server and an in-browser
+build both use it, so they render the theme the same way.
+
+```bash
+npm run build:storefront   # → dist/storefront/ (static files: open index.html through any web server)
+npm run test:storefront    # serves that folder under a strict CSP and walks a shopper through it
+```
+
+In the browser build:
+
+- The cart is kept in the visitor's browser.
+- Routes live in the page's `#name`, so reloads keep the current page.
+- Checkout is simulated.
+
+## Installable theme ZIP
+
+```bash
+npm run package            # → dist/full-circle-theme.zip
+```
+
+Upload it under Online Store › Themes › Add theme › Upload zip file.

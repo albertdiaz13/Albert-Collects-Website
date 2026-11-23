@@ -13,3 +13,4 @@ Thumbs.db
 .vscode/
 .idea/
 node_modules/
+full-circle-preview/dist/

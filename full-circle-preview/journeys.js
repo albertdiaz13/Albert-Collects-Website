@@ -87,11 +87,11 @@ async function fresh(browser, opts = {}) {
     ok('header booking route reaches the show schedule');
     const rows = page.locator('[data-fc-bill] .fc-bill__title');
     const titles = await rows.allTextContents();
-    assert.ok(titles[0].includes('Winter') && titles[1].includes('Spring') && titles[2].includes('February'), titles.join(' | '));
-    assert.ok(await page.locator('.fc-bill--past').getByText('October').isVisible());
+    assert.ok(titles[0].includes('Expo') && titles[1].includes('Convention') && titles[2].includes('Swap'), titles.join(' | '));
+    assert.ok(await page.locator('.fc-bill--past').getByText('Last Season').isVisible());
     ok('schedule sorted by date; past show listed under Past shows only');
 
-    await page.locator('.fc-bill__link', { hasText: 'Winter' }).click();
+    await page.locator('.fc-bill__link', { hasText: 'Expo' }).click();
     await page.waitForURL('**/products/sample-winter-card-show');
     // First screen on a phone: date, venue, table options and price
     const vh = 844;
