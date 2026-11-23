@@ -43,7 +43,7 @@
   padding: 1.25rem 0;
   border-bottom: var(--fc-hair);
 }
-.fc-line__media { grid-area: media; display: block; aspect-ratio: 1; background: var(--fc-surface); outline: 1px solid rgba(var(--fc-ink-rgb), 0.12); outline-offset: -1px; overflow: hidden; }
+.fc-line__media { grid-area: media; display: block; text-decoration: none; aspect-ratio: 1; background: var(--fc-surface); outline: 1px solid rgba(var(--fc-ink-rgb), 0.12); outline-offset: -1px; overflow: hidden; }
 .fc-line__media img { width: 100%; height: 100%; object-fit: cover; }
 .fc-line__media .fc-line__mark { object-fit: contain; padding: 18%; opacity: 0.6; }
 .fc-line--table .fc-line__media { background: var(--fc-ink); color: var(--fc-paper); }
