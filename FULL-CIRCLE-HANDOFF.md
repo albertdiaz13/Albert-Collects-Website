@@ -260,3 +260,44 @@ files or the ZIP.
 - **An approved trade-night photo** for the About strip, added under **About › Event photo**.
   None was supplied, so the strip shows the brush mark for now.
 - **The real table count** for each Friday.
+
+## Public demo link
+
+**URL:** https://full-circle-demo.albertdiaz13.workers.dev/
+
+This is the same build as the private Claude preview. It is hosted as the Cloudflare Worker
+`full-circle-demo` on the account `albertdiaz13@outlook.com`, using static assets.
+
+**Demo mode:**
+
+- The cart is kept in each visitor's own browser.
+- Checkout stops at a "Checkout (simulated)" page.
+- Nothing connects to Shopify, and no order or payment is possible.
+
+**Who can open it:** anyone who has the link. There is no sign-in.
+
+- The page sends `noindex` and the site's `robots.txt` blocks crawlers, so it should stay out of
+  search results.
+- To restrict it to named people, put Cloudflare Access in front of the Worker (Zero Trust ›
+  Access › Applications).
+
+**Expiry:** none. The link works until the Worker is deleted or disabled.
+
+- To delete it: Workers & Pages › `full-circle-demo` › Settings › Delete.
+- To keep the Worker but turn off its public URL: Settings › Domains & Routes, turn off
+  workers.dev.
+
+**Sharing a specific Friday:** add a `#name` to the URL. For example,
+`…workers.dev/#p-ors-tcg-trade-nights-2026-12-04` opens the Dec 4 booking page.
+
+**To update the demo:**
+
+1. Run `npm run build:storefront`.
+2. Run `node browser/build-public.js`. It writes `dist/public-demo` and its manifest.
+3. Deploy with the Workers static-assets direct upload: open an upload session, upload each
+   batch, then upload the Worker script. Alternatively, run
+   `npx wrangler deploy --assets dist/public-demo --name full-circle-demo` with a Cloudflare API
+   token.
+
+**To check it:** `node browser/verify-public.js <url> <dir>` walks through the demo in fresh,
+signed-out browsers at desktop and phone sizes.
